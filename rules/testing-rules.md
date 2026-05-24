@@ -138,5 +138,64 @@ plan is the test artifact; Claude does not run the steps.
 
 ## Project-specific tooling
 
-`/onboard` appends a section here describing this project's test
-runner, marker syntax, and the canonical command lines Jamie pastes.
+This project has **no traditional test suite**. The deliverable
+is markdown only — no language runtime, no compilable code, no
+unit / functional / integration test categories in the usual
+sense. The categories and discipline sections above apply for any
+*future* tooling (e.g. Phase 3 regression-test automation), but
+they're aspirational right now.
+
+What functions as testing today:
+
+1. **Re-read the six command files end-to-end after a change.**
+   Catches: status name mismatches, file ownership overlap,
+   broken prereq references, drift in the design-review or
+   test-plan filename / placeholder conventions.
+2. **Mental dry-run** against a hypothetical consumer project
+   (Python CLI, PHP/LAMP, Node/web). Catches: prompts that don't
+   make sense for a real stack, outputs that contradict each
+   other.
+3. **Live test (the canonical walkthrough).** Copy `cc-template/`
+   to a sandbox directory, drop a known-good design doc into
+   `docs/design/`, then run the full chain in order: `/onboard`
+   → `/design-review` (stage 1 initial) → mark up the checkpoint
+   → `/design-review` (stage 2 walks dispositions) → research
+   session → re-run `/design-review` (stage 1 addendum) →
+   `/design-review` (stage 2 lands) → `/bootstrap` → Phase 0 work
+   → `/exit-test-plan` (stage 1 initial) → run, fill §4 →
+   `/exit-test-plan` (stage 2 dispositions) → polish session
+   lands fixes → `/exit-test-plan` (stage 1 addendum) → run
+   §6.1, fill its run log → `/exit-test-plan` (stage 2 lands) →
+   between-phase `/design-review` → `/deployment-plan` (both
+   full and deferred paths) → `/wind-down`. Inspect outputs
+   against each command file's spec.
+
+When Phase 3 regression-test automation ships, the live test
+remains the highest-confidence check; the scripted check is a
+faster pre-flight that catches invariant-breaking changes (status
+comment renames, ONBOARD-FILL marker drift, zero-pad-width
+changes) before they reach the live test.
+
+### Test runner
+
+None. The "tests" are: re-reading command files (human eye),
+mental dry-run (human reasoning), and the live-test walkthrough
+(human execution).
+
+### Marker syntax for integration tests
+
+Not applicable — there are no integration tests as such. The
+closest analog is the live-test walkthrough's between-phase
+`/design-review` checkpoints and the `/exit-test-plan` flows;
+those are *the* integration tests for this project.
+
+### Expected test counts
+
+Not applicable. The relevant counts are:
+- **Six command files** at both root `.claude/commands/` and
+  `cc-template/.claude/commands/` (12 total).
+- **Three status comments** in `cc-template/CLAUDE.md`.
+- **Two ONBOARD-FILL marker pairs** across the rules files.
+
+Phase 3's regression-test automation may pin these as
+machine-checked invariants.

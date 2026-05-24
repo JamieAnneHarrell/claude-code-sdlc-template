@@ -1,79 +1,107 @@
 # CLAUDE.md
 
-> 🛠️ **You are working ON cc-template, not in a copied project.**
-> This file is the authoritative session-start guide for
-> template-improvement work. Read it cold.
+<!-- ONBOARD-STATUS: COMPLETE 2026-05-24 -->
+<!-- BOOTSTRAP-STATUS: UNCONFIGURED -->
+<!-- DEPLOYMENT-PLAN-STATUS: UNCONFIGURED -->
 
-## What this template is
+> ✅ **Onboarded.** Planning docs are written. Next step is
+> `/design-review` for a post-onboarding sanity check, then
+> `/bootstrap` to plan the dev environment, then the first phase
+> prompt from `docs/CLAUDE_CODE_PROMPTS.md`. `/deployment-plan`
+> is deferrable. At every phase close that ships user-observable
+> behavior, `/exit-test-plan` authors the manual walkthrough;
+> Stage 2 lands dispositions once Jamie has run it.
+>
+> **Project:** `claude-code-sdlc-template` — a self-modifying
+> project seed for new software projects driven by Claude Code.
+> The distributable subdirectory `cc-template/` ships six slash
+> commands (`/onboard`, `/bootstrap`, `/deployment-plan`,
+> `/design-review`, `/exit-test-plan`, `/wind-down`) plus curated
+> collaboration rules. Consumers copy `cc-template/` into a new
+> project, drop a design doc into `docs/design/`, and run the
+> configuration ritual. This repository is itself a downstream
+> consumer of its own template, so improvements are exercised on
+> the source before they ship.
+>
+> **Language / framework:** No language runtime — the deliverable
+> is markdown files only.
+>
+> **Multi-agent mode:** explore-plus-plan (Explore for research,
+> Plan for design proposals; implementation stays sequential).
 
-`cc-template` is the seed Jamie copies into a new directory to start
-a new project. The template ships **three configuration commands**
-plus **two recurring commands**.
+## Reading order at session start
 
-The configuration ritual is a sequence of three slash commands:
+1. **This file** — quick orientation and reading list.
+2. **`TODO.txt`** — gitignored session handoff. First entry is
+   what we pick up next; the rest is the upcoming queue.
+3. **`docs/PROJECT_PLAN.md`** — active phase queue.
+4. **`docs/CLAUDE_CODE_PROMPTS.md`** — authoritative prompt for
+   the current phase.
+5. **`docs/design/`** — design intake plus any `/design-review`
+   checkpoints in flight. A checkpoint with
+   `AWAITING-DECISIONS` frontmatter means Stage 1 ran but Stage
+   2 hasn't walked dispositions yet (or there's an addendum
+   round mid-iteration).
+6. **`docs/test-plans/`** — if the current phase has a test plan
+   in flight, it'll be `phase-NNN-exit.md` here.
+   `AWAITING-DISPOSITIONS` means the phase is somewhere in the
+   iterative test-and-polish loop (original run, dispositions,
+   polish coding session, optional §6.N addendums); `LANDED`
+   means every run log is PASS / SKIP, every Fix-now is
+   verified, and the phase exit is closed.
 
-1. **`/onboard`** — *what are we building?* Reads design docs from
-   `docs/design/`, produces REQUIREMENTS / ARCHITECTURE /
-   PROJECT_PLAN / CLAUDE_CODE_PROMPTS, and writes README and rules
-   stubs.
-2. **`/bootstrap`** — *how do I start coding?* Reads the onboarded
-   project, plans the dev environment, fills the README "Developer
-   setup" section and the `<!-- ONBOARD-FILL: environment -->`
-   block in `rules/environment-rules.md`. Hard prerequisite to
-   Phase 0.
-3. **`/deployment-plan`** — *how does this ship?* Optional and
-   deferrable. Produces `docs/DEPLOYMENT.md` and the README
-   "Deployment" section.
+## Collaboration rules
 
-The split exists because the three questions get answered with
-different amounts of information at different times. Don't collapse
-them back together.
+**Read these every session, before any work:**
 
-The recurring commands are:
+- [`rules/coding-session-rules.md`](rules/coding-session-rules.md)
+  — the 9 standing rules (root-cause, trust diagnosis, rejections
+  permanent, no unsolicited design, decouple data from display,
+  reference rule numbers, Jamie runs commits, Jamie runs tests,
+  session wind-down rewrites TODO.txt). Includes the rule-7
+  commit handoff format.
+- [`rules/design-philosophy-rules.md`](rules/design-philosophy-rules.md)
+  — KISS, progressive disclosure, simple defaults.
+  *iPhone, not Android. Macintosh, not PC.*
 
-4. **`/design-review`** — *are we still building the right thing
-   the right way?* Two-stage and iterative. Stage 1 has two
-   branches: the **initial branch** writes a sign-off-ready
-   checkpoint document at `docs/design/design-review-checkpoint-NNN.md`
-   with severity-tiered findings (Blockers / Recommendations /
-   Notes), one `AUDIT NOTE — JAH:` block per finding (one finding
-   = one decision), and an empty `## Disposition log` placeholder;
-   the **addendum branch** (after a research / clarification
-   session between rounds) appends a new `## Addendum N — date`
-   section with re-opened findings (suffix `-AN`) plus any new
-   findings, in the same shape. Stage 2 walks the latest round's
-   marked AUDIT NOTE blocks, appends rows to the Disposition log,
-   then asks Jamie whether to land the doc or open another
-   addendum round; on the land path it applies the accumulated
-   revisions to REQUIREMENTS / ARCHITECTURE / PROJECT_PLAN /
-   CLAUDE_CODE_PROMPTS. Mirrors `/exit-test-plan`'s addendum
-   lifecycle. Runs at high-risk transitions over the life of the
-   project, not as part of configuration. See
-   `.claude/commands/design-review.md`.
+**Read these when relevant to the current task:**
 
-5. **`/exit-test-plan`** — *did the phase actually meet its exit
-   criteria as a human can verify them?* Two-stage and iterative.
-   Stage 1 has two branches: the **initial branch** reads the
-   current phase's exit criteria + prompt + implementation files
-   and writes a manual walkthrough at
-   `docs/test-plans/phase-NNN-exit.md` (§1 scope, §2 prep, §3 test
-   cases as Steps / Expected / Fail signals, §4 run log with
-   `[PENDING]` placeholders, §5 empty); the **addendum branch**
-   (after a polish coding session lands fixes) appends a new §6.N
-   polish addendum with first-class TCs in the same shape as §3,
-   plus its own run log and comments. Stage 2 reads the newest
-   filled run log + trailing notes, walks each finding, performs
-   root-cause analysis where warranted, appends rows to §5, and
-   asks Jamie whether to land the document or open another polish
-   round. Mirrors decisions to `docs/design-decisions.md` /
-   `docs/open-questions.md` / `TODO.txt`. Runs at every phase exit
-   that warrants a manual check, not as part of configuration.
-   See `.claude/commands/exit-test-plan.md`.
+- [`rules/project-rules.md`](rules/project-rules.md) —
+  project-specific scope discipline. MVP scope statements,
+  out-of-scope list, and the dependency-justification rule.
+- [`rules/testing-rules.md`](rules/testing-rules.md) — test
+  discipline. This project has no traditional test suite; the
+  "testing" sections describe re-reading the command files, the
+  mental dry-run, and the live-test walkthrough.
+- [`rules/environment-rules.md`](rules/environment-rules.md) —
+  cross-platform conventions, shells, where Claude scratch files
+  go. Project-specific environment lives inside the
+  `<!-- ONBOARD-FILL: environment -->` block and is filled by
+  `/bootstrap`.
+- [`rules/multi-agent-rules.md`](rules/multi-agent-rules.md) —
+  how this project uses subagents (explore-plus-plan mode).
 
-Both recurring commands are deliberate exceptions to the "don't
-add a fourth command" guideline — each addresses a real drift
-risk that was first felt on a live project and lifted into the
-template only after the pattern proved itself.
+If Jamie says "rule 4" or "this is a rule 1 issue" mid-session,
+that's a drift signal pointing at
+[`rules/coding-session-rules.md`](rules/coding-session-rules.md).
+Acknowledge, correct course, move on.
+
+## Project-specific context
+
+The full reference for "what is this template" lives in
+[`README.md`](README.md). The architectural shape (source-of-truth
+root + `cc-template/` distributable, universal-content
+duplication, source-only docs at root) is in
+[`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md). The testable
+contract — functional requirements per command, non-functional
+invariants — is in [`docs/REQUIREMENTS.md`](docs/REQUIREMENTS.md).
+
+This file ALSO documents the load-bearing invariants below, in
+template-improvement language ("if you change this, audit the
+whole chain first") that complements REQUIREMENTS.md's
+testable-contract framing. Both are deliberate: REQUIREMENTS.md
+is the contract; the section below is the don't-break-this
+warning Jamie sees at session start.
 
 ## Load-bearing invariants — do not break
 
@@ -173,12 +201,12 @@ If you change one of these, audit the whole chain first.
   If the placeholder text changes, stage detection breaks — audit
   `.claude/commands/design-review.md` Step 0, Step S1.5, and Step
   S1.A together.
-- **Commit handoffs only on artifact boundaries.** Stage 1
-  *initial* branch (new checkpoint created) and Stage 2 *landing*
-  (doc flipped to `LANDED`) surface a rule-7 commit handoff.
-  Stage 1 *addendum* branch and Stage 2 *open another round* are
-  mid-iteration and do NOT surface commit handoffs — wind-down
-  stages any pending changes at session close. Mirrors
+- **`/design-review` commit handoffs only on artifact boundaries.**
+  Stage 1 *initial* branch (new checkpoint created) and Stage 2
+  *landing* (doc flipped to `LANDED`) surface a rule-7 commit
+  handoff. Stage 1 *addendum* branch and Stage 2 *open another
+  round* are mid-iteration and do NOT surface commit handoffs —
+  wind-down stages any pending changes at session close. Mirrors
   `/exit-test-plan`'s commit-handoff discipline.
 - **`/exit-test-plan` has two stages** auto-detected from the
   state of `docs/test-plans/phase-*-exit.md` for the target
@@ -221,10 +249,10 @@ If you change one of these, audit the whole chain first.
   `docs/open-questions.md` + `TODO.txt`. Spec gaps queue for
   `/design-review` rather than promoting directly to
   REQUIREMENTS / ARCHITECTURE.
-- **Commit handoffs only on artifact boundaries.** Stage 1
-  initial branch (new plan created) and Stage 2 landing (doc
-  flipped to `LANDED`) surface a rule-7 commit handoff. Stage 1
-  addendum branch and Stage 2 "open another round" are
+- **`/exit-test-plan` commit handoffs only on artifact boundaries.**
+  Stage 1 initial branch (new plan created) and Stage 2 landing
+  (doc flipped to `LANDED`) surface a rule-7 commit handoff.
+  Stage 1 addendum branch and Stage 2 "open another round" are
   mid-iteration and do NOT surface commit handoffs — wind-down
   stages any pending changes at session close.
 - **README section names, exact spelling**: `Developer setup` and
@@ -258,64 +286,6 @@ If you change one of these, audit the whole chain first.
   when the design doc already pins the stack.
 - **Failures refuse explicitly** with a pointer to the right
   command. No silent fallbacks.
-
-## Standard rules still apply
-Read all of the rules/*.md files first.
-
-When working on the template, also follow the standard rules in
-`rules/`. The most important during template-improvement work:
-
-- [`rules/coding-session-rules.md`](rules/coding-session-rules.md) —
-  the 9 rules, including rule-7 commit handoff format.
-- [`rules/design-philosophy-rules.md`](rules/design-philosophy-rules.md) —
-  KISS and progressive disclosure.
-
-## Testing template changes
-
-In increasing order of confidence:
-
-1. **Re-read the six command files end-to-end** after a change.
-   Check the chain is unbroken: status names match, file ownership
-   doesn't overlap, prereqs reference what the previous command
-   actually produces, the design-review checkpoint convention
-   (filename, frontmatter status, AUDIT NOTE placeholder text,
-   Disposition log Round column shape) is consistent across
-   `/onboard`, `/design-review`, and `/wind-down`, and the
-   test-plan convention (filename, frontmatter status, `[PENDING]`
-   placeholder) is consistent across `/exit-test-plan` and
-   `/wind-down`.
-2. **Mental dry-run** against a hypothetical project (Python CLI,
-   PHP/LAMP, Node/web). Verify the prompts and outputs are coherent.
-3. **Live test**: copy `cc-template/` to a sandbox dir, drop a
-   known-good design doc into `docs/design/`, then run the full
-   chain in order: `/onboard` → `/design-review` (stage 1
-   initial) → mark up the checkpoint inline (some markings
-   asking for further investigation) → `/design-review` (stage 2,
-   recommends "open Addendum 1") → research session → re-run
-   `/design-review` (stage 1 addendum branch) → mark up
-   Addendum 1 (all closing cleanly this round) → `/design-review`
-   (stage 2 lands the doc) → `/bootstrap` → Phase 0 work →
-   `/exit-test-plan` (stage 1 initial) → run the plan and fill
-   §4 → `/exit-test-plan` (stage 2 dispositions) → polish coding
-   session lands fixes → `/exit-test-plan` (stage 1 addendum
-   branch) → run §6.1 and fill its run log → `/exit-test-plan`
-   (stage 2 lands) → between-phase `/design-review` pair →
-   `/deployment-plan` (full path and deferred path) →
-   `/wind-down`. Inspect outputs against each command file's
-   spec. Pay special attention to: zero-padded NNN sorting past
-   `checkpoint-009.md` and past `phase-009-exit.md`; the
-   wind-down warning when a checkpoint is `AWAITING-DECISIONS`
-   (any of its four shapes — unmarked latest round, walked
-   pending land-or-addendum, between-rounds research session,
-   addendum mid-mark) or a test plan is mid-polish-loop, and
-   TODO.txt's first entry doesn't reflect it; design-review
-   Stage 2's refusal when any latest-round finding is unmarked;
-   design-review Stage 1 addendum branch's refusal when no
-   marking actually asks for further investigation;
-   exit-test-plan Stage 2's refusal when any run log row (§4 or
-   §6.N) is still `[PENDING]`; the exit-test-plan addendum
-   branch's refusal when no Fix-now items are ready for
-   verification.
 
 ## Migrating projects from older template versions
 

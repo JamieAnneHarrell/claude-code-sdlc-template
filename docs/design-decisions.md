@@ -217,3 +217,44 @@ source-repo working dir `claude-code-sdlc-template/` match (clean
 clone ergonomics); the dist subdir inside the repo stays
 `cc-template/` (lighter consumer-facing brand). See the
 "Source/dist subdirectory split" decision's scope note.
+
+---
+
+## Onboarding outputs — language, multi-agent mode, scope, license
+
+**Decision.** `/onboard` ran on 2026-05-24 with these choices:
+
+- **Language / runtime.** None. The project ships markdown only.
+- **Project name vs. slug convention.** `claude-code-sdlc-template`
+  is the overall project / project branding (used in CLAUDE.md
+  banner, README title, repo URL); `cc-template` is the
+  distributable release (used when referencing the dist
+  subdirectory and in consumer-facing copy).
+- **Multi-agent mode.** `explore-plus-plan`. Plan subagent earns
+  its place because of the load-bearing invariant complexity in
+  CLAUDE.md and the recurring-command lifecycles. Implementation
+  stays sequential — no worktree spawning.
+- **Scope statements.** No GUI in MVP. No ML models in MVP.
+  Cross-platform with Windows 11 primary, Linux/macOS first-class
+  supported. No language runtime in MVP.
+- **License — dual.** The `cc-template/` distributable ships
+  under MIT. Everything else in the repo ships under
+  CC BY-NC-ND 4.0.
+
+**Why.** The dual license lets the parts of the repo that are
+*meant to be copied and built on* (the distributable) be freely
+incorporated into consumer projects — including commercial ones
+— while the parts that are *not meant to be redistributed* (the
+project-management docs, design intake, root CLAUDE.md, root
+README) stay protected from repackaging.
+
+**What this means for consumers.** Anyone seeding a new project
+from `cc-template/` can copy it, modify it, ship it, and sell
+the resulting product — the dist is fully permissive under MIT,
+attribution required (retain the MIT LICENSE text). The
+source-only docs in the rest of the repo are reference material
+only; they can be read but not redistributed or modified for
+distribution.
+
+**Scope note.** No secrets-and-credentials-hygiene NFR was added
+because the design has no DB and no credential storage.

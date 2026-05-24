@@ -1,0 +1,51 @@
+Source-only docs license — claude-code-sdlc-template
+=====================================================
+
+SPDX-License-Identifier: CC-BY-NC-ND-4.0
+
+Copyright (c) 2026 Jamie Anne Harrell
+
+This license covers the source-only management documents at the
+root of this repository — including docs/, this LICENSE, the
+root README.md, the root CLAUDE.md, and any other files at root
+NOT inside the cc-template/ subdirectory and NOT inside the
+.claude/ or rules/ subdirectories.
+
+The .claude/ and rules/ subdirectories at root carry the dist's
+MIT license because this project uses its own cc-template/
+template on itself — those root copies ARE this project's working
+copy of cc-template content, used the same way any consumer would
+use them.
+
+The cc-template/ subdirectory has its own LICENSE (MIT). See
+cc-template/LICENSE.
+
+---
+
+This work is licensed under the Creative Commons
+Attribution-NonCommercial-NoDerivatives 4.0 International
+License.
+
+To view a copy of this license, visit
+https://creativecommons.org/licenses/by-nc-nd/4.0/
+or send a letter to Creative Commons, PO Box 1866, Mountain View,
+CA 94042, USA.
+
+Summary of terms (the canonical license linked above is
+authoritative; this summary is for convenience):
+
+- Attribution — You must give appropriate credit, provide a link
+  to the license, and indicate if changes were made.
+- NonCommercial — You may not use the material for commercial
+  purposes.
+- NoDerivatives — If you remix, transform, or build upon the
+  material, you may not distribute the modified material.
+- No additional restrictions — You may not apply legal terms or
+  technological measures that legally restrict others from doing
+  anything the license permits.
+
+These docs are the project's own management material. They are
+reference, not raw material for redistribution. If you are
+building your own project from this template, you want the dist
+subdirectory at cc-template/ — that ships under MIT and is
+freely incorporable into commercial and non-commercial work.

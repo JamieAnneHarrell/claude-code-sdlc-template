@@ -68,14 +68,60 @@ design docs and project plan are the contract.
 <!-- ONBOARD-FILL: project-scope -->
 
 ### MVP scope statements
-- (Onboarding adds e.g. "No GUI in MVP", "No ML models in MVP", "Single
-  user only in MVP")
+
+- **No language runtime.** The deliverable is markdown files. No
+  interpreter, compiler, package manager, or build step is part
+  of MVP.
+- **No GUI in MVP.** No web service, no API, no graphical
+  interface. The "product" is the file tree that consumers copy
+  and the commands they invoke inside Claude Code.
+- **No ML models in MVP.** No statistical or learned components
+  anywhere. Everything is deterministic markdown and the
+  commands' deterministic behavior.
+- **Cross-platform.** Windows 11 is primary; Linux and macOS are
+  first-class supported. Anything that works on one but not the
+  others is a bug.
+- **Self-modifying discipline.** The source-of-truth project is
+  itself a downstream consumer of its own template. Improvements
+  exercise on the source before they ship to consumers.
 
 ### Runtime dependency allowlist
-- (Onboarding adds the chosen libraries with one-line rationale each)
+
+None. The project has no language runtime and therefore no
+runtime dependencies. If a future phase introduces a dependency
+(e.g. Phase 3 regression-test automation might introduce a small
+PowerShell or shell script), it goes through the standard
+dependency-justification rule in the General rules section
+above.
 
 ### Out-of-scope until further notice
-- (Onboarding lists rejected approaches and roadmap items so future
-  Claude doesn't re-propose them)
+
+- **Markdown linting / style enforcement automation.** Style
+  consistency is human-reviewed; not worth tooling investment
+  for a content-only repo.
+- **A landing page or product website.** Distribution is
+  git-based.
+- **Translations into non-English locales.** English-only for
+  the foreseeable future.
+- **Bundling as an installable package** (npm, pip, etc.).
+  Distribution remains "copy the `cc-template/` subdirectory."
+- **Push-model upstream → downstream updates.** Rejected during
+  the source/dist restructure (see
+  [`docs/design-decisions.md`](../docs/design-decisions.md)
+  "Downstream updates use a pull model, not push"). Pull-only via
+  Phase 2's `/refresh-from-repository`.
+- **Configurable upstream URL** (for `/refresh-from-repository`).
+  The URL is baked in to
+  `github.com/JamieAnneHarrell/claude-code-sdlc-template`; not
+  user-configurable in v1.
+- **A fourth configuration command.** The three configuration
+  commands already cover the lifecycle. Adding a fourth needs
+  strong justification (per root `CLAUDE.md` "Design principles
+  for template changes").
+- **Per-command status comments for the recurring commands.** The
+  `/design-review` and `/exit-test-plan` lifecycles are tracked
+  via per-file frontmatter status on their artifacts, not via a
+  fourth status comment in `CLAUDE.md`. This is a load-bearing
+  invariant (see root `CLAUDE.md`).
 
 <!-- /ONBOARD-FILL -->
