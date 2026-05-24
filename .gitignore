@@ -1,0 +1,64 @@
+# cc-template seed .gitignore
+# Onboarding may extend this with language-specific patterns.
+
+# Session handoff (per rule 9, this is personal scratch — never commit)
+TODO.txt
+
+# Local Claude config (per-machine, not per-project)
+.claude/settings.local.json
+
+# OS junk
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor / IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Build / dependency directories (language-agnostic; onboarding adds more)
+build/
+dist/
+*.egg-info/
+node_modules/
+vendor/
+
+# Virtual environments (Python)
+.venv/
+venv/
+env/
+ENV/
+
+# Compiled artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.dylib
+*.dll
+
+# Logs
+*.log
+logs/
+
+# Test artifacts
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Scratch / temp directories
+tmp/
+scratch/
+*.tmp
+
+# Backup files (e.g. CLAUDE.md.bak created before /onboard rewrites it)
+*.bak
