@@ -14,6 +14,18 @@ fixtures, no network, no databases, no real subprocess calls. These
 form the bulk of the test suite and run on every commit, every CI
 build, every machine.
 
+### Functional tests
+Tests that exercise a slice of the application against a real database
+of the **same engine used in production** — HTTP routes, ORM queries,
+migrations, jobs that touch the DB. They run by default (they are not
+integration tests in the marker sense), but they need a real engine
+because behavior diverges across engines.
+
+Functional tests must use a separate test database from the dev
+database, and must use the production engine — never substitute SQLite
+or another "lighter" engine for speed. See "No engine substitution"
+under Discipline below.
+
 ### Integration tests
 Tests that exercise external dependencies — real binaries (ffmpeg,
 ffprobe), real databases, real network calls, real video files, real
@@ -63,6 +75,20 @@ A test can have multiple `assert` lines, but it should test one
 concept. "Test that the parser produces correct output for valid input"
 is one concept; "test that it produces correct output for valid input
 AND raises on invalid input" is two — split them.
+
+### No engine substitution
+
+If production runs on MariaDB, tests run on MariaDB. If production
+runs on Postgres, tests run on Postgres. Do not run functional tests
+against SQLite (or against a different SQL engine — including MySQL
+when production is MariaDB, or vice versa) for speed. Engine
+differences in JSON storage and functions, ENUMs, FULLTEXT,
+foreign-key enforcement defaults, transaction isolation, and string
+collation cause tests to pass while production breaks on the same
+query.
+
+Tests that don't need a database don't get one — that's how unit tests
+stay fast, not by swapping engines underneath them.
 
 ---
 

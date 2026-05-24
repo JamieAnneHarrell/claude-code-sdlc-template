@@ -89,9 +89,12 @@ self-modifying-project framing depends on the distributable being a
 concrete directory you can point at.
 
 **Scope note.** The subdir is named `cc-template/` to preserve the
-consumer-facing name. The source repo root is `jah-template-project/`
-so the two are nominally distinct. Auto-memory continuity was
-reconnected manually at rename time.
+consumer-facing name (lighter brand for what consumers copy and
+seed projects with). The source repo root is
+`claude-code-sdlc-template/` so the two are nominally distinct
+and signal different audiences (source = maintainers /
+contributors; dist = consumers). Auto-memory continuity has been
+reconnected manually at each rename.
 
 ---
 
@@ -135,10 +138,11 @@ pip` then re-invoke) and avoids the "command updates itself but the
 already-running invocation is stale" problem.
 
 **Scope note.** Building `/refresh-from-repository` is Phase 2 work.
-Two design problems open for that phase: the merge strategy for
-`CLAUDE.md` specifically (it has no `ONBOARD-FILL` markers today),
-and which public GitHub path the source repo will live at. Both
-tracked in `docs/open-questions.md`.
+One design problem still open for that phase: the merge strategy for
+`CLAUDE.md` specifically (it has no `ONBOARD-FILL` markers today).
+Tracked in `docs/open-questions.md`. The public GitHub URL is
+resolved — see the "Public GitHub URL for the source repo" decision
+below.
 
 ---
 
@@ -174,3 +178,42 @@ have to maintain.
 source is the upstream; pulling from itself is a no-op at best
 and a footgun at worst. The command will detect that case and
 refuse.
+
+---
+
+## Public GitHub URL for the source repo
+
+**Decision.** The source-of-truth repo lives at
+`github.com/JamieAnneHarrell/claude-code-sdlc-template` (public).
+Phase 2's `/refresh-from-repository` command will bake this URL
+in as the upstream constant. Renamed from the initial
+`cc-template` shortly after creation to avoid
+`cc-template/cc-template/` clone collisions and to position the
+project's SDLC-methodology weight more accurately.
+
+**Why.** A pull-model `/refresh-from-repository` (see the
+"Downstream updates use a pull model" decision above) needs a
+known public URL to pull from. Picking the URL now — before the
+Phase 2 command is designed — means the design can treat the URL
+as a settled input rather than a parameter. Personal-namespace
+(`JamieAnneHarrell`) over a fresh org because there's no second
+maintainer or sibling project yet; the name can move later by
+adding a GitHub redirect.
+
+**Why not a configurable URL with no baked-in default.** Pushes
+configuration burden onto every downstream consumer for a value
+that, in practice, only changes if the canonical repo moves. Bake
+in the default; let consumers override only if they're pulling
+from a fork.
+
+**Why not a dedicated GitHub org (e.g. `jah-tools/cc-template`).**
+Premature. There's one maintainer and one project today. A
+personal-namespace URL is the simplest thing that works and is
+trivially redirectable via GitHub's repo-transfer mechanism if a
+second project ever shares the org.
+
+**Scope note.** Repo name `claude-code-sdlc-template` and local
+source-repo working dir `claude-code-sdlc-template/` match (clean
+clone ergonomics); the dist subdir inside the repo stays
+`cc-template/` (lighter consumer-facing brand). See the
+"Source/dist subdirectory split" decision's scope note.

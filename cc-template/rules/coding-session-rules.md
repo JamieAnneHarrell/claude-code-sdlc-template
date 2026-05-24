@@ -105,8 +105,7 @@ any one is a regression.
    5. `pre-commit run` — dry-run hooks against the staged snapshot. If
       any hook reports "files were modified by this hook", re-run
       `git add` and repeat.
-   6. `git commit ...` — command according to fomatting requirements
-      below to be handed to Jamie only after step 5 is green.
+   6. `git commit -m "<subject>"` — only after step 5 is green.
 
 2. **One command per copyable line.** Each shell command appears on its
    own line in its own fenced code block (or, in a multi-command block,

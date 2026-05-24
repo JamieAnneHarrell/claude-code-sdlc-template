@@ -46,21 +46,6 @@ would unblock an answer.
 
 ### Open Questions
 
-#### Public GitHub URL for the source repo
-
-*What we know.* Phase 2 ships `/refresh-from-repository` (see
-`docs/design-decisions.md` entry 2), which pulls from the public
-upstream. The command needs a baked-in URL or a configurable one.
-
-*What would unblock.* Decide the GitHub org/path the source repo
-will live at (e.g. `github.com/<org>/jah-template-project`). Affects
-the URL constant in `/refresh-from-repository` and any references
-in shipping docs that point at the upstream.
-
-*Not blocking today.* Phase 2 is downstream of Phase 1
-(post-restructure exit-test-plan). Decide before Phase 2 design
-starts.
-
 #### CLAUDE.md merge strategy for `/refresh-from-repository --merge`
 
 *What we know.* Rules files have `<!-- ONBOARD-FILL: ... -->`
@@ -85,6 +70,142 @@ strategy explicitly. Should pick one of the above (or invent a
 fourth) and live with the implications.
 
 ### Deferred User Stories
+
+#### Multi-agent-rules.md output shape under-specified in /onboard
+
+*Context.* `/onboard` rewrites `rules/multi-agent-rules.md`
+wholesale based on the mode Jamie picks. The spec in
+`.claude/commands/onboard.md` Step "rules/multi-agent-rules.md"
+is thin — for `explore-plus-plan` it says only "Explore + Plan.
+State when each is appropriate." ds-niche-stream (the most
+mature downstream consumer) evolved a much richer shape that
+`/onboard` would not naturally produce for a new project:
+
+- "Use Explore for:" / "Don't use Explore for:" structured
+  lists with concrete examples
+- "Use Plan for:" / "Don't use Plan for:" same structure
+- "What's NOT enabled in this project" section (no
+  implementation agents, no worktrees, with rationale)
+- Briefing rule embedded directly in the file rather than
+  referenced from global `~/.claude/CLAUDE.md` (the current
+  spec says reference; ds-niche-stream embeds, which is more
+  robust to global-file edits)
+
+A new project onboarded today gets the sparse shape, not the
+evolved shape.
+
+*Proposed approach.* Address via a `/design-review` checkpoint
+after this project's `/onboard` runs. The review can compare
+this project's freshly-produced `rules/multi-agent-rules.md`
+against ds-niche-stream's evolved version and decide:
+
+- Whether to beef up `onboard.md`'s spec to describe the
+  Use For / Don't Use For structure, OR
+- Whether to ship ds-niche-stream's structured shape as a
+  scaffold in the placeholder file itself (with `/onboard`
+  filling in mode-specific details).
+
+*Open sub-questions.* Briefing rule — embed per-project (ds-
+niche-stream's pattern) or reference from global (current
+`/onboard` spec)? Embedding survives global-file edits;
+referencing avoids duplication.
+
+#### In-flight artifact status callout at top of CLAUDE.md
+
+*Context.* ds-niche-stream's CLAUDE.md opens with a 🟡 callout
+summarizing current in-flight artifact state (e.g. "Phase 1.3 exit
+`AWAITING-DISPOSITIONS` — paused on... Next action is
+`/design-review` ... Phase 2 is blocked behind the landing"). At
+session start this greets the developer with the single most
+important piece of "where are we" context without requiring a
+TODO.txt or test-plan scan. ds-niche-stream appears to maintain
+this manually.
+
+*Proposed approach.* Surface as a `/wind-down` enhancement:
+detect when an artifact is mid-flight (any
+`docs/design/design-review-checkpoint-*.md` is
+`AWAITING-DECISIONS`, or any `docs/test-plans/phase-*-exit.md` is
+`AWAITING-DISPOSITIONS`), and write/refresh a 🟡 callout block at
+the top of CLAUDE.md describing the state and the next action.
+Clear the callout when nothing is mid-flight. Marker-block
+delimited so it doesn't conflict with the rest of CLAUDE.md.
+
+*Open sub-questions.* Whether `/wind-down` should also detect
+`/exit-test-plan` polish-loop states (Stage 1 addendum branch,
+Stage 2 open-another-round) and reflect those in the callout.
+Whether the callout belongs in CLAUDE.md or in a separate file
+like `STATUS.md` that CLAUDE.md links to. Whether to introduce a
+fourth status comment family (something like
+`<!-- INFLIGHT-STATUS: ... -->`) for machine-parseable state.
+
+#### "Project quick orientation" section in onboarded CLAUDE.md
+
+*Context.* ds-niche-stream (the most mature downstream consumer)
+evolved a rich `## Project quick orientation` section in its
+CLAUDE.md below the banner. Contents include a multi-paragraph
+project description, stack bullets that go beyond the banner
+(Admin UI, Public stack, Database engine, Formatter / static
+analysis, Main source path with a pointer into
+`docs/ARCHITECTURE.md`), and full format/lint commands. Neither
+`/onboard` nor `/bootstrap`'s spec produces this section — the
+banner alone (Project / Language / Multi-agent / Shell / Run /
+Test / Developer setup) is terse. A new project onboarded today
+would miss the things that come up often at session start: DB
+engine, source-tree location, public-vs-admin stack split for
+web projects.
+
+*Proposed approach.* Address via the same `/design-review`
+checkpoint that handles `multi-agent-rules.md` (above), after
+this project's `/onboard` + `/bootstrap` run. The review can
+compare the freshly-produced CLAUDE.md against ds-niche-stream's
+shape and decide whether `/bootstrap` should write a "Project
+quick orientation" section alongside the banner, or whether the
+banner alone is enough (KISS — don't add a section every project
+has to maintain).
+
+*Open sub-questions.* If the section is added, which command
+owns it — `/onboard` (most project context is already collected
+there) or `/bootstrap` (knows the stack + commands)? How much
+overlaps with the banner before the duplication starts hurting?
+
+#### Placeholder qualifiers persist into configured CLAUDE.md
+
+*Context.* The dist's `cc-template/CLAUDE.md` placeholder is
+written for the unconfigured state and includes phrasings that
+become stale once onboarding completes:
+
+- `## Reading order at session start (configured projects)` —
+  the `(configured projects)` parenthetical is a flag for
+  pre-onboard readers; after `/onboard` it's redundant.
+- Collaboration rules section: `rules/environment-rules.md —
+  ... Project-specific environment is filled in by /bootstrap.`
+  is stale after `/bootstrap` runs.
+- Same for `rules/multi-agent-rules.md — ... (filled in by
+  /onboard based on the chosen mode).` after `/onboard` runs.
+
+Both `/onboard` and `/bootstrap` specs say "keep collaboration
+rules and references unchanged," so these stale phrasings
+persist forever in every onboarded project. ds-niche-stream has
+them cleaned up — likely Jamie's manual edit.
+
+*Proposed approach.* Two fix shapes:
+
+- **A (KISS).** Reword the placeholder so it reads correctly in
+  both states (drop `(configured projects)`, drop the "filled
+  in by" qualifiers). No command-side logic added. Apply to
+  both root and `cc-template/`.
+- **B.** Update `/onboard` and `/bootstrap` specs to strip the
+  stale qualifiers as part of their CLAUDE.md rewrites. More
+  work, more invariants.
+
+Recommend A; defer the decision to the same `/design-review`
+checkpoint that handles the other CLAUDE.md drift findings
+above.
+
+*Open sub-questions.* Whether shape A breaks the placeholder's
+readability for a developer encountering an unconfigured
+template for the first time — the qualifiers serve a real
+purpose pre-onboard.
 
 #### Source-only release/build helper command
 
