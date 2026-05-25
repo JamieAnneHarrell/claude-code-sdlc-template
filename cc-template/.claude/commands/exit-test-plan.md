@@ -66,11 +66,11 @@ target phase:
   is `AWAITING-DISPOSITIONS` and the **newest run log** in the
   document (§4 if no addendum yet, otherwise the latest §6.N)
   has been filled (no `[PENDING]` placeholders remain) but
-  doesn't yet have its dispositions in §5. Walks each TC note
-  and out-of-scope observation one at a time with Jamie, proposes
-  a disposition, performs root-cause analysis where warranted,
-  appends rows to §5.1 and sub-sections to §5.2, mirrors
-  decisions to `docs/design-decisions.md` /
+  doesn't yet have its dispositions in §5. Walks each TC note,
+  each `[BLOCKED]` row, and each out-of-scope observation one at
+  a time with Jamie, proposes a disposition, performs root-cause
+  analysis where warranted, appends rows to §5.1 and sub-sections
+  to §5.2, mirrors decisions to `docs/design-decisions.md` /
   `docs/open-questions.md` / `TODO.txt`, then asks Jamie whether
   to flip the frontmatter to `LANDED <date>` or open another
   polish round.
@@ -163,9 +163,19 @@ The placeholder line that distinguishes "unfilled" rows is exactly
 the literal string `[PENDING]` (uppercase, in square brackets) at
 the end of the row, in any run log in the document (§4 or any
 §6.N). Any row whose status field has been changed (to `[PASS]`,
-`[FAIL]`, `[SKIP]`, or any other value) counts as filled. The
-detection logic above treats §4 and every §6.N as first-class run
-logs of identical shape.
+`[FAIL]`, `[SKIP]`, `[BLOCKED]`, or any other value) counts as
+filled. The detection logic above treats §4 and every §6.N as
+first-class run logs of identical shape.
+
+`[BLOCKED]` means the test could not run at all — a setup
+prerequisite failed, the dev server wouldn't start, a dependency
+wasn't installed, or an unexpected error blocked progress before
+the Steps could be exercised. It is distinct from `[FAIL]`, which
+means the test ran and produced wrong output. The tester records
+the blocker itself in the run log's notes block, keyed by TC ID
+(e.g. `TC-3 blocked: dev server won't start — port 5173 already
+in use`). Stage 2 walks `[BLOCKED]` rows alongside per-TC notes
+(see Step S2.2) using the same five disposition values.
 
 ---
 
@@ -226,8 +236,10 @@ Load these in order. Skip any that don't exist.
    §5.1 disposition table tells you which Fix-now items need
    manual re-verification; the latest §6.N (if any) tells you
    what was already verified. The addendum you're about to author
-   should cover the unverified Fix-now items plus any FAILs from
-   the newest run log that have been fixed since.
+   should cover the unverified Fix-now items, any FAILs from the
+   newest run log that have been fixed since, and every
+   `[BLOCKED]` row from the newest run log (auto-re-run, see
+   S1.A Step 2).
 
 Do not start asking questions yet.
 
@@ -427,9 +439,13 @@ site or requirement>.
 ## 4. Run log
 
 Copy this block into the next session's chat when reporting back.
-One word in the result column is fine: `pass`, `fail`, `skip`.
-Until then, every row reads `[PENDING]` — this is the literal
-sentinel `/exit-test-plan` Stage 2 detection looks for.
+One word in the result column is fine: `pass`, `fail`, `skip`,
+`blocked`. Until then, every row reads `[PENDING]` — this is the
+literal sentinel `/exit-test-plan` Stage 2 detection looks for.
+
+Use `blocked` when the test could not run at all (setup
+prerequisite failed, dev server wouldn't start, etc.). Use `fail`
+when the test ran and produced wrong output. Don't conflate them.
 
 ```
 TESTER: <name>  <date>
@@ -444,7 +460,12 @@ Notes / surprises:
 <free-form. The tester writes inline observations here while
 running — UX feedback, hypotheses about root cause, "while I was
 in here I noticed…" remarks. Stage 2 reads this verbatim, in
-whatever shape the tester wrote it.>
+whatever shape the tester wrote it.
+
+For any [BLOCKED] row above, include a one-sentence description
+of the blocker keyed by TC ID (e.g. `TC-3 blocked: dev server
+won't start — port 5173 already in use`). Stage 2 needs the
+blocker description to disposition the row.>
 ```
 
 ---
@@ -564,6 +585,13 @@ when Jamie wraps the session.
    - Every FAIL in the newest run log whose underlying defect was
      fixed during the polish coding session needs a TC verifying
      the fix. (Ask Jamie which FAILs were fixed; do not assume.)
+   - **Every BLOCKED row in the newest run log gets a TC in
+     this addendum automatically — never drop a BLOCKED test.**
+     The TC is the same test from §3 (or the prior addendum
+     where it last ran); revise the Steps inline if §5.1's
+     unblocking work changed prereqs or affordances. No
+     cross-reference cruft in the title — the prior run log
+     and §5.1 row are already the record.
    - SKIP rows usually do not need re-verification unless the
      skip condition has changed (Jamie confirms case by case).
 
@@ -573,12 +601,17 @@ when Jamie wraps the session.
 
 3. **Compose TCs in the same three-block shape as §3** (Steps,
    Expected, Fail signals — see S1.6). Number them
-   `TC-AN.1`, `TC-AN.2`, … where N is the addendum number. Each
-   TC's title should reference the §5.1 row or original-§4 TC it
-   verifies (e.g.
-   `TC-A1.1 — verify §5.1 TC-2a fix: timezone selector replaced
-   free-text`). This linkage is what lets Stage 2 know which
-   §5.1 row this addendum closes.
+   `TC-AN.1`, `TC-AN.2`, … where N is the addendum number.
+   Title conventions:
+   - **Fix-now verifications and FAIL re-tests**: title
+     references the §5.1 row or original-§4 TC being verified
+     (e.g. `TC-A1.1 — verify §5.1 TC-2a fix: timezone selector
+     replaced free-text`). The linkage is what lets Stage 2 know
+     which §5.1 row this addendum closes.
+   - **BLOCKED re-runs**: title is the original test's title as-is
+     (e.g. `TC-A1.2 — Site creation and switching`). No
+     cross-reference prefix — the prior run log and §5.1 row are
+     already the record of what was blocked and why.
 
 4. **Append §6.N to the file** using this template:
 
@@ -614,7 +647,11 @@ when Jamie wraps the session.
 
    <free-form. Same role as §4's notes block — the tester writes
    inline observations here while running. Stage 2 reads this
-   verbatim alongside the addendum run log.>
+   verbatim alongside the addendum run log.
+
+   For any [BLOCKED] row above, include a one-sentence
+   description of the blocker keyed by TC ID. Stage 2 needs the
+   blocker description to disposition the row.>
    ```
 
 5. **Keep frontmatter at `AWAITING-DISPOSITIONS`.** The status
@@ -663,7 +700,7 @@ dispositioned in earlier §5 entries; don't re-litigate them.
 In the newest run log, in particular:
 
 - The run-log table — each row's result (`pass` / `fail` /
-  `skip`).
+  `skip` / `blocked`).
 - The "Notes / surprises" block (for §4) or "Comments / surprises"
   block (for §6.N) — a single free-form surface. Observations
   come in whatever shape the tester wrote them. Don't expect
@@ -671,12 +708,15 @@ In the newest run log, in particular:
 
 Re-state to Jamie what you found, in three short bullets:
 
-- The pass/fail summary for this run (e.g. "20/24 pass, 2 fail,
-  2 skip" for §4; or "3/3 pass" for an addendum).
+- The pass/fail/blocked summary for this run (e.g. "20/24 pass,
+  2 fail, 1 blocked, 1 skip" for §4; or "3/3 pass" for an
+  addendum).
 - A count of inline notes (per-TC notes + out-of-scope
-  observations at the bottom of the notes block).
+  observations at the bottom of the notes block) and a count of
+  `[BLOCKED]` rows.
 - Any obvious clusters — multiple TCs reporting the same symptom,
-  multiple notes pointing at the same code site.
+  multiple notes pointing at the same code site, multiple
+  blockers traceable to the same prereq.
 
 Confirm with Jamie that this is the right read before walking
 findings. If she points out something you missed in the notes,
@@ -720,10 +760,56 @@ not just the conclusion.
 that verifies a known Fix-now item from §5.1 does **not** need a
 new disposition — the underlying Fix-now is still queued, the
 polish just didn't take this round, and the next polish session
-will address it. Move on without proposing a new §5.1 row. Notes
-that describe **new** observations (something the tester saw
-during the addendum run that wasn't in any prior §5.1 row) DO get
-walked as above and get a new §5.1 row with disposition.
+will address it. Move on without proposing a new §5.1 row. Same
+pattern for a `[BLOCKED]` row on an addendum re-run of a
+previously-blocked test — the original §5.1 BLOCKED row's
+unblocking path (Fix-now / Spec gap / Defer) is still active;
+don't write a duplicate §5.1 row. (A **new** `[BLOCKED]` —
+a test that was never blocked before becoming blocked in the
+addendum — DOES get walked as above and gets a new §5.1 row.)
+Notes that describe **new** observations (something the tester
+saw during the addendum run that wasn't in any prior §5.1 row)
+DO get walked as above and get a new §5.1 row with disposition.
+
+**BLOCKED rows.** For each `[BLOCKED]` row in the newest run log
+(walk in TC order, alongside the per-TC notes above):
+
+1. Read the tester's blocker description from the run log's notes
+   block. Restate in one sentence — what couldn't run, and what
+   stopped it. If no blocker description was recorded for a
+   `[BLOCKED]` row, refuse to disposition that row until Jamie
+   supplies one.
+2. Propose one of the same five disposition values, interpreted
+   as the path to unblock:
+   - **Fix-now** when the blocker is a small in-scope cleanup
+     coding pass (the typical case).
+   - **Spec gap** when the blocker surfaces a question
+     REQUIREMENTS / ARCHITECTURE doesn't answer — queues for the
+     next `/design-review` checkpoint, which may decide to
+     author a new PROJECT_PLAN.md phase to do the work.
+   - **Defer to Deferred User Stories** when the blocker depends
+     on a feature the current phase didn't ship; the test will
+     be SKIPped in the next addendum.
+   - **Defer to Known Limitations** when the test simply isn't
+     runnable on the current stack and the blocker is accepted
+     as a constraint; the test will be SKIPped in the next
+     addendum.
+   - **Note-only** is rare for blockers — typically a blocker
+     warrants at least one of the four above.
+3. Append a row to §5.1 with the disposition, the Reason column
+   prefixed `Blocker:` followed by an abbreviated blocker
+   description plus the path to unblock.
+4. Wait for Jamie to confirm before moving on.
+
+Where the blocker warrants real investigation (the surface
+hypothesis might not be the true cause), perform root-cause
+analysis as above and preserve the investigation in §5.2.
+
+Regardless of disposition, every `[BLOCKED]` row in the newest
+run log will result in a TC re-run in the next addendum
+(S1.A Step 2 handles that automatically) — the disposition
+governs what unblocking work happens between addendums, not
+whether the test re-runs.
 
 ## Step S2.3: Walk each out-of-scope observation
 
@@ -763,9 +849,13 @@ across rounds. Columns:
 - `Round` is `Original` for findings from §4, or `Addendum N`
   for findings from §6.N.
 - One row per per-TC note from S2.2 (only those that warranted
-  a new disposition — see the addendum special case in S2.2).
+  a new disposition — see the addendum special case in S2.2),
+  plus one row per `[BLOCKED]` row from S2.2's BLOCKED walk.
 - Abbreviate observations to one short sentence; the full text
-  stays in the run log's notes block.
+  stays in the run log's notes block. For BLOCKED-driven rows,
+  prefix the abbreviated observation with `Blocker:` and put the
+  path to unblock (Fix-now / Spec gap / Defer to …) in the
+  Reason column.
 - Reason column is a short justification for the disposition.
 
 **§5.2 Out-of-scope observations** — one sub-section per O-ID,
@@ -835,8 +925,9 @@ new §6.N with first-class TCs in the same shape as §3, plus its
 own run log and comments block. Stage 2 runs again to read each
 addendum's results and either land the document or open another
 polish round. The document isn't `LANDED` until every run log
-(§4 plus every §6.N) is PASS / SKIP and §5 has no outstanding
-Fix-now items left unverified.
+(§4 plus every §6.N) is PASS / SKIP — no `[BLOCKED]` or `[FAIL]`
+rows in the newest run log — and §5 has no outstanding Fix-now
+items left unverified.
 ```
 
 For later plans, write:
@@ -910,19 +1001,21 @@ shapes are:
 
 - **If S2.6 picks "open the next polish round"** (the typical
   case when §5.1 has any new Fix-now items, or the newest run
-  log had any FAIL):
+  log had any FAIL or `[BLOCKED]`):
 
   ```
   - At the beginning of the next session, work the Phase N polish
     batch from docs/test-plans/phase-NNN-exit.md §5.1 (latest
-    Fix-now rows + any FAILs from the newest run log). Plan a
-    single bundled PR if scope allows; split if the fixes touch
-    unrelated concerns. When polish lands, re-run /exit-test-plan
-    to author the next §6.N addendum verifying the fixes.
+    Fix-now rows + any FAILs from the newest run log + any
+    BLOCKED unblocking work). Plan a single bundled PR if scope
+    allows; split if the fixes touch unrelated concerns. When
+    polish lands, re-run /exit-test-plan to author the next §6.N
+    addendum verifying the fixes and re-running any blocked tests.
   ```
 
 - **If S2.6 picks "land the document"** (no outstanding Fix-now
-  items, no FAILs, every run log is PASS / SKIP):
+  items, no FAILs, no `[BLOCKED]` rows in the newest run log,
+  every run log is PASS / SKIP):
 
   ```
   - At the beginning of the next session, <gate-unblock — e.g.
@@ -984,11 +1077,16 @@ Default recommendation:
   - §5.1 contains any Fix-now row whose verification hasn't been
     PASS in some run log.
   - The newest run log has any FAIL.
+  - **The newest run log has any `[BLOCKED]` row.** BLOCKED is a
+    final disposition for that run log, but the test plan does
+    not close while any test remains blocked — the next addendum
+    re-runs it (see S1.A Step 2).
   - Any newly-added §5.1 row from this Stage 2 run is Fix-now.
 - **Recommend "land"** otherwise: every run log is PASS / SKIP,
   every Fix-now in §5.1 has a passed verification (either via
-  the automated test suite or a passed addendum TC), no new
-  Fix-now items surfaced this round.
+  the automated test suite or a passed addendum TC), no
+  `[BLOCKED]` rows in the newest run log, no new Fix-now items
+  surfaced this round.
 
 State the recommendation and the reasoning. Wait for Jamie's
 decision; she can override.
@@ -1103,13 +1201,23 @@ End with one of:
 - **`AWAITING-DISPOSITIONS` plan, every run log filled, but a
   note is ambiguous.** Surface the specific note in S2.2 or S2.3
   and ask before planning the disposition. Don't guess at intent.
+- **`[BLOCKED]` row in the newest run log with no blocker
+  description in the notes block.** Refuse to disposition that
+  row: "TC-N is marked `[BLOCKED]` but no blocker description is
+  recorded in the notes block. Add a one-sentence description
+  keyed by TC ID, then re-run `/exit-test-plan`." Stage 2 needs
+  the blocker to choose between Fix-now / Spec gap / Defer paths.
 - **Addendum branch fires but Jamie hasn't actually landed a
-  polish session yet.** S1.A Step 2 asks Jamie which Fix-now
-  items the addendum verifies. If the answer is "none — polish
-  isn't done yet," refuse the addendum: "No Fix-now items are
-  ready for verification. Run the polish coding session first,
-  then re-invoke `/exit-test-plan`." Don't author an empty
-  addendum.
+  polish session yet, and no BLOCKED rows need re-running.**
+  S1.A Step 2 asks Jamie which Fix-now items the addendum
+  verifies. If the answer is "none — polish isn't done yet" AND
+  the newest run log has no `[BLOCKED]` rows to re-run, refuse
+  the addendum: "No Fix-now items are ready for verification and
+  no BLOCKED tests are queued. Run the polish coding session
+  first, then re-invoke `/exit-test-plan`." Don't author an empty
+  addendum. (A BLOCKED-only addendum — purely re-running
+  previously-blocked tests after unblocking work landed — is
+  valid and proceeds normally.)
 - **A finding's disposition implies an edit to `REQUIREMENTS.md`
   /  `ARCHITECTURE.md` / `PROJECT_PLAN.md` /
   `CLAUDE_CODE_PROMPTS.md` / `rules/*.md` / `CLAUDE.md` /

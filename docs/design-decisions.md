@@ -258,3 +258,38 @@ distribution.
 
 **Scope note.** No secrets-and-credentials-hygiene NFR was added
 because the design has no DB and no credential storage.
+
+---
+
+## `/exit-test-plan` BLOCKED tests auto-re-add to next addendum, never dropped
+
+**Decision.** Every `[BLOCKED]` row in the newest run log of an
+`/exit-test-plan` plan gets re-added to the next §6.N addendum
+automatically — never dropped. The cycle continues until the
+test reaches a non-BLOCKED result (PASS / FAIL / SKIP). The plan
+cannot flip to `LANDED` while any `[BLOCKED]` row remains in the
+newest run log.
+
+**Why.** A blocker is a real signal — the system couldn't run the
+test. Dropping it (or making re-add an operator-toggled choice
+each addendum) creates a path where a real blocker silently exits
+the plan because someone forgot to re-queue it. Auto-re-add makes
+"the plan landed" mean "every test ran, or was explicitly accepted
+as SKIP."
+
+**Why not ask the operator each addendum which BLOCKED rows to
+re-add.** Easy to forget; defeats the safety guarantee. The
+initial Phase 1.1 implementation proposed this and was corrected
+mid-session.
+
+**Why not drop BLOCKED after one addendum cycle.** A real blocker
+can outlast a single fix attempt; dropping loses the signal.
+
+**Why not treat BLOCKED like SKIP for landing purposes.** SKIP is
+an explicit tester decision recorded at run time; BLOCKED is the
+system reporting the test could not run. Collapsing them would
+let unattended blockers ride through to landing.
+
+See `.claude/commands/exit-test-plan.md` Step S1.A Step 2 and
+Step S2.2 BLOCKED rows for the implementation, and Phase 1.1's
+prompt in `docs/CLAUDE_CODE_PROMPTS.md` for the deviation footer.

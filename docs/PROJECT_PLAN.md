@@ -92,7 +92,7 @@ documents, not behavior.
 
 ---
 
-## Phase 1.1 — `/exit-test-plan` BLOCKED disposition (deficiency)
+## Phase 1.1 — `/exit-test-plan` BLOCKED disposition (COMPLETE)
 
 **Goal.** Add a `BLOCKED` disposition to `/exit-test-plan` so test
 items not runnable due to a blocker discovered during a test run

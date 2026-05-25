@@ -165,6 +165,14 @@ closes and before Phase 2.x.
 - 2026-05-24 — "Before running this prompt" reworded to reflect
   Phase 1.2 sequencing decided in design-review checkpoint 001
   (R4a). Prompt body unchanged.
+- 2026-05-25 — Landed. Deviations:
+  - Did not run `/exit-test-plan` Stage 1 against an artificial
+    blocker case as the prompt's exit criteria specified. This
+    project has no traditional test suite (NFR-6) and does not
+    run `/exit-test-plan` against itself.
+  - `rules/testing-rules.md` not edited — scope item 5 was
+    conditional and the §3 / §4 / §5 contract didn't change
+    shape.
 
 ---
 
