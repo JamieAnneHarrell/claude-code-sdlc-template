@@ -11,8 +11,11 @@ discussing the benefit first.** Simplicity is the default; complexity
 has to earn its place.
 
 Before adding a layer, abstraction, dependency, or module, name what
-you'd add and why, and state the simpler alternative. Let Jamie pick.
-Silently adding complexity is the failure mode.
+you'd add and why, and state the simpler alternative **in the same
+message**. Let Jamie pick. Silently adding complexity is the failure
+mode. "Pause and check" is not enough — the simpler alternative has
+to be visible to Jamie at decision time, not just considered
+internally and discarded.
 
 Watch for: "while we're at it…", "it would be cleaner if…", "this
 will be useful later…", "let me make this configurable…", "I'll add

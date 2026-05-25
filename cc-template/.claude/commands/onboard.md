@@ -223,7 +223,33 @@ shows up alongside phase boundaries — Jamie sees the gate when she
 scans the plan, separately from the prompt body.
 
 ### `docs/CLAUDE_CODE_PROMPTS.md`
-One prompt per phase. Each prompt:
+
+**File-level header.** The file opens with a short header explaining
+the deviation-footer convention. Include verbatim (the deviation
+block below `# Claude Code prompts` is load-bearing — `/wind-down`
+and any future tooling that touches prompt footers depend on it):
+
+```
+# Claude Code prompts
+
+One prompt per phase. Paste the prompt body into a Claude Code
+session to run that phase. Each prompt has a "revisions since this
+prompt ran" footer where deviations from the original plan
+accumulate during the actual coding session.
+
+**The footer is for plan deviations only — never a recap of what
+landed.** The git log is the recap; the prompt body is the plan;
+the footer captures where the plan had to change. A clean execution
+of the prompt leaves the footer empty except for the landing-date
+marker. Example deviation: "Scope item 5 skipped — conditional on
+§3 contract changing, which it didn't." Not a deviation: "Edited
+file X to add Y" — that's commit-log material.
+```
+
+(Any project-specific intro paragraphs — historical-phase notes,
+reading-order pointers — go after the deviation block.)
+
+**Per-prompt structure.** One prompt per phase. Each prompt:
 - Has a header `## Prompt N: <Phase Name>`
 - States what to read first (REQUIREMENTS, ARCHITECTURE, PROJECT_PLAN)
 - Numbered scope items for the phase
@@ -231,9 +257,12 @@ One prompt per phase. Each prompt:
 - Exit criteria
 - Ends with a "revisions since this prompt ran" footer (initially
   "none tracked"). Revisions accumulate *after* the prompt runs, so the
-  block sits below the prompt body, not above it.
+  block sits below the prompt body, not above it. Per the convention
+  above, the footer is for plan deviations only — not a recap of what
+  landed.
 
-Pattern reference: `c:\Users\jamie\Documents\code\ds-auto-dailies\CLAUDE_CODE_PROMPTS.md`.
+Pattern reference: this template's own
+`docs/CLAUDE_CODE_PROMPTS.md` is the canonical shape.
 
 **Design-review checkpoints between prompts.** Identify high-risk
 transitions in the phase queue — schema/migrations, multi-tenancy,

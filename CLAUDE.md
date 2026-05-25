@@ -50,14 +50,19 @@
 
 ## Collaboration rules
 
-**Read these every session, before any work:**
+**MUST DO before responding to the first user message of any session.**
+Read these two files end-to-end. Their contents are *not* loaded into
+context by default — only this CLAUDE.md is. Skipping this step is the
+#1 cause of rule drift (KISS violations, commit-message bloat, no
+simpler-alternative on additions).
 
 - [`rules/coding-session-rules.md`](rules/coding-session-rules.md)
   — the 9 standing rules (root-cause, trust diagnosis, rejections
   permanent, no unsolicited design, decouple data from display,
   reference rule numbers, Jamie runs commits, Jamie runs tests,
   session wind-down rewrites TODO.txt). Includes the rule-7
-  commit handoff format.
+  commit handoff format and the rule-4 simpler-alternative
+  self-check.
 - [`rules/design-philosophy-rules.md`](rules/design-philosophy-rules.md)
   — KISS, progressive disclosure, simple defaults.
   *iPhone, not Android. Macintosh, not PC.*

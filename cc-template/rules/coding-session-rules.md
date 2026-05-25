@@ -58,6 +58,14 @@ The requirements, architecture, and project plan documents define the
 scope. Anything outside those documents needs explicit approval before
 implementation.
 
+**Self-check before any addition.** When proposing capability,
+abstraction, dependency, or configuration that wasn't asked for,
+name the simpler alternative **in the same message** and let Jamie
+pick. "I could add X for reasons R; the simpler alternative is to do
+nothing / do Y." This is the visible enforcement of KISS (see
+[`rules/design-philosophy-rules.md`](design-philosophy-rules.md)).
+Silently picking the richer option is the failure mode.
+
 ## Rule 5: Decouple data from display
 
 Never conflate what the program knows with what the program shows.
@@ -92,6 +100,12 @@ under 72 chars, imperative mood, one logical change per commit). Claude
 proposes the message in the handoff.
 
 ### Commit handoff format
+
+**Pre-flight:** before generating *any* commit handoff, re-read this
+entire "Commit handoff format" section end-to-end. The commands that
+produce handoffs (`/wind-down`, `/design-review` Stage 1 initial and
+Stage 2 landing, `/exit-test-plan` Stage 1 initial and Stage 2 landing)
+each name this re-read explicitly. Habit-mode handoffs drift long.
 
 Every commit proposal must satisfy these constraints together. Skipping
 any one is a regression.
@@ -188,13 +202,29 @@ Required shape after rewrite:
 - **The first entry is what we pick up next session**, written in the
   form "At the beginning of the next session, ..." so Jamie sees it
   the moment she opens the file.
-- Remaining entries are the upcoming queue in priority order.
+- **Reference prompts by ID, never inline their content.** "Run Prompt
+  1.2 from `docs/CLAUDE_CODE_PROMPTS.md`" is the right shape. Pasting
+  the prompt body, scope bullets, or constraints into TODO.txt
+  duplicates source-of-truth and dates fast.
+- **Don't queue past the immediate next session.** Roadmap items belong
+  in `docs/PROJECT_PLAN.md`; open questions belong in
+  `docs/open-questions.md`. TODO.txt is *exactly* (a) the immediate
+  next step plus (b) decisions that genuinely block the next session
+  from starting. Three-steps-ahead planning belongs elsewhere.
 - Preserve the handoff format Jamie is already using in the file
   (headers, sections, etc.); only the contents change.
 
 Wind-down also keeps the rest of the repository documents coherent. Not
-every doc changes every session — only surface the ones that apply,
-and propose the edits for Jamie to approve:
+every doc changes every session — only surface the ones that apply.
+
+**How wind-down proposes edits.** State the intent in one short
+sentence ("I'll rewrite TODO.txt with the next-session entry pointing
+at Prompt 1.2 and add an OQ entry about rule 7 brevity"), then make
+the edits directly via the Edit tool. Do not paste the full proposed
+text into chat for pre-approval — the edit-approval mode is the
+per-edit review surface, and pre-pasting duplicates it. Exception:
+structural changes that span multiple docs warrant a brief plan
+before editing.
 
 - **`docs/CLAUDE_CODE_PROMPTS.md`**: when a planned prompt landed this
   session, mark it as landed. If the session deviated significantly

@@ -5,6 +5,14 @@ session to run that phase. Each prompt has a "revisions since this
 prompt ran" footer where deviations from the original plan
 accumulate during the actual coding session.
 
+**The footer is for plan deviations only — never a recap of what
+landed.** The git log is the recap; the prompt body is the plan;
+the footer captures where the plan had to change. A clean execution
+of the prompt leaves the footer empty except for the landing-date
+marker. Example deviation: "Scope item 5 skipped — conditional on
+§3 contract changing, which it didn't." Not a deviation: "Edited
+file X to add Y" — that's commit-log material.
+
 Phases that completed before this file was written (Phase 0) are
 recorded as historical references; their prompts were not authored
 under this template's convention.
@@ -173,6 +181,22 @@ closes and before Phase 2.x.
   - `rules/testing-rules.md` not edited — scope item 5 was
     conditional and the §3 / §4 / §5 contract didn't change
     shape.
+- 2026-05-25 — Intersession friction-fix pass between Prompt 1.1
+  landing and Prompt 1.2 starting (orthogonal to 1.1's scope;
+  recorded here as the most-recently-landed prompt):
+  - Rule 7: pre-flight re-read trigger wired into `/wind-down`
+    Step 4, `/design-review` S1.8 + S2.7, `/exit-test-plan` S1.7
+    + S2.7.
+  - Rule 9: TODO.txt tightened (reference prompts by ID;
+    immediate-next + blocking only); wind-down state-intent-then-
+    edit pattern replaces pre-pasted approvals.
+  - Rule 4 + KISS: simpler-alternative-in-same-message self-check.
+  - Root + `cc-template/` CLAUDE.md: MUST-DO block emphasizing the
+    rules files aren't auto-loaded.
+  - `/onboard`: deviation-block written verbatim into seeded
+    `docs/CLAUDE_CODE_PROMPTS.md`.
+  - `docs/open-questions.md`: new OQ "Sharpen rule 7 commit-message
+    brevity constraints" deferred to Phase 1.2 R4b.
 
 ---
 

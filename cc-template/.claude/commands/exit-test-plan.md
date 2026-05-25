@@ -525,6 +525,11 @@ carryovers; preserve whatever was already there.
 
 ## Step S1.7: Surface git commands (rule 7)
 
+**Re-read rule 7's "Commit handoff format" section in
+`rules/coding-session-rules.md` end-to-end before drafting the
+message.** The brevity bar needs to be active in working memory
+before you write a single word.
+
 Stage only the new test plan file:
 
 ```
@@ -1125,6 +1130,11 @@ TODO entry. When polish lands, Jamie re-invokes
 
 This step runs only when S2.6 picked "land the document." Skip
 it on the polish-round path.
+
+**Re-read rule 7's "Commit handoff format" section in
+`rules/coding-session-rules.md` end-to-end before drafting the
+message.** The brevity bar needs to be active in working memory
+before you write a single word.
 
 Stage 2 (landing) typically modifies the test plan file plus
 `docs/design-decisions.md` and `docs/open-questions.md`.

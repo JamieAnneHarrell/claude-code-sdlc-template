@@ -530,6 +530,11 @@ carryovers; preserve whatever was already there.
 
 ## Step S1.8: Surface git commands (rule 7) — initial branch only
 
+**Re-read rule 7's "Commit handoff format" section in
+`rules/coding-session-rules.md` end-to-end before drafting the
+message.** The brevity bar needs to be active in working memory
+before you write a single word.
+
 Stage only the new files:
 
 ```
@@ -994,6 +999,11 @@ State the rewritten `TODO.txt` back to Jamie before saving.
 
 This step runs only when S2.5 picked "land the document." Skip it
 on the "open Addendum N+1" path.
+
+**Re-read rule 7's "Commit handoff format" section in
+`rules/coding-session-rules.md` end-to-end before drafting the
+message.** The brevity bar needs to be active in working memory
+before you write a single word.
 
 Stage 2 (landing) typically modifies the checkpoint file plus one
 or more of REQUIREMENTS / ARCHITECTURE / PROJECT_PLAN /

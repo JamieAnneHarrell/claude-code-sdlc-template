@@ -46,6 +46,30 @@ would unblock an answer.
 
 ### Open Questions
 
+#### Sharpen rule 7 commit-message brevity constraints
+
+*What we know.* The 2026-05-25 friction session added a "re-read
+rule 7 end-to-end before drafting" trigger to `/wind-down`,
+`/design-review` Stage 1 initial + Stage 2 landing, and
+`/exit-test-plan` Stage 1 initial + Stage 2 landing. That addresses
+*not* re-reading the rule; it doesn't address the rule's text
+itself, which today says "body is at most a few sentences plus an
+optional short bullet list" — soft enough that drift is easy.
+
+*Options to consider.* Phase 1.2's R4b is already scoped to rework
+rule 7 brevity ("subject + zero or one body sentence" as default;
+bullets cite doc IDs; PowerShell mechanics relegated to a reference
+sub-section). Specific constraints to consider during R4b:
+
+- Body ≤ 3 sentences, OR ≤ 4 bullets — pick one shape.
+- Each bullet ≤ 1 line at typical terminal width.
+- Subject ≤ 60 chars (tighter than current 72).
+- "If the body is more than the subject's elaboration, it's too long."
+
+*What would unblock.* Phase 1.2 (`Prompt 1.2` in
+`docs/CLAUDE_CODE_PROMPTS.md`) executes the R4b rework; this OQ
+captures the candidate constraints to consider then.
+
 #### CLAUDE.md merge strategy for `/refresh-from-repository --merge`
 
 *What we know.* Rules files have `<!-- ONBOARD-FILL: ... -->`

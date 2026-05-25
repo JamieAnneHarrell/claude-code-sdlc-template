@@ -33,14 +33,20 @@ correct.
 `TODO.txt` is the handoff between sessions, **not** a running history.
 At wind-down, **rewrite** it — do not append.
 
-Required shape after rewrite:
+Required shape after rewrite (full spec in rule 9):
 
 - **Completed items removed.** No strikethroughs, no "(done)"
   annotations. The git log is the record of what was done; TODO.txt
   is the record of what is next.
 - **First entry is what we pick up next session**, written in the
   form: "At the beginning of the next session, ..."
-- **Remaining entries are the upcoming queue** in priority order.
+- **Reference prompts by ID, never inline.** "Run Prompt 1.2 from
+  `docs/CLAUDE_CODE_PROMPTS.md`" — not the prompt body, scope, or
+  constraints.
+- **Don't queue past the immediate next session.** Roadmap items
+  belong in `docs/PROJECT_PLAN.md`; open questions belong in
+  `docs/open-questions.md`. TODO.txt = exactly the immediate next
+  step + decisions that genuinely block starting next session.
 - **Preserve the format Jamie is using** in the file (headers,
   sections, separators). Only the contents change.
 
@@ -143,7 +149,12 @@ at once, surface both and ask Jamie which to prioritize as the
 first entry (the other becomes the second). Don't guess the
 ordering.
 
-Show Jamie the rewritten TODO.txt before saving, and let her edit.
+**How to apply the rewrite.** State the intent in one short
+sentence ("I'll rewrite TODO.txt with the next-session entry
+pointing at Prompt 1.2 plus the open-questions cleanup item"),
+then call Edit/Write directly. Do **not** paste the full proposed
+TODO.txt back into chat for pre-approval — the edit-approval mode
+is the per-edit review surface and pre-pasting duplicates it.
 
 ## Step 3: Update tracking docs (only those that apply)
 
@@ -152,9 +163,16 @@ diffs to apply:
 
 ### `docs/CLAUDE_CODE_PROMPTS.md`
 - If a planned prompt landed this session, mark it landed in the
-  prompt's "revisions since this prompt ran" footer.
-- If the session deviated significantly from the prompt's original
-  plan, note the deviation alongside the landing marker.
+  prompt's "revisions since this prompt ran" footer — a date marker
+  plus, if applicable, terse deviation bullets.
+- **The footer is for plan deviations only — never a recap of what
+  landed.** The git log is the recap; the prompt body is the plan;
+  the footer captures where the plan had to change. Example
+  deviation: "Scope item 5 skipped — conditional on §3 contract
+  changing, which it didn't." Not a deviation: "Edited file X to
+  add Y" — that's commit-log material.
+- If the session was a clean execution of the prompt, the landing
+  marker is enough — no bullets.
 - **Do not edit prompts that landed in prior sessions.** Those are
   historical record.
 
@@ -173,14 +191,16 @@ diffs to apply:
   Approaches / Open Questions.
 
 ### `docs/REQUIREMENTS.md` and `docs/ARCHITECTURE.md`
-- If the session changed requirements or architecture, surface the
-  diff for Jamie to approve.
+- If the session changed requirements or architecture, state the
+  intent ("I'll add NFR-N to REQUIREMENTS covering X") and call
+  Edit directly. Edit-approval gates the change — no pre-pasted
+  diff in chat.
 - These are slower-changing docs; most sessions don't touch them.
 
 ### `docs/PROJECT_PLAN.md`
 - If a phase landed, mark its status.
 - If scope changed (phase split, phase reordered, new phase inserted),
-  surface the diff.
+  state the intent and edit directly.
 
 ### `docs/design/design-review-checkpoint-*.md` and `docs/design/REVIEWS.md`
 - If a checkpoint changed status this session
@@ -213,12 +233,18 @@ diffs to apply:
 If there are uncommitted changes (staged or unstaged) that should land
 before the session ends:
 
-1. Run `git status` to confirm what's pending.
-2. Per rule 7, surface a commit handoff. Use the project's formatter
+1. **Re-read rule 7's "Commit handoff format" section in
+   `rules/coding-session-rules.md` end-to-end before drafting the
+   message.** Habit-mode handoffs drift long. The brevity bar
+   (subject < 72 chars, body = a few sentences max, bullets cite
+   doc IDs over restating implementation) needs to be active in
+   working memory before you write a single word.
+2. Run `git status` to confirm what's pending.
+3. Per rule 7, surface a commit handoff. Use the project's formatter
    in the dry-run sequence (ruff for Python, etc. — read
    `rules/environment-rules.md` and `rules/testing-rules.md` for the
    project's specific tooling).
-3. **Do not run the commit yourself.** Jamie pastes the commands.
+4. **Do not run the commit yourself.** Jamie pastes the commands.
 
 If no uncommitted changes, skip this step.
 
