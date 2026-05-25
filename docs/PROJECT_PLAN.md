@@ -48,6 +48,12 @@ PROJECT_PLAN / CLAUDE_CODE_PROMPTS, filled rules `ONBOARD-FILL`
 blocks, and `ONBOARD-STATUS: COMPLETE`. Validates the configuration
 chain end-to-end on a real project.
 
+**Checkpoint sequencing.** `/onboard` →
+`/design-review` (post-onboarding sanity check, gates `/bootstrap`)
+→ `/bootstrap` → Phase 1 closes → Phase 1.1 begins. The
+post-onboarding `/design-review` fires *between* `/onboard` and
+`/bootstrap`, not after.
+
 **Deliverables.**
 - `docs/REQUIREMENTS.md`, `docs/ARCHITECTURE.md`,
   `docs/PROJECT_PLAN.md`, `docs/CLAUDE_CODE_PROMPTS.md` written by
@@ -63,21 +69,26 @@ chain end-to-end on a real project.
   follow-up step.
 - Dual `LICENSE`: CC BY-NC-ND 4.0 at root; MIT at
   `cc-template/LICENSE`.
+- Post-onboarding `/design-review` checkpoint LANDED (gates
+  `/bootstrap`).
 - `/bootstrap` run on the source — README "Developer setup"
   section written, `<!-- ONBOARD-FILL: environment -->` block
   filled, `BOOTSTRAP-STATUS: COMPLETE`.
 
-**Exit criteria.** `ONBOARD-STATUS` and `BOOTSTRAP-STATUS` both
-read `COMPLETE <date>` in root `CLAUDE.md`. The four planning docs
-exist and reflect the design intake without contradiction. The
-`CLAUDE.md` merge survives — no template-improvement content
-(load-bearing invariants, design-principles, testing-template-
-changes, migrating-older-versions) was lost. Manual phase-exit
-walkthrough is light here — the deliverable is documents, not
-behavior.
+**Exit criteria (pre-bootstrap).** `ONBOARD-STATUS: COMPLETE <date>`
+in root `CLAUDE.md`. The four planning docs exist and reflect the
+design intake without contradiction. The `CLAUDE.md` merge
+survives — no template-improvement content (load-bearing
+invariants, design-principles, testing-template-changes,
+migrating-older-versions) was lost. The post-onboarding
+`/design-review` checkpoint has flipped to `LANDED <date>` with
+its findings dispositioned across the planning docs.
 
-**Design review checkpoint:** before Phase 1.1 begins. Run
-`/design-review`.
+**Exit criteria (post-bootstrap).** `BOOTSTRAP-STATUS: COMPLETE <date>`
+in root `CLAUDE.md`. README "Developer setup" section is the
+verified-working shape produced by `/bootstrap`'s verify mode.
+Manual phase-exit walkthrough is light here — the deliverable is
+documents, not behavior.
 
 ---
 
@@ -107,6 +118,69 @@ the same shape as `[PENDING]`. Stage 2 walks blocked rows and
 queues the appropriate next-step. Validated by re-running
 `/exit-test-plan` against an artificial blocker case during the
 exit walkthrough.
+
+---
+
+## Phase 1.2 — Rules and CLAUDE.md cleanup pass
+
+**Goal.** Optimize universal rules and CLAUDE.md content for
+context-window cost without removing any load-bearing invariant.
+Driven by checkpoint 001 findings R4a (rules context-size), R4b
+(rule 7 commit-message brevity), R4c (cc-template/CLAUDE.md
+placeholder qualifiers), and R2 (cc-template/CLAUDE.md
+Reading-order entry for `docs/design/`).
+
+**Deliverables.**
+- Audit of current line counts across root `CLAUDE.md`,
+  `cc-template/CLAUDE.md`, and all six rules files
+  (`coding-session-rules.md`, `design-philosophy-rules.md`,
+  `project-rules.md`, `multi-agent-rules.md`,
+  `environment-rules.md`, `testing-rules.md`) with
+  load-bearing-vs-trimmable classification per section.
+- Targeted reduction (≥25%) of rules + CLAUDE.md content while
+  preserving every named load-bearing invariant and every rule
+  that downstream consumers rely on. Edits mirror to both root
+  and `cc-template/`.
+- Rule 7 rework so commit-message brevity is foregrounded: "subject
+  + zero or one body sentence" is the default; body bullets cite
+  doc IDs (FR-N, NFR-N, ARCHITECTURE §N, Prompt N) over restating
+  context; multi-paragraph bodies are the rare case.
+- `cc-template/CLAUDE.md` placeholder reworded per OQ option A:
+  drop the "(configured projects)" parenthetical from the
+  Reading-order header; rephrase the "filled in by `/bootstrap`"
+  / "filled in by `/onboard`" qualifiers so they read correctly
+  pre- and post-onboard.
+- `cc-template/CLAUDE.md` Reading-order list gets a new
+  `docs/design/` entry mirroring root `CLAUDE.md` item 5
+  ("design intake plus any `/design-review` checkpoints in
+  flight"), so downstream consumers' generated CLAUDE.md
+  directs them to in-flight checkpoints.
+- Rules-overlap pass for `design-philosophy-rules.md` vs global
+  `~/.claude/CLAUDE.md`: decide per section whether to keep
+  self-contained (downstream consumers don't have Jamie's
+  globals) or trim with explicit "see global" notes.
+- `docs/open-questions.md` placeholder-qualifiers entry marked
+  resolved (or moved to `design-decisions.md`).
+
+**Exit criteria.** Aggregate line count across rules + CLAUDE.md
+(root and dist) is ≥25% lower than the pre-cleanup baseline. Every
+load-bearing invariant named in CLAUDE.md is still present and
+sourced. A re-read of rule 7 produces commit-message handoffs
+that hit the new brevity bar. The dist's `cc-template/CLAUDE.md`
+reads correctly both pre-onboard (placeholder state) and
+post-onboard (rewritten state). The new `docs/design/`
+Reading-order entry is present in `cc-template/CLAUDE.md`.
+Validated by `/exit-test-plan` walkthrough covering: a sample
+commit handoff exercises the new rule 7 shape; a sandbox copy of
+`cc-template/` reads correctly without the stale qualifiers.
+
+---
+
+## Phase 2 — Planned project enhancements (roadmap)
+
+Roadmap phases that extend the template's behavior beyond
+configuration and recurring lifecycles. Each ships in the dist
+and gets exercised on the source first.
 
 ---
 

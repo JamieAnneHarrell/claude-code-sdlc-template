@@ -107,9 +107,11 @@ the README stub, and flips `ONBOARD-STATUS`.
 
 ## Prompt 1.1: `/exit-test-plan` BLOCKED disposition
 
-**Before running this prompt:** post-Phase-1 `/design-review` has
-already run per the PROJECT_PLAN.md checkpoint. This prompt picks
-up after that.
+**Before running this prompt:** Phase 1's post-onboarding
+`/design-review` has landed (checkpoint 001). Phase 1.1 runs
+first per the sequencing decided in that checkpoint (R4a);
+Phase 1.2 (rules + CLAUDE.md cleanup) fires after Phase 1.1
+closes and before Phase 2.x.
 
 **Read first.**
 - [`.claude/commands/exit-test-plan.md`](../.claude/commands/exit-test-plan.md)
@@ -158,6 +160,115 @@ up after that.
   consistently.
 - Validated by `/exit-test-plan` Stage 1 on an artificial blocker
   case during the Phase 1.1 exit walkthrough.
+
+**Revisions since this prompt ran:**
+- 2026-05-24 — "Before running this prompt" reworded to reflect
+  Phase 1.2 sequencing decided in design-review checkpoint 001
+  (R4a). Prompt body unchanged.
+
+---
+
+## Prompt 1.2: Rules and CLAUDE.md cleanup pass
+
+**Before running this prompt:** Phase 1.1 (BLOCKED disposition)
+has landed. This prompt addresses checkpoint 001 findings R4a
+(rules + CLAUDE.md context-size optimization), R4b (rule 7
+commit-message guidance tightening), R4c (cc-template/CLAUDE.md
+placeholder qualifier cleanup), and R2 (cc-template/CLAUDE.md
+Reading-order entry for `docs/design/`). Must land before Phase
+2.1 so the cleaner content ships in the dist first.
+
+**Read first.**
+- [`docs/design/design-review-checkpoint-001.md`](design/design-review-checkpoint-001.md)
+  (findings R2, R4a, R4b, R4c and their dispositions)
+- [`docs/PROJECT_PLAN.md`](PROJECT_PLAN.md) Phase 1.2
+- [`docs/REQUIREMENTS.md`](REQUIREMENTS.md) NFR-6 (no runtime),
+  NFR-9 (source/dist duplication is deliberate)
+- Root [`CLAUDE.md`](../CLAUDE.md) — every load-bearing
+  invariant named in the "Load-bearing invariants" section must
+  survive the cleanup
+- [`cc-template/CLAUDE.md`](../cc-template/CLAUDE.md) — the
+  pre-onboard placeholder; R4c and R2 edits land here
+- All six rules files at root: `coding-session-rules.md`,
+  `design-philosophy-rules.md`, `project-rules.md`,
+  `multi-agent-rules.md`, `environment-rules.md`,
+  `testing-rules.md`
+- Global `~/.claude/CLAUDE.md` content to identify rules that
+  overlap and could be trimmed with explicit "see global" notes
+
+**Scope.**
+1. **Baseline measurement.** Capture pre-cleanup line counts for
+   each rules file, root `CLAUDE.md`, and `cc-template/CLAUDE.md`.
+   Record in a working note (not committed) so the ≥25% reduction
+   target is measurable.
+2. **Classify content.** Walk each file section-by-section.
+   Categorize: load-bearing (named in CLAUDE.md invariants or
+   parsed literally by a command) → keep verbatim; content
+   referenced by a command spec → keep but compress; rationale /
+   anecdote / repeated guidance → candidate for compression or
+   removal.
+3. **Rule 7 rework (R4b).** Restructure
+   `rules/coding-session-rules.md` rule 7 so brevity is
+   foregrounded: (a) "subject + zero or one body sentence" is the
+   default; (b) body bullets cite doc IDs (FR-N, NFR-N,
+   ARCHITECTURE §N, Prompt N) over restating context;
+   (c) multi-paragraph bodies are the rare case, not the default.
+   Move the PowerShell-quoting mechanics into a "Mechanics
+   reference" sub-section at the end, smaller font weight in the
+   reader's eye.
+4. **CLAUDE.md cleanup (R4c).** Apply OQ option A to
+   `cc-template/CLAUDE.md`: drop the "(configured projects)"
+   parenthetical from the Reading-order header; rephrase "filled
+   in by `/bootstrap`" / "filled in by `/onboard`" qualifiers to
+   read correctly pre- and post-onboard.
+5. **Reading-order parity (R2).** Add a `docs/design/`
+   Reading-order entry to `cc-template/CLAUDE.md` mirroring root
+   `CLAUDE.md` item 5 ("design intake plus any `/design-review`
+   checkpoints in flight").
+6. **Global-overlap decision.** For each section of
+   `rules/design-philosophy-rules.md` (and any other rules with
+   significant global overlap), decide: keep self-contained
+   (downstream consumers don't inherit Jamie's globals) or trim
+   with explicit "see global `~/.claude/CLAUDE.md` for X" notes.
+   Document the call inline in the rules file.
+7. **Mirror to dist.** Every rules-file edit applies identically
+   to root and `cc-template/`. CLAUDE.md edits are file-specific
+   (root and dist diverge by design).
+8. **OQ cleanup.** Mark the `placeholder qualifiers persist`
+   entry in `docs/open-questions.md` as resolved (or move to
+   `design-decisions.md`).
+
+**Constraints (what NOT to do).**
+- Do NOT remove or rename any load-bearing invariant named in
+  root `CLAUDE.md` "Load-bearing invariants" section.
+- Do NOT change the `[PENDING]` or
+  `> _[UNMARKED — replace this line with your decision per the legend above]_`
+  placeholder strings (NFR-4).
+- Do NOT change any status comment vocabulary or
+  `<!-- ONBOARD-FILL: ... -->` marker names.
+- Do NOT collapse rule 7 to the point that the PowerShell
+  quoting / HEREDOC guidance is lost — relegate, don't delete.
+  The mechanics matter when commits land in the VSCode PowerShell
+  terminal.
+- Do NOT touch files outside the cleanup scope: design intake
+  docs, REQUIREMENTS, ARCHITECTURE, PROJECT_PLAN, CLAUDE_CODE_PROMPTS,
+  README. The cleanup is rules + CLAUDE.md only.
+
+**Exit criteria.**
+- Post-cleanup aggregate line count across rules + CLAUDE.md
+  (root and dist) is ≥25% lower than the pre-cleanup baseline.
+- Every load-bearing invariant named in root `CLAUDE.md` is
+  still present and sourced.
+- A spot-check of rule 7 produces a commit handoff that hits the
+  new brevity bar.
+- `cc-template/CLAUDE.md` reads correctly both as a pre-onboard
+  placeholder and as the post-onboard CLAUDE.md template (no
+  stale qualifiers).
+- `cc-template/CLAUDE.md` Reading-order list includes the
+  `docs/design/` entry.
+- Validated by `/exit-test-plan` walkthrough covering: rule 7
+  brevity bar on a sample commit handoff; sandbox copy of
+  `cc-template/` reads correctly pre- and post-onboard.
 
 **Revisions since this prompt ran:** none tracked.
 

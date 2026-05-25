@@ -2,7 +2,7 @@
 checkpoint: 001
 date: 2026-05-24
 reviewer: Claude (Opus 4.7) with Jamie
-status: AWAITING-DECISIONS
+status: LANDED 2026-05-24
 trigger: Post-onboarding sanity check (between /onboard and /bootstrap)
 ---
 
@@ -105,7 +105,7 @@ or similar). Option (a) is the smaller edit. Pick one and align
 the narrative.
 
 > AUDIT NOTE — JAH:
-> _[UNMARKED — replace this line with your decision per the legend above]_
+> _DECISION: (a)_
 
 #### R2. `cc-template/CLAUDE.md` placeholder Reading-order list omits `docs/design/`
 
@@ -141,7 +141,7 @@ dispositions yet"). One-line edit. Same change applies if the
 proposed Phase 1.2 cleanup (R4a–R4c) absorbs this work.
 
 > AUDIT NOTE — JAH:
-> _[UNMARKED — replace this line with your decision per the legend above]_
+> _Accepted._
 
 #### R3. Stale `open-questions.md` entries — already resolved on-disk
 
@@ -176,7 +176,7 @@ correctly open, but verify. Open-questions.md is outside Stage 2's
 edit scope, so this lands as a TODO, not a doc edit.
 
 > AUDIT NOTE — JAH:
-> _[UNMARKED — replace this line with your decision per the legend above]_
+> _Accepted._
 
 #### R4a. Add Phase 1.2 cleanup — rules and CLAUDE.md context-size optimization
 
@@ -217,7 +217,7 @@ Sequencing: Phase 1.1 (BLOCKED disposition) first, then Phase 1.2
 (this cleanup), then Phase 2.x.
 
 > AUDIT NOTE — JAH:
-> _[UNMARKED — replace this line with your decision per the legend above]_
+> _Accepted._
 
 #### R4b. Add to Phase 1.2 — tighten rule 7 commit-message guidance
 
@@ -249,7 +249,7 @@ rare case, not the default. Decide independently of R4c so each
 sub-finding stands on its own.
 
 > AUDIT NOTE — JAH:
-> _[UNMARKED — replace this line with your decision per the legend above]_
+> _Accepted._
 
 #### R4c. Add to Phase 1.2 — `cc-template/CLAUDE.md` placeholder qualifier cleanup
 
@@ -278,7 +278,7 @@ Apply to both root and `cc-template/` for parity. Couples
 naturally with R4a since both touch the same CLAUDE.md file.
 
 > AUDIT NOTE — JAH:
-> _[UNMARKED — replace this line with your decision per the legend above]_
+> _Accepted._
 
 ### Notes — acceptable now, revisit later
 
@@ -306,7 +306,7 @@ now, the disposition adds nothing to PROJECT_PLAN.md or other
 landing-scope docs.
 
 > AUDIT NOTE — JAH:
-> _[UNMARKED — replace this line with your decision per the legend above]_
+> _Accepted._
 
 #### N2. Project quick orientation section (defer formally)
 
@@ -327,7 +327,7 @@ and the maintenance-vs-utility tradeoff is clearer. No
 landing-scope doc edit.
 
 > AUDIT NOTE — JAH:
-> _[UNMARKED — replace this line with your decision per the legend above]_
+> _Accepted._
 
 #### N3. PROJECT_PLAN.md missing a Phase 2 parent header (cosmetic)
 
@@ -347,7 +347,7 @@ enhancements (roadmap)` parent header between Phase 1.1 and Phase
 is — the flat list is also readable.
 
 > AUDIT NOTE — JAH:
-> _[UNMARKED — replace this line with your decision per the legend above]_
+> _DECISION: Add now._
 
 ## What the design got right (preserve)
 
@@ -406,18 +406,38 @@ the purposes of Stage 2's landing application.*
 
 | Round | Finding | Disposition | Reason |
 |-------|---------|-------------|--------|
-| *empty until Stage 2* | | | |
+| Original | R1 | Decision | Pick option (a): split Phase 1 exit criteria pre/post bootstrap; restate checkpoint sequencing as /onboard → /design-review → /bootstrap → Phase 1 closes. |
+| Original | R2 | Accepted | Add `docs/design/` Reading-order entry to `cc-template/CLAUDE.md` mirroring root CLAUDE.md item 5; folded into Prompt 1.2 scope (out of Stage 2 edit scope). |
+| Original | R3 | Accepted | Surface TODO for next-session `open-questions.md` cleanup pass: remove resolved multi-agent-rules + briefing-rule entries; spot-check remainder. |
+| Original | R4a | Accepted | Add Phase 1.2 (Cleanup) to PROJECT_PLAN.md and Prompt 1.2 to CLAUDE_CODE_PROMPTS.md; scope = rules + CLAUDE.md context-size reduction. |
+| Original | R4b | Accepted | Folded into Phase 1.2 scope: rework rule 7 commit-message guidance to foreground brevity and doc-id citations. |
+| Original | R4c | Accepted | Folded into Phase 1.2 scope: apply OQ option A to cc-template/CLAUDE.md placeholder qualifiers (drop "(configured projects)" and "filled in by" phrasings). |
+| Original | N1 | Deferred | Revisit at a future `/design-review` checkpoint (pre-Phase-2.1 or pre-Phase-2.2); OQ entry remains as-is for now. |
+| Original | N2 | Deferred | Revisit at same future checkpoint as N1; OQ entry remains as-is for now. |
+| Original | N3 | Decision | Add `## Phase 2 — Planned project enhancements (roadmap)` parent header between Phase 1.x and Phase 2.1. |
 
 ## Sign-off Summary
 
-*Filled when Stage 2 lands the doc. Jamie does not edit this
-section — sign-offs go inline above.*
-
 | ID | Final disposition |
 |----|-------------------|
-| *empty until landing* | |
+| R1 | Decision: option (a) — split Phase 1 exit criteria pre/post bootstrap; restate checkpoint sequencing |
+| R2 | Accepted (folded into Prompt 1.2 scope) |
+| R3 | Accepted (surfaced as TODO; open-questions.md is out of Stage 2 edit scope) |
+| R4a | Accepted (Phase 1.2 + Prompt 1.2 added) |
+| R4b | Accepted (folded into Prompt 1.2 scope) |
+| R4c | Accepted (folded into Prompt 1.2 scope) |
+| N1 | Deferred (revisit pre-Phase-2.1 or pre-Phase-2.2; OQ entry remains) |
+| N2 | Deferred (revisit at same future checkpoint as N1; OQ entry remains) |
+| N3 | Decision: add Phase 2 parent header now |
 
 ## Follow-up actions landed
 
-*Filled when Stage 2 lands the doc. Lists every doc edit and
-every TODO that landed during the landing pass.*
+- R1: edited `docs/PROJECT_PLAN.md` Phase 1 — added Checkpoint sequencing note, split Exit criteria into pre-bootstrap and post-bootstrap, added the post-onboarding `/design-review` to the deliverables list.
+- R4a: edited `docs/PROJECT_PLAN.md` — inserted `## Phase 1.2 — Rules and CLAUDE.md cleanup pass` between Phase 1.1 and the new Phase 2 header.
+- R4a: edited `docs/CLAUDE_CODE_PROMPTS.md` — inserted Prompt 1.2 (Rules and CLAUDE.md cleanup pass), citing R4a/R4b/R4c/R2 in its Read-first and Scope sections.
+- R4b, R4c, R2: folded into Prompt 1.2's Scope (rule 7 rework, placeholder qualifier cleanup, `docs/design/` Reading-order entry in `cc-template/CLAUDE.md`).
+- R2: scope addition only — `cc-template/CLAUDE.md` edit deferred to Phase 1.2 (out of Stage 2 edit scope).
+- N3: edited `docs/PROJECT_PLAN.md` — inserted `## Phase 2 — Planned project enhancements (roadmap)` parent header between Phase 1.x and Phase 2.1.
+- R1, R4a sequencing: edited `docs/CLAUDE_CODE_PROMPTS.md` Prompt 1.1 — "Before running this prompt" reworded to reflect checkpoint-001 sequencing decisions; revisions-footer entry added.
+- R3: TODO surfaced for next-session `open-questions.md` cleanup pass (`docs/open-questions.md` is outside Stage 2's edit scope).
+- N1, N2: recorded as deferred in this checkpoint's Disposition log + Sign-off Summary; OQ entries unchanged.
