@@ -1,16 +1,14 @@
 # CLAUDE.md
 
 <!-- ONBOARD-STATUS: COMPLETE 2026-05-24 -->
-<!-- BOOTSTRAP-STATUS: UNCONFIGURED -->
+<!-- BOOTSTRAP-STATUS: COMPLETE 2026-05-24 -->
 <!-- DEPLOYMENT-PLAN-STATUS: UNCONFIGURED -->
 
-> ✅ **Onboarded.** Planning docs are written. Next step is
-> `/design-review` for a post-onboarding sanity check, then
-> `/bootstrap` to plan the dev environment, then the first phase
-> prompt from `docs/CLAUDE_CODE_PROMPTS.md`. `/deployment-plan`
-> is deferrable. At every phase close that ships user-observable
-> behavior, `/exit-test-plan` authors the manual walkthrough;
-> Stage 2 lands dispositions once Jamie has run it.
+> ✅ **Onboarded and bootstrapped.** Ready for the next phase
+> prompt in `docs/CLAUDE_CODE_PROMPTS.md` (Phase 1.1 — add
+> `BLOCKED` disposition to `/exit-test-plan`). `/deployment-plan`
+> is deferrable — run it when distribution mechanism (git clone
+> vs zip vs other) needs to be pinned.
 >
 > **Project:** `claude-code-sdlc-template` — a self-modifying
 > project seed for new software projects driven by Claude Code.
@@ -23,11 +21,11 @@
 > consumer of its own template, so improvements are exercised on
 > the source before they ship.
 >
-> **Language / framework:** No language runtime — the deliverable
-> is markdown files only.
->
-> **Multi-agent mode:** explore-plus-plan (Explore for research,
-> Plan for design proposals; implementation stays sequential).
+> **Language / framework:** No language runtime — markdown only.
+> **Multi-agent mode:** explore-plus-plan
+> **Shell:** PowerShell on Windows 11 (Jamie's maintainer setup); project itself is shell-agnostic
+> **Run:** N/A — markdown only &nbsp;·&nbsp; **Test:** N/A — validated by use of the template on real projects
+> **Developer setup:** see `README.md`
 
 ## Reading order at session start
 

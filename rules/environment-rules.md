@@ -237,13 +237,40 @@ violating username, stop and surface the policy.
 <!-- ONBOARD-FILL: environment -->
 
 ### Language and runtime
-- (Onboarding adds e.g. "Python 3.12 in `.venv/`", "PHP 8.3 / Laravel
-  11", "Node 20 / TypeScript")
+- None. The deliverable is markdown files only — no interpreter,
+  compiler, build step, or package manager involved. NFR-6 in
+  `docs/REQUIREMENTS.md` is the contract.
+
+### Shell expectation
+- **Jamie's maintainer setup:** PowerShell on Windows 11, VS Code
+  with the Claude Code extension. Claude's PowerShell tool is the
+  right choice for shell commands in her sessions. The "Shell
+  handling" section above governs tool choice.
+- **The project itself is shell-agnostic.** Contributors and
+  consumers on macOS or Linux work fine in bash / zsh; nothing in
+  the deliverable depends on Windows or PowerShell. If you're
+  contributing from a different environment, match commands to
+  your shell.
 
 ### Venv / environment activation
-- (Onboarding adds the project's specific path)
+- N/A — no language runtime. There is no venv to activate, no
+  Claude-bash or Claude-PowerShell prefix needed for project
+  binaries (there are no project binaries).
 
 ### Build / run / test commands
-- (Onboarding adds the canonical command lines)
+- N/A as automated commands. The validation loop is:
+  1. Re-read the touched command and rules files.
+  2. Mental dry-run against the load-bearing invariants in
+     `CLAUDE.md`.
+  3. Real-world use of the template on a new project.
+- Maintainers should run `git --version` to confirm git is on PATH
+  before contributing.
+
+### Tooling beyond language
+- **Git** — maintainers / contributors only. Any modern version.
+- **Claude Code** — everyone. Any distribution (IDE extension,
+  desktop app, CLI, web). No version pin; **Opus 4.7** (as of
+  2026-05-24) or the most recent high-performance Claude model
+  recommended for maintainers.
 
 <!-- /ONBOARD-FILL -->
