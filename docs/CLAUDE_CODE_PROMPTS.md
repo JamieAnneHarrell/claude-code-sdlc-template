@@ -42,7 +42,7 @@ source/dist split rationale.
 
 ---
 
-## Prompt 1: Onboard the source-of-truth (IN PROGRESS)
+## Prompt 1: Onboard the source-of-truth (COMPLETE)
 
 This prompt is the one currently running. The `/onboard` command
 itself implements the work — it reads

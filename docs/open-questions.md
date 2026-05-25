@@ -207,6 +207,71 @@ readability for a developer encountering an unconfigured
 template for the first time — the qualifiers serve a real
 purpose pre-onboard.
 
+#### Universal-rules customization partitions
+
+*Context.* FR-11 says universal rules content — the 9
+coding-session rules, design-philosophy, and the placeholder rules
+files (environment / multi-agent / project / testing) — ships
+identical between root and `cc-template/`. NFR-9 acknowledges the
+duplication is deliberate but creates drift risk.
+
+This session's `/bootstrap` filled the
+`<!-- ONBOARD-FILL: environment -->` block in root
+`rules/environment-rules.md` with Jamie-specific maintainer
+content (PowerShell on Windows 11, VSCode + Claude Code
+extension). That content is correct for the source-of-truth
+project but should NOT appear in `cc-template/rules/environment-rules.md`,
+which must stay generic for downstream consumers who may use a
+different shell or editor.
+
+The existing `<!-- ONBOARD-FILL: ... -->` marker pattern handles
+this single case — the dist keeps the placeholder; the source
+fills it during its own `/bootstrap` run. But the partition lives
+at the bottom of one specific file, and the pattern doesn't
+generalize. Other rules files may have sections that ought to
+differ between source and dist, or that downstream consumers
+might legitimately need to customize per project:
+
+- `rules/coding-session-rules.md` rule 7: PowerShell-quoting
+  mechanics that are Windows-specific (would be different on a
+  bash-primary project)
+- `rules/design-philosophy-rules.md`: any project-specific
+  overlays on the general principles
+- `rules/testing-rules.md`: language-specific test commands (a
+  Python project's "run the tests" line differs from a PHP one)
+- `rules/project-rules.md`: already has a project-scope
+  ONBOARD-FILL block, but other sections may need similar
+  treatment as the rule grows
+
+*Options to consider.*
+- **A. Expand the ONBOARD-FILL pattern.** Add
+  `<!-- ONBOARD-FILL: ... -->` markers to whichever sections of
+  whichever rules files might need divergence — universal content
+  outside markers (template-owned), project-specific content
+  inside (downstream-owned). `/refresh-from-repository --merge`
+  (Phase 2.1) already needs to preserve `ONBOARD-FILL` content,
+  so extending the pattern keeps merge semantics identical.
+- **B. Allow per-file divergence.** Relax FR-11 / NFR-9 to
+  "universal sections of universal files identical." Specific
+  files (e.g. `environment-rules.md`) can diverge wholesale
+  between root and dist. Higher drift risk unless an automated
+  check (Phase 3) compares only the universal sections.
+- **C. Status quo.** Keep all rules files universal-identical.
+  Treat Jamie's bootstrap-time fill in root
+  `environment-rules.md` as a single-file exception (the
+  ONBOARD-FILL block is *itself* the partition, and the dist's
+  unfilled placeholder IS the consumer-customizable surface).
+  Don't generalize.
+
+*What would unblock.* Audit each universal rules file
+section-by-section for "ought to differ between source and dist"
+content. This could fold into Phase 1.2 (rules + CLAUDE.md
+cleanup pass) which already touches every rules file, or get its
+own `/design-review` checkpoint. Decision affects
+`/refresh-from-repository --merge` semantics (Phase 2.1) and
+Phase 3 regression-check shape (what counts as "drift" vs. what
+counts as "legitimate divergence").
+
 #### Source-only release/build helper command
 
 *Context.* Today the dist subdir is kept in sync with the source

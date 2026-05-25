@@ -40,7 +40,7 @@ infrastructure. No `/exit-test-plan` walkthrough warranted.
 
 ---
 
-## Phase 1 — Onboard the source-of-truth (IN PROGRESS)
+## Phase 1 — Onboard the source-of-truth (COMPLETE)
 
 **Goal.** Run the configuration ritual on this project so the
 source-of-truth has its own REQUIREMENTS / ARCHITECTURE /
