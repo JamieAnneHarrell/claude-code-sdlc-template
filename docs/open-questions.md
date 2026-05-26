@@ -46,93 +46,145 @@ would unblock an answer.
 
 ### Open Questions
 
-#### Sharpen rule 7 commit-message brevity constraints
+#### Reconciliation algorithm for `/refresh-from-repository`
 
-*What we know.* The 2026-05-25 friction session added a "re-read
-rule 7 end-to-end before drafting" trigger to `/wind-down`,
-`/design-review` Stage 1 initial + Stage 2 landing, and
-`/exit-test-plan` Stage 1 initial + Stage 2 landing. That addresses
-*not* re-reading the rule; it doesn't address the rule's text
-itself, which today says "body is at most a few sentences plus an
-optional short bullet list" — soft enough that drift is easy.
-
-*Options to consider.* Phase 1.2's R4b is already scoped to rework
-rule 7 brevity ("subject + zero or one body sentence" as default;
-bullets cite doc IDs; PowerShell mechanics relegated to a reference
-sub-section). Specific constraints to consider during R4b:
-
-- Body ≤ 3 sentences, OR ≤ 4 bullets — pick one shape.
-- Each bullet ≤ 1 line at typical terminal width.
-- Subject ≤ 60 chars (tighter than current 72).
-- "If the body is more than the subject's elaboration, it's too long."
-
-*What would unblock.* Phase 1.2 (`Prompt 1.2` in
-`docs/CLAUDE_CODE_PROMPTS.md`) executes the R4b rework; this OQ
-captures the candidate constraints to consider then.
-
-#### CLAUDE.md merge strategy for `/refresh-from-repository --merge`
-
-*What we know.* Rules files have `<!-- ONBOARD-FILL: ... -->`
-marker blocks that demarcate downstream-owned content from
-template-owned content. `CLAUDE.md` does not — `/onboard` currently
-rewrites it wholesale based on project answers. So the
-`--merge` stage can cleanly merge rules files (take upstream content
-outside markers, preserve downstream content inside markers) but
-needs a different strategy for `CLAUDE.md`.
+*What we know.* The 2026-05-26 design cleanup settled the contract
+for `/refresh-from-repository` (template marks its own content,
+block-level reconciliation matrix, semantic conflict detection runs
+in-session — see `docs/design-decisions.md` "Template marks its own
+content; reconciliation tolerates divergence"). What it did *not*
+settle is the precise mechanism the merge uses to compare
+downstream-current against upstream-current and a baseline.
 
 *Options to consider.*
-- Add equivalent `<!-- ONBOARD-FILL: ... -->` markers to
-  `CLAUDE.md` during `/onboard` so the same merge logic applies.
-- Diff `CLAUDE.md` against the upstream version and surface
-  differences for Jamie to disposition manually (no auto-merge).
-- Skip `CLAUDE.md` from `--merge` entirely; only refresh commands
-  and rules. Downstream re-runs `/onboard` if they want
-  `CLAUDE.md` regenerated.
+- **Per-block content hash recorded in the marker.** Each template
+  block carries `hash=<sha>` in its open marker; refresh recomputes
+  the live hash and compares. Self-contained per file; no out-of-
+  band state needed.
+- **File-level commit-stamp baseline.** A `last-synced-at:
+  <upstream-commit>` stamp at the top of each refresh-managed file;
+  refresh fetches that upstream commit's version of the file as the
+  baseline. Requires upstream to keep history accessible (already
+  true via GitHub).
+- **Git 3-way merge against tagged upstream releases.** Upstream
+  tags releases; downstream records the tag it sync'd from; refresh
+  runs `git merge-file` between downstream, current upstream, and
+  the baseline-tag content. Leverages git's merge engine; requires
+  release-tag discipline upstream.
+- **Hybrid.** Hash per block (cheap inline-edit detection) PLUS
+  file-level commit stamp (baseline for the in-baseline-vs-new
+  decision). The two signals are complementary.
 
-*What would unblock.* Phase 2 design session that walks the merge
-strategy explicitly. Should pick one of the above (or invent a
-fourth) and live with the implications.
+*What would unblock.* The Phase 2.1 build session picks one and the
+pre-Phase-2.1 `/design-review` sanity-checks the choice. Constraints:
+must support the matrix in `docs/design-decisions.md`; should not
+require maintaining release-tag discipline upstream as a hard
+prerequisite (acceptable as part of a hybrid).
 
 ### Deferred User Stories
 
-#### Multi-agent-rules.md output shape under-specified in /onboard
+#### Plan-mode / checklist execution should surface `/wind-down`, not inline commit handoffs
 
-*Context.* `/onboard` rewrites `rules/multi-agent-rules.md`
-wholesale based on the mode Jamie picks. The spec in
-`.claude/commands/onboard.md` Step "rules/multi-agent-rules.md"
-is thin — for `explore-plus-plan` it says only "Explore + Plan.
-State when each is appropriate." ds-niche-stream (the most
-mature downstream consumer) evolved a much richer shape that
-`/onboard` would not naturally produce for a new project:
+*Context.* When Claude finishes a plan-mode execution (or any ad-hoc
+checklist-driven multi-step task that ends at session close), the
+natural last step Claude surfaces today is a rule-7 commit handoff
+— stage list, `git status`, `git commit -m "..."` block. That gets
+the changes committed, but it skips the rest of `/wind-down`'s job:
+TODO.txt refresh (rule 9), `docs/design-decisions.md` /
+`docs/open-questions.md` / `docs/CLAUDE_CODE_PROMPTS.md` deviation-
+footer / `docs/ARCHITECTURE.md` / `docs/REQUIREMENTS.md` /
+command-doc coherence sweep, and any artifact-status callouts. The
+consumer who follows the inline commit handoff lands the changes
+but leaves the rest of the repo's docs in whatever state the plan
+execution left them.
 
-- "Use Explore for:" / "Don't use Explore for:" structured
-  lists with concrete examples
-- "Use Plan for:" / "Don't use Plan for:" same structure
-- "What's NOT enabled in this project" section (no
-  implementation agents, no worktrees, with rationale)
-- Briefing rule embedded directly in the file rather than
-  referenced from global `~/.claude/CLAUDE.md` (the current
-  spec says reference; ds-niche-stream embeds, which is more
-  robust to global-file edits)
+Jamie surfaced this at the end of the 2026-05-26 Prompt-2.1 cleanup:
+the surfaced commit block worked, but `/wind-down` would have
+duplicated the commit check AND done the doc coherence pass.
+Running both is wasteful; choosing only the inline commit skips work.
 
-A new project onboarded today gets the sparse shape, not the
-evolved shape.
+Distinct from artifact-boundary handoffs in commands like
+`/onboard`, `/bootstrap`, `/design-review` Stage 1 initial / Stage
+2 landing, `/exit-test-plan` Stage 1 initial / Stage 2 landing —
+those commit at their own artifact boundary and are by design
+separate from session-end wind-down. The user story is about
+**plan-mode / checklist-driven** execution that has no
+artifact-boundary handoff of its own.
 
-*Proposed approach.* Address via a `/design-review` checkpoint
-after this project's `/onboard` runs. The review can compare
-this project's freshly-produced `rules/multi-agent-rules.md`
-against ds-niche-stream's evolved version and decide:
+*Proposed approach.* Update the plan-mode workflow (and any future
+checklist-driven execution conventions) so the final step is
+"propose `/wind-down`" — Claude says "all plan steps complete;
+run `/wind-down` to commit and refresh docs" rather than surfacing
+the inline git block. `/wind-down`'s existing Step 4 (re-read rule
+7 then surface the commit handoff) absorbs the commit work; its
+other steps cover the doc coherence pass.
 
-- Whether to beef up `onboard.md`'s spec to describe the
-  Use For / Don't Use For structure, OR
-- Whether to ship ds-niche-stream's structured shape as a
-  scaffold in the placeholder file itself (with `/onboard`
-  filling in mode-specific details).
+Implementation surfaces to touch:
 
-*Open sub-questions.* Briefing rule — embed per-project (ds-
-niche-stream's pattern) or reference from global (current
-`/onboard` spec)? Embedding survives global-file edits;
-referencing avoids duplication.
+- `rules/coding-session-rules.md` rule 9 — add a line clarifying
+  that plan-mode and checklist execution route session-end commits
+  through `/wind-down` rather than surfacing them inline.
+- Anywhere in Claude Code's plan-mode behavior that auto-surfaces
+  commit handoffs at plan completion (if any — may be
+  emergent-from-rule-7 rather than configured).
+- `.claude/commands/wind-down.md` — add a "called-from-plan-mode"
+  intake path if needed (most likely just an extra reminder in the
+  command preamble: "if you came here from plan-mode completion,
+  do the full doc-coherence pass before the commit").
+
+*Open sub-questions.* Whether artifact-boundary commands
+(`/onboard`, `/bootstrap`, `/design-review`, `/exit-test-plan`)
+should also route through `/wind-down` at their artifact boundaries
+(probably no — those *are* the artifact boundary, and forcing them
+through `/wind-down` collapses two distinct moments). Whether
+"checklist-driven execution" needs a more precise definition
+(e.g., does TodoWrite-tracked work count? It probably should).
+
+#### "Before running this prompt" header-block pattern in CLAUDE_CODE_PROMPTS.md
+
+*Context.* `/onboard`'s spec for `docs/CLAUDE_CODE_PROMPTS.md`
+(see `.claude/commands/onboard.md` step `docs/CLAUDE_CODE_PROMPTS.md`,
+"Design-review checkpoints between prompts") plants a "Before
+running this prompt:" header-block note at the top of each
+forward-looking prompt to signal a between-phase `/design-review`
+checkpoint. The same checkpoint is *also* recorded as a first-class
+entry in `docs/PROJECT_PLAN.md` for high-risk transitions (e.g.
+`## Design Review Checkpoint — pre-Phase-2.1`).
+
+The header-block notes ended up conflating two things:
+
+- **Gate assertion** — "the pre-Phase-X review has landed" stated as
+  a fact, but the prompt has no way to verify the gate at execution
+  time. If false, the consumer notices only after starting the work.
+- **Next-session reminder** — content that arguably belongs in
+  `TODO.txt` at the moment the consumer picks up the prompt, not
+  inside the prompt body.
+
+Jamie surfaced this during the 2026-05-26 cleanup of Prompt 2.1 and
+the block was stripped from that prompt specifically. The other
+forward-looking prompts (2.2, 3) still carry it. Landed prompts
+(1.1, 1.2) carry historical-state header blocks; the file's
+convention is to leave landed prompts unedited retroactively.
+
+*Proposed approach.* The pre-Phase-2.1 `/design-review` should
+evaluate the pattern across the file:
+
+- Retire the `/onboard` header-block-note form entirely; rely on
+  PROJECT_PLAN.md first-class checkpoint entries alone as the
+  between-phase signal.
+- Or, keep the header-block pattern but rewrite the language so it
+  reads as a gate-check rather than a gate-assertion ("If the
+  pre-Phase-X review hasn't landed yet, stop and run it first.").
+- Or, hybrid: keep landed prompts' header blocks (historical
+  record) and retire only the forward-looking-prompt form.
+
+The review's disposition should update `/onboard`'s spec
+accordingly so future onboards don't reproduce the pattern.
+
+*Open sub-questions.* Whether the same critique applies to other
+inside-prompt-body content that arguably belongs in TODO.txt at
+prompt-pickup time (e.g. "Read first" lists that re-state the
+file-level reading-order banner).
 
 #### In-flight artifact status callout at top of CLAUDE.md
 
@@ -178,100 +230,17 @@ would miss the things that come up often at session start: DB
 engine, source-tree location, public-vs-admin stack split for
 web projects.
 
-*Proposed approach.* Address via the same `/design-review`
-checkpoint that handles `multi-agent-rules.md` (above), after
-this project's `/onboard` + `/bootstrap` run. The review can
-compare the freshly-produced CLAUDE.md against ds-niche-stream's
-shape and decide whether `/bootstrap` should write a "Project
-quick orientation" section alongside the banner, or whether the
-banner alone is enough (KISS — don't add a section every project
-has to maintain).
+*Proposed approach.* Address via a future `/design-review`
+checkpoint that compares this project's freshly-produced CLAUDE.md
+against ds-niche-stream's shape and decides whether `/bootstrap`
+should write a "Project quick orientation" section alongside the
+banner, or whether the banner alone is enough (KISS — don't add a
+section every project has to maintain).
 
 *Open sub-questions.* If the section is added, which command
 owns it — `/onboard` (most project context is already collected
 there) or `/bootstrap` (knows the stack + commands)? How much
 overlaps with the banner before the duplication starts hurting?
-
-#### Universal-rules customization partitions
-
-*Context.* FR-11 says universal rules content — the 9
-coding-session rules, design-philosophy, and the placeholder rules
-files (environment / multi-agent / project / testing) — ships
-identical between root and `cc-template/`. NFR-9 acknowledges the
-duplication is deliberate but creates drift risk.
-
-This session's `/bootstrap` filled the
-`<!-- ONBOARD-FILL: environment -->` block in root
-`rules/environment-rules.md` with Jamie-specific maintainer
-content (PowerShell on Windows 11, VSCode + Claude Code
-extension). That content is correct for the source-of-truth
-project but should NOT appear in `cc-template/rules/environment-rules.md`,
-which must stay generic for downstream consumers who may use a
-different shell or editor.
-
-The existing `<!-- ONBOARD-FILL: ... -->` marker pattern handles
-this single case — the dist keeps the placeholder; the source
-fills it during its own `/bootstrap` run. But the partition lives
-at the bottom of one specific file, and the pattern doesn't
-generalize. Other rules files may have sections that ought to
-differ between source and dist, or that downstream consumers
-might legitimately need to customize per project:
-
-- `rules/coding-session-rules.md` rule 7: PowerShell-quoting
-  mechanics that are Windows-specific (would be different on a
-  bash-primary project)
-- `rules/design-philosophy-rules.md`: any project-specific
-  overlays on the general principles
-- `rules/testing-rules.md`: language-specific test commands (a
-  Python project's "run the tests" line differs from a PHP one)
-- `rules/project-rules.md`: already has a project-scope
-  ONBOARD-FILL block, but other sections may need similar
-  treatment as the rule grows
-
-*Options to consider.*
-- **A. Expand the ONBOARD-FILL pattern.** Add
-  `<!-- ONBOARD-FILL: ... -->` markers to whichever sections of
-  whichever rules files might need divergence — universal content
-  outside markers (template-owned), project-specific content
-  inside (downstream-owned). `/refresh-from-repository --merge`
-  (Phase 2.1) already needs to preserve `ONBOARD-FILL` content,
-  so extending the pattern keeps merge semantics identical.
-- **B. Allow per-file divergence.** Relax FR-11 / NFR-9 to
-  "universal sections of universal files identical." Specific
-  files (e.g. `environment-rules.md`) can diverge wholesale
-  between root and dist. Higher drift risk unless an automated
-  check (Phase 3) compares only the universal sections.
-- **C. Status quo.** Keep all rules files universal-identical.
-  Treat Jamie's bootstrap-time fill in root
-  `environment-rules.md` as a single-file exception (the
-  ONBOARD-FILL block is *itself* the partition, and the dist's
-  unfilled placeholder IS the consumer-customizable surface).
-  Don't generalize.
-
-*What would unblock.* Audit each universal rules file
-section-by-section for "ought to differ between source and dist"
-content. This could fold into Phase 1.2 (rules + CLAUDE.md
-cleanup pass) which already touches every rules file, or get its
-own `/design-review` checkpoint. Decision affects
-`/refresh-from-repository --merge` semantics (Phase 2.1) and
-Phase 3 regression-check shape (what counts as "drift" vs. what
-counts as "legitimate divergence").
-
-#### Source-only release/build helper command
-
-*Context.* Today the dist subdir is kept in sync with the source
-manually — edit in the dist when a shipping change is needed,
-copy up to root when it's a command this project itself uses.
-If drift between root copies and dist copies of the same file
-becomes painful, a small source-only command (e.g. `/sync-root-to-dist`
-or `/release`) could automate the diff/copy step.
-
-*Proposed approach.* Defer until pain is felt. Manual sync is the
-v1 answer and git diff at commit time catches accidental drift.
-
-*Open sub-questions.* Whether the sync is dist→root or root→dist
-(i.e. which side is canonical for shared content like the recurring
-commands). Current convention: edit in dist first.
 
 #### Regression-test automation for the distributable
 

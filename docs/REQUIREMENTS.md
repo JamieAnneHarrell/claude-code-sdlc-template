@@ -101,14 +101,22 @@ PROJECT_PLAN / CLAUDE_CODE_PROMPTS, `docs/design/` intake,
 project's README, and root `CLAUDE.md` never copy into the dist.
 
 **FR-13: `/refresh-from-repository` is a Phase 2 deliverable.** A
-two-stage self-modifying command shipped in the dist. Stage 1
-selectively pulls the latest `.claude/commands/*.md` and
-`rules/*.md` from the public upstream; stage 2 (`--merge`) runs
-the freshly-updated logic and surgically merges deltas in
-downstream `CLAUDE.md` and `rules/*.md` while preserving
-`<!-- ONBOARD-FILL: ... -->` blocks. Refuses when invoked against
-the source repo (the source is upstream; pulling from itself is a
-footgun).
+single-stage command shipped in the dist that pulls latest
+`.claude/commands/*.md` from upstream and merges latest
+`rules/*.md` + `CLAUDE.md` against the downstream's current state
+using block-level reconciliation against template-owned marker
+blocks. Auto-detects "merge-logic drift" (locally-loaded refresh
+logic is N generations behind upstream) and stages skills-first when
+warranted, prompting the consumer to re-invoke. Source-mode behavior:
+when invoked in a repo containing a `cc-template/` subdirectory at
+cwd, "upstream" is the local `cc-template/` subdir rather than the
+public GitHub URL (serves the source-of-truth repo's root↔dist sync
+and the vendored-template-lock-in use case). Two progressive-
+disclosure flags ship in v1: `--refresh-skills-only` (manual override
+for the drift-staging path) and `--no-claudemd` (skip CLAUDE.md from
+the merge). Full design contract in `docs/design-decisions.md`
+"Template marks its own content; reconciliation tolerates
+divergence."
 
 **FR-14: `/write-user-documentation` is a Phase 2 deliverable.** A
 command that authors end-user documentation. Shipped in the dist;
@@ -155,13 +163,19 @@ source of truth for the recurring-artifact lifecycle (the three
 status comments in `CLAUDE.md` govern only the configuration
 ritual).
 
-**NFR-4: Stage-detection placeholders are load-bearing.** Stage
-detection parses for exact strings:
+**NFR-4: Stage-detection and refresh-marker placeholders are
+load-bearing.** Stage detection parses for exact strings:
 `> _[UNMARKED — replace this line with your decision per the legend above]_`
 (in `/design-review` AUDIT NOTE blocks) and `[PENDING]` (in
 `/exit-test-plan` §4 / §6.N run log rows). Changing the
 placeholder text breaks stage detection — audit `Step 0`, `Step
-S1.5`, and `Step S1.A` of the relevant command file together.
+S1.5`, and `Step S1.A` of the relevant command file together. The
+template-marker syntax for `/refresh-from-repository` is similarly
+load-bearing (exact strings TBD by the Phase 2.1 build session,
+sanity-checked in pre-Phase-2.1 `/design-review`) — once shipped,
+the open/close marker text and any metadata fields embedded in
+markers cannot drift without auditing the refresh logic and all
+template files that carry markers.
 
 **NFR-5: Failures refuse explicitly.** Commands refuse with a
 pointer to the right command when prerequisites aren't met (e.g.

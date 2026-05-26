@@ -138,11 +138,16 @@ pip` then re-invoke) and avoids the "command updates itself but the
 already-running invocation is stale" problem.
 
 **Scope note.** Building `/refresh-from-repository` is Phase 2 work.
-One design problem still open for that phase: the merge strategy for
-`CLAUDE.md` specifically (it has no `ONBOARD-FILL` markers today).
-Tracked in `docs/open-questions.md`. The public GitHub URL is
-resolved — see the "Public GitHub URL for the source repo" decision
-below.
+The public GitHub URL is resolved — see the "Public GitHub URL for the
+source repo" decision below.
+
+**Superseded by** the 2026-05-26 design-cleanup decisions below
+(`Refresh-from-repository is single-stage with skills-first staging
+on detected drift`, `Template marks its own content; reconciliation
+tolerates divergence`, `Source-repo refresh syncs local cc-template/
+→ root`, `Refresh progressive-disclosure flags`, `Vendored-template
+lock-in as a documented use case`). The pull-model framing in this
+entry still stands; the two-stage detail does not.
 
 ---
 
@@ -321,3 +326,180 @@ readers but actively confused post-onboard readers, and the latter
 audience is much larger (every downstream session).
 
 Folded into Phase 1.2 cleanup (R4c).
+
+---
+
+## `/refresh-from-repository` is single-stage with skills-first staging on detected drift
+
+**Decision.** `/refresh-from-repository` runs as a single invocation
+that pulls the latest commands and rules from upstream and then runs
+the merge logic loaded at invocation start. There is no required
+two-stage user flow. The command does, however, detect "merge-logic
+drift" automatically and stage skills-first when the locally-loaded
+refresh logic is N generations behind upstream.
+
+**Why.** The two-stage `pip install --upgrade pip` analogy in the
+"Downstream updates use a pull model" entry above cited a footgun
+that doesn't actually exist for Claude Code commands. Slash commands
+are read fresh from disk at each invocation, not cached in a
+long-lived process. The currently-executing invocation continues
+following the instructions it loaded at start; replacing the
+command file on disk only affects *future* invocations. One
+invocation can safely pull-then-merge.
+
+**How drift is detected.** Before pulling anything, the command
+fetches upstream's current `refresh-from-repository.md`, compares
+the version-stamp / marker-convention metadata to the locally-loaded
+copy, and on drift pulls only `.claude/commands/*.md` files and
+surfaces "your refresh logic was N versions behind; latest commands
+now loaded — re-invoke to merge." Two well-chosen signals beat
+either no signal (silent failure on schema drift) or a flag the
+consumer doesn't know to use.
+
+**Why not always two-stage.** Adds an invocation to the routine path
+for a problem that doesn't exist most of the time. KISS — auto-detect
+the case that needs staging; default path is one invocation.
+
+**Why not require the consumer to use `--refresh-skills-only`.** The
+consumer often won't know to worry about merge-logic drift; auto-
+detect and prompt. The flag exists as a manual override for power
+users (see "Refresh progressive-disclosure flags" below).
+
+---
+
+## Template marks its own content; reconciliation tolerates divergence
+
+**Decision.** Template-owned content in rules files (and CLAUDE.md
+post-onboard) is wrapped in template-owned marker blocks. Markers
+carry "DO NOT EDIT — move elsewhere to personalize" language.
+`/refresh-from-repository` reconciles at the block level using a
+three-input matrix: downstream-current, upstream-current, and a
+baseline (what upstream looked like the last time this downstream
+sync'd). Each block carries enough metadata for the refresh to
+detect "user edited inline" — a content hash or recorded baseline
+content. Mismatch surfaces; refresh doesn't silently overwrite.
+
+**Consumer contract (refresh's promise):**
+
+- Don't edit inside a template marker block. Refresh expects to
+  replace its contents.
+- To opt out: move the block out of the template region into your
+  own personalized-rules section, or delete the block entirely.
+  Refresh respects the absence as your decision.
+- Personalized rules are yours forever — refresh never touches them,
+  and they don't get upstream improvements by design.
+- Inline edits are detected and surfaced, not silently overwritten.
+
+**Why.** Two earlier proposals failed. (a) "User wraps opt-outs in
+LOCAL markers" is unenforceable — consumers wholesale-delete rules
+they disagree with (Android project deletes "iPhone, not Android"),
+refresh has no signal it was deliberate, silently re-adds the rule.
+(b) "Diff-each-time without a baseline" can't distinguish
+"block-new-since-baseline" from "block-the-user-removed." Marking
+*our* content (which we can enforce) and tracking a baseline (which
+we can stamp ourselves) is the smallest mechanism that handles every
+deletion / edit / personalization case the consumer can throw at it.
+
+**Why not git-3-way as the only mechanism.** Requires upstream to
+maintain stable release tags AND downstream to track which tag it
+sync'd from. Self-contained per-block metadata is simpler for v1
+and doesn't preclude git-3-way as a later iteration.
+
+**Semantic conflict detection is the executing session's job.** When
+upstream's new blocks land alongside downstream's personalized
+content, the Claude session running `/refresh-from-repository` reads
+both and surfaces real semantic conflicts ("upstream's new rule R12
+says always-X; your personalized rule says never-X") using language
+understanding, not a heuristic engine. The command spec instructs
+the session to do this analysis directly.
+
+**Scope note.** The exact reconciliation algorithm (per-block hash
+in the marker, file-level commit stamp at the top, both, or git-3-way
+against tagged upstream commits) is deferred to the Phase 2.1 build
+session and the pre-Phase-2.1 `/design-review` will sanity-check the
+choice. What's settled here is the contract and the matrix; the
+mechanism is a build-time decision.
+
+---
+
+## Source-repo refresh syncs local `cc-template/` → root
+
+**Decision.** When `/refresh-from-repository` runs in the source-of-
+truth repo, "upstream" is the local `./cc-template/` subdirectory
+rather than the public GitHub URL. Detection is trivial: the
+source-of-truth repo is the only one with a `cc-template/` subdir
+at cwd.
+
+**Why.** The source repo itself is a downstream consumer of its own
+template; manual root↔dist sync was previously handled by hand or
+hypothetically by a "source-only release helper" command (open
+question now closed). Folding source-mode behavior into
+`/refresh-from-repository` keeps one mental model for "pull
+template changes into this project" and avoids adding a fourth
+configuration-ritual command.
+
+**Bonus use case — vendored template lock-in.** A consumer who
+wants to pin to a specific upstream version can vendor `cc-template/`
+into their own repo as a subdirectory and use the same source-mode
+sync to apply that vendored copy to root. Upgrading the vendored
+copy is a deliberate `git pull` from upstream into the vendored
+subdir; the routine sync from subdir to root is a stable, audited
+operation. Documented configuration-management pattern.
+
+**Why not refuse at source.** The current Phase 2.1 prompt described
+a refusal stance at source ("pulling from itself is a footgun").
+Refusing leaves the manual-sync problem unsolved and forecloses the
+vendored-lockin pattern. Sync-from-subdir is the right behavior; the
+"footgun" framing was based on misreading the source repo's
+relationship to its own dist.
+
+---
+
+## Refresh progressive-disclosure flags
+
+**Decision.** `/refresh-from-repository` ships with two
+progressive-disclosure flags that name what they suppress:
+
+- `--refresh-skills-only` — pulls only `.claude/commands/*.md`; no
+  merge attempted. Manual override for the auto-detected
+  drift-staging path; useful when a consumer wants to inspect
+  upstream's new refresh logic before letting it touch their
+  rules.
+- `--no-claudemd` — skips CLAUDE.md from the merge. Rules and
+  commands still refresh. For consumers who've heavily-customized
+  CLAUDE.md outside the marker model.
+
+**Why.** Default behavior covers the common case (per
+`rules/design-philosophy-rules.md` progressive disclosure). Both
+flags exist as access-not-foreground escape hatches; neither is
+required to use the command.
+
+**Why not more flags.** Each flag is one more thing the consumer
+might reach for inappropriately. Two real escape hatches earn their
+place; speculative flags ("--dry-run", "--from-tag",
+"--exclude-rules", etc.) are deferred to evidence-of-need.
+
+---
+
+## Vendored-template lock-in as a documented use case
+
+**Decision.** Consumers who want to pin to a specific upstream
+template version vendor the `cc-template/` subdirectory of an
+upstream commit into their own repo and use the source-mode behavior
+of `/refresh-from-repository` (see "Source-repo refresh syncs local
+`cc-template/` → root" above) to sync that vendored copy to root.
+
+**Why.** The mechanism already exists for the source-of-truth repo's
+own root↔dist sync. Naming it as a supported configuration-management
+pattern costs nothing and serves consumers with audit or
+reproducibility requirements that would otherwise force them off the
+template.
+
+**Why not a separate command.** Same mechanism, different motivation.
+A dedicated command would force consumers to learn two tools for one
+operation and would drift relative to source-mode refresh.
+
+**Scope note.** Upgrading the vendored copy is a deliberate consumer
+action (`git fetch` + copy / `git subtree` / similar) — not
+something `/refresh-from-repository` automates. The command's job is
+to apply whatever the vendored subdir currently holds.

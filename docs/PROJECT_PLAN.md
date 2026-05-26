@@ -4,10 +4,8 @@ Phased plan for `claude-code-sdlc-template`. Derived from
 [`docs/ARCHITECTURE.md`](ARCHITECTURE.md) and the design intake
 at [`docs/design/cc-template-product-spec.md`](design/cc-template-product-spec.md).
 
-Phases close with `/exit-test-plan` (manual walkthrough against the
-phase's exit criteria) when the phase ships user-observable
-behavior. High-risk transitions between phases also get a
-`/design-review` checkpoint — see the markers below.
+Phases currenlty never close with `/exit-test-plan`. High-risk transitions 
+between phases get a `/design-review` checkpoint — see the markers below.
 
 Phase 0 was scoped before this plan was written, so its prompt is
 recorded in [`docs/CLAUDE_CODE_PROMPTS.md`](CLAUDE_CODE_PROMPTS.md)
@@ -36,7 +34,7 @@ copy-paste workflow remains intact.
 
 **Exit criteria.** Complete as of the source/dist restructure.
 This phase ships no user-observable behavior — it's
-infrastructure. No `/exit-test-plan` walkthrough warranted.
+infrastructure. No `/exit-test-plan` walkthrough.
 
 ---
 
@@ -116,9 +114,8 @@ for the next addendum.
 addendum) places `[BLOCKED]` as a valid run log placeholder in
 the same shape as `[PENDING]`. Stage 2 walks blocked rows and
 queues the appropriate next-step. Validated by re-running
-`/exit-test-plan` against an artificial blocker case during the
-exit walkthrough.
-
+`/exit-test-plan` against an artificial blocker case in another
+project during the exit walkthrough.
 ---
 
 ## Phase 1.2 — Rules and CLAUDE.md cleanup pass (COMPLETE)
@@ -170,10 +167,6 @@ that hit the new brevity bar. The dist's `cc-template/CLAUDE.md`
 reads correctly both pre-onboard (placeholder state) and
 post-onboard (rewritten state). The new `docs/design/`
 Reading-order entry is present in `cc-template/CLAUDE.md`.
-Validated by `/exit-test-plan` walkthrough covering: a sample
-commit handoff exercises the new rule 7 shape; a sandbox copy of
-`cc-template/` reads correctly without the stale qualifiers.
-
 ---
 
 ## Phase 2 — Planned project enhancements (roadmap)
@@ -186,39 +179,58 @@ and gets exercised on the source first.
 
 ## Phase 2.1 — `/refresh-from-repository` (roadmap)
 
-**Goal.** Build the two-stage downstream update command that lets
-consumers pull the latest commands and rules from the public
-upstream without re-running `/onboard`.
+**Goal.** Build the single-stage downstream update command that
+lets consumers pull latest commands and merge latest rules /
+CLAUDE.md from the public upstream without re-running `/onboard`,
+using block-level reconciliation against template-owned markers.
 
 **Deliverables.**
 - `cc-template/.claude/commands/refresh-from-repository.md`
-  written as a two-stage self-modifying command.
-- Stage 1: selectively pulls latest `.claude/commands/*.md` and
-  `rules/*.md` from
-  `github.com/JamieAnneHarrell/claude-code-sdlc-template`.
-  Replaces the command files themselves, including
-  `/refresh-from-repository`.
-- Stage 2 (`--merge`): runs the freshly-updated logic. Diffs the
-  downstream's `CLAUDE.md` and `rules/*.md` against the upstream
-  `cc-template/` subtree and surgically merges deltas while
-  preserving `<!-- ONBOARD-FILL: ... -->` blocks.
-- CLAUDE.md merge strategy resolved (see
-  [`docs/open-questions.md`](open-questions.md)).
-- Refusal logic when invoked against the source repo (pulling
-  from itself is a footgun).
-- Documentation: shipping README explains how downstream consumers
-  use `/refresh-from-repository`; this project's
-  `docs/CLAUDE_CODE_PROMPTS.md` Prompt 2.1 records the prompt that
-  built it.
+  written per the design contract in
+  [`docs/design-decisions.md`](design-decisions.md) (`Refresh-
+  from-repository is single-stage with skills-first staging on
+  detected drift`, `Template marks its own content; reconciliation
+  tolerates divergence`, `Source-repo refresh syncs local
+  cc-template/ → root`, `Refresh progressive-disclosure flags`,
+  `Vendored-template lock-in as a documented use case`).
+- Template marker syntax pinned (open/close strings, embedded
+  metadata fields). Becomes load-bearing per NFR-4 once shipped.
+- Reconciliation algorithm chosen from the options in
+  [`docs/open-questions.md`](open-questions.md) (per-block hash,
+  file-level commit-stamp baseline, git-3-way, or hybrid),
+  sanity-checked in the pre-Phase-2.1 `/design-review`.
+- Template markers added to refresh-managed regions of rules
+  files and CLAUDE.md (post-onboard wrapping is part of this
+  phase's work; the consumer contract requires markers to exist
+  before refresh can target them).
+- Auto-detected drift → skills-first staging logic implemented;
+  manual `--refresh-skills-only` flag exposed.
+- `--no-claudemd` flag exposed.
+- Source-mode behavior: detect `cc-template/` subdir at cwd and
+  treat it as upstream; same code path serves the source-of-truth
+  repo's root↔dist sync and the vendored-template-lock-in use
+  case.
+- Semantic conflict surfacing across template/personalized regions
+  is the executing session's job (per
+  `docs/design-decisions.md` "Template marks its own content").
+- Documentation: shipping `cc-template/README.md` explains how
+  consumers use the command (default invocation, flags, vendored-
+  lock-in pattern); this project's
+  `docs/CLAUDE_CODE_PROMPTS.md` Prompt 2.1 records the build
+  prompt; root `CLAUDE.md` Load-bearing invariants section
+  updated *after* markers exist on-disk (pinning their syntax as
+  load-bearing).
 
-**Exit criteria.** A test downstream project (sandbox copy of
-`cc-template/`) seeded from an earlier commit successfully pulls
-the latest commands and rules via stage 1, then `--merge` lands
-deltas in `CLAUDE.md` and `rules/*.md` without trampling
-`ONBOARD-FILL` content. Refusal triggers correctly when run
-against the source repo. Manual `/exit-test-plan` walkthrough
-covers happy path + at least two failure modes (upstream
-unreachable; merge conflict in `ONBOARD-FILL`-adjacent text).
+**Exit criteria.** Sandbox downstream project (copy of an earlier
+`cc-template/` commit) runs refresh cleanly: command files
+wholesale-replaced; rules and CLAUDE.md block-merged against
+upstream with `ONBOARD-FILL` content preserved; consumer-edited
+template blocks surface as divergences rather than silent
+overwrites; consumer-deleted blocks are not re-added.
+Source-mode invocation at this project's root syncs `cc-template/`
+contents up correctly. Drift auto-detection stages skills-first
+when the locally-loaded refresh is older than upstream's current
+refresh.
 
 **Design review checkpoint:** before Phase 2.1 begins.
 
@@ -250,8 +262,9 @@ documentation.
 **Exit criteria.** Command runs against a freshly-seeded downstream
 project (sandbox) and produces a user-facing README and any
 supplementary docs the consumer requested. Output style is
-consistent with the project's documentation conventions. Manual
-`/exit-test-plan` walkthrough covers the happy path.
+consistent with the project's documentation conventions. Sandbox
+re-read against the dist command spec is the validation
+(`/exit-test-plan` is not used in this project per NFR-6).
 
 ---
 

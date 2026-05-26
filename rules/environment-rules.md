@@ -229,6 +229,9 @@ username, stop and surface the policy.
   3. Real-world use of the template on a new project.
 - Maintainers should run `git --version` to confirm git is on PATH
   before contributing.
+- IMPORTANT: There is currently no need for /exit-test-plan usage
+  in this project. NEVER surface a demand for the /exit-test-plan 
+  skill.
 
 ### Tooling beyond language
 - **Git** — maintainers / contributors only. Any modern version.
