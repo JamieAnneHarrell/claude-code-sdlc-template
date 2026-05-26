@@ -302,7 +302,13 @@ Reading-order entry for `docs/design/`). Must land before Phase
   brevity bar on a sample commit handoff; sandbox copy of
   `cc-template/` reads correctly pre- and post-onboard.
 
-**Revisions since this prompt ran:** none tracked.
+**Revisions since this prompt ran:**
+
+- LANDED 2026-05-25. Deviations: aggregate reduction -11.7% (-269
+  lines), short of ≥25%; load-bearing content density was the
+  limit. Validation was per `rules/testing-rules.md`
+  "Project-specific tooling" — the `/exit-test-plan` bullet was a
+  drafting carry-over (this project doesn't use that command).
 
 ---
 

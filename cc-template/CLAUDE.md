@@ -44,20 +44,24 @@
 >   lands dispositions across the project's docs, and asks Jamie
 >   whether to land the document or open another polish round.
 
-## Reading order at session start (configured projects)
+## Reading order at session start
 
-1. **This file** — quick orientation and reading list
-2. **`TODO.txt`** — gitignored session handoff. First entry is what we pick
-   up next; the rest is the upcoming queue.
+1. **This file** — quick orientation and reading list.
+2. **`TODO.txt`** — gitignored session handoff. First entry is what
+   we pick up next; the rest is the upcoming queue.
 3. **`docs/PROJECT_PLAN.md`** — active phase queue.
-4. **`docs/CLAUDE_CODE_PROMPTS.md`** — authoritative prompt for the current
-   phase.
-5. **`docs/test-plans/`** — if the current phase has a test plan in flight,
-   it'll be `phase-NNN-exit.md` here. `AWAITING-DISPOSITIONS` means the
-   phase is somewhere in the iterative test-and-polish loop (original
-   run, dispositions, polish coding session, optional §6.N addendums);
-   `LANDED` means every run log is PASS / SKIP, every Fix-now is
-   verified, and the phase exit is closed.
+4. **`docs/CLAUDE_CODE_PROMPTS.md`** — authoritative prompt for the
+   current phase.
+5. **`docs/design/`** — design intake plus any `/design-review`
+   checkpoints in flight. A checkpoint with `AWAITING-DECISIONS`
+   frontmatter means Stage 1 ran but Stage 2 hasn't walked
+   dispositions yet (or there's an addendum round mid-iteration).
+6. **`docs/test-plans/`** — if the current phase has a test plan in
+   flight, it'll be `phase-NNN-exit.md` here. `AWAITING-DISPOSITIONS`
+   means the phase is somewhere in the iterative test-and-polish
+   loop (original run, dispositions, polish coding session, optional
+   §6.N addendums); `LANDED` means every run log is PASS / SKIP,
+   every Fix-now is verified, and the phase exit is closed.
 
 ## Collaboration rules
 
@@ -81,10 +85,8 @@ simpler-alternative on additions).
   MVP, what is roadmap, dependency justification).
 - `rules/testing-rules.md` — test discipline, language-neutral.
 - `rules/environment-rules.md` — cross-platform conventions, shells,
-  venv handling, where Claude scratch files go. Project-specific
-  environment is filled in by `/bootstrap`.
-- `rules/multi-agent-rules.md` — how this project uses subagents
-  (filled in by `/onboard` based on the chosen mode).
+  venv handling, where Claude scratch files go.
+- `rules/multi-agent-rules.md` — how this project uses subagents.
 
 If Jamie says "rule 4" or "this is a rule 1 issue" mid-session, that's a
 drift signal pointing at `rules/coding-session-rules.md`. Acknowledge,

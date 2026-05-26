@@ -50,39 +50,33 @@
 
 ## Collaboration rules
 
-**MUST DO before responding to the first user message of any session.**
-Read these two files end-to-end. Their contents are *not* loaded into
-context by default — only this CLAUDE.md is. Skipping this step is the
-#1 cause of rule drift (KISS violations, commit-message bloat, no
+**MUST DO before responding to the first user message of any
+session.** Read these two files end-to-end — their contents are
+*not* loaded into context by default. Skipping is the #1 cause of
+rule drift (KISS violations, commit-message bloat, no
 simpler-alternative on additions).
 
 - [`rules/coding-session-rules.md`](rules/coding-session-rules.md)
-  — the 9 standing rules (root-cause, trust diagnosis, rejections
-  permanent, no unsolicited design, decouple data from display,
-  reference rule numbers, Jamie runs commits, Jamie runs tests,
-  session wind-down rewrites TODO.txt). Includes the rule-7
-  commit handoff format and the rule-4 simpler-alternative
-  self-check.
+  — the 9 standing rules, including rule-7 commit handoff format
+  and rule-4 simpler-alternative self-check.
 - [`rules/design-philosophy-rules.md`](rules/design-philosophy-rules.md)
-  — KISS, progressive disclosure, simple defaults.
+  — KISS, progressive disclosure.
   *iPhone, not Android. Macintosh, not PC.*
 
-**Read these when relevant to the current task:**
+**Read when relevant to the current task:**
 
-- [`rules/project-rules.md`](rules/project-rules.md) —
-  project-specific scope discipline. MVP scope statements,
-  out-of-scope list, and the dependency-justification rule.
+- [`rules/project-rules.md`](rules/project-rules.md) — MVP scope,
+  out-of-scope list, dependency justification.
 - [`rules/testing-rules.md`](rules/testing-rules.md) — test
   discipline. This project has no traditional test suite; the
-  "testing" sections describe re-reading the command files, the
-  mental dry-run, and the live-test walkthrough.
+  "testing" sections describe re-reading command files, mental
+  dry-run, and the live-test walkthrough.
 - [`rules/environment-rules.md`](rules/environment-rules.md) —
-  cross-platform conventions, shells, where Claude scratch files
-  go. Project-specific environment lives inside the
-  `<!-- ONBOARD-FILL: environment -->` block and is filled by
-  `/bootstrap`.
+  cross-platform conventions, shells, scratch files. The
+  project-specific environment is inside the
+  `<!-- ONBOARD-FILL: environment -->` block.
 - [`rules/multi-agent-rules.md`](rules/multi-agent-rules.md) —
-  how this project uses subagents (explore-plus-plan mode).
+  subagent usage (explore-plus-plan mode).
 
 If Jamie says "rule 4" or "this is a rule 1 issue" mid-session,
 that's a drift signal pointing at
@@ -91,189 +85,162 @@ Acknowledge, correct course, move on.
 
 ## Project-specific context
 
-The full reference for "what is this template" lives in
-[`README.md`](README.md). The architectural shape (source-of-truth
-root + `cc-template/` distributable, universal-content
-duplication, source-only docs at root) is in
-[`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md). The testable
-contract — functional requirements per command, non-functional
-invariants — is in [`docs/REQUIREMENTS.md`](docs/REQUIREMENTS.md).
-
-This file ALSO documents the load-bearing invariants below, in
-template-improvement language ("if you change this, audit the
-whole chain first") that complements REQUIREMENTS.md's
-testable-contract framing. Both are deliberate: REQUIREMENTS.md
-is the contract; the section below is the don't-break-this
-warning Jamie sees at session start.
+The "what is this template" reference is [`README.md`](README.md).
+Architectural shape (source-of-truth root + `cc-template/`
+distributable, universal-content duplication, source-only docs at
+root) is in [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md). The
+testable contract is [`docs/REQUIREMENTS.md`](docs/REQUIREMENTS.md).
+The Load-bearing invariants section below complements REQUIREMENTS
+with "don't break this" warnings keyed to the conventions that
+stage detection and recurring lifecycles depend on.
 
 ## Load-bearing invariants — do not break
 
-If you change one of these, audit the whole chain first.
+Changing one of these requires auditing the whole chain.
+
+### Configuration ritual (status comments)
 
 - **Status comment names, exact spelling**: `ONBOARD-STATUS`,
   `BOOTSTRAP-STATUS`, `DEPLOYMENT-PLAN-STATUS`. Base values:
-  `UNCONFIGURED`, `COMPLETE <YYYY-MM-DD>`. Two extra
-  status-specific values exist: `BOOTSTRAP-STATUS` also takes
-  `INSTRUCTIONS-WRITTEN <YYYY-MM-DD>` (README and rules written,
-  developer has not yet validated that required tools are on
-  PATH); `DEPLOYMENT-PLAN-STATUS` also takes
-  `DEFERRED <YYYY-MM-DD>`. Each command owns exactly one comment.
+  `UNCONFIGURED`, `COMPLETE <YYYY-MM-DD>`. Status-specific extras:
+  `BOOTSTRAP-STATUS` also takes `INSTRUCTIONS-WRITTEN <YYYY-MM-DD>`
+  (README and rules written, tools not yet PATH-validated);
+  `DEPLOYMENT-PLAN-STATUS` also takes `DEFERRED <YYYY-MM-DD>`. Each
+  command owns exactly one comment.
 - **Recurring commands do NOT own status comments in `CLAUDE.md`.**
-  Per-file frontmatter status is the source of truth for each:
+  Per-file frontmatter status is the source of truth instead:
   `AWAITING-DECISIONS` / `LANDED` on
   `docs/design/design-review-checkpoint-NNN.md`, and
   `AWAITING-DISPOSITIONS` / `LANDED` on
-  `docs/test-plans/phase-NNN-exit.md`. Don't add a
-  `DESIGN-REVIEW-STATUS` or `EXIT-TEST-PLAN-STATUS` banner — the
-  three-status banner is the configuration ritual; recurring
-  artifacts conflate badly with it.
-- **`/bootstrap` has two modes** keyed off the current
-  `BOOTSTRAP-STATUS` value: write mode (from `UNCONFIGURED`) writes
-  instructions and flips to `INSTRUCTIONS-WRITTEN`; verify mode
-  (from `INSTRUCTIONS-WRITTEN`) runs the README's verify commands
-  and flips to `COMPLETE`. Don't collapse them.
-- **`/design-review` has two stages** auto-detected from the state
-  of `docs/design/design-review-checkpoint-*.md`, and the full
-  lifecycle is **iterative** across rounds (mirrors
-  `/exit-test-plan`'s addendum lifecycle). Stage 1 has two
-  branches: the **initial branch** (no checkpoint, or newest is
-  `LANDED`) writes a new checkpoint with `AWAITING-DECISIONS`; the
-  **addendum branch** (newest is `AWAITING-DECISIONS`, latest
-  round all marked, Disposition log already has rows for that
-  round) appends a new `## Addendum N — date` section with
-  re-opened findings (suffix `-AN`) plus any new findings. Stage 2
+  `docs/test-plans/phase-NNN-exit.md`. Don't add
+  `DESIGN-REVIEW-STATUS` or `EXIT-TEST-PLAN-STATUS` banners —
+  recurring artifacts conflate badly with the three-status
+  configuration ritual.
+- **`/bootstrap` has two modes** keyed off `BOOTSTRAP-STATUS`:
+  write mode (`UNCONFIGURED` → writes instructions → flips to
+  `INSTRUCTIONS-WRITTEN`); verify mode (`INSTRUCTIONS-WRITTEN` →
+  runs the README's verify commands → flips to `COMPLETE`). Don't
+  collapse them.
+
+### `/design-review` lifecycle
+
+- **Two stages, iterative across rounds** (mirrors
+  `/exit-test-plan`'s addendum lifecycle). Auto-detected from
+  `docs/design/design-review-checkpoint-*.md` state. Stage 1 has
+  two branches: **initial** (no checkpoint or newest is `LANDED`)
+  writes a new checkpoint with `AWAITING-DECISIONS`; **addendum**
   (newest is `AWAITING-DECISIONS`, latest round all marked,
-  Disposition log does NOT yet have rows for that round) walks
-  each marked finding, appends rows to the Disposition log, then
-  asks Jamie whether to land the doc or open another addendum
-  round. Frontmatter stays `AWAITING-DECISIONS` for the whole
-  iterative loop; Jamie never manually flips it. There is no
-  limit on the number of addendums.
+  Disposition log already has rows for that round) appends
+  `## Addendum N — date` with re-opened findings (suffix `-AN`)
+  plus any new findings. Stage 2 (latest round marked, Disposition
+  log does NOT yet have rows for that round) walks each marked
+  finding, appends rows to the Disposition log, then asks Jamie:
+  land or open another round. Frontmatter stays
+  `AWAITING-DECISIONS` for the whole loop; Jamie never manually
+  flips it. No limit on addendum count.
 - **Stage 1 is findings-only (rule 4).** Both Stage 1 branches
   edit only the checkpoint file (initial also writes
   `docs/design/REVIEWS.md`); neither edits REQUIREMENTS /
-  ARCHITECTURE / PROJECT_PLAN / CLAUDE_CODE_PROMPTS. Stage 2 IS
-  the doc-editing session, and only on the "land" path — the
-  "open another round" path edits only the checkpoint file
-  (Disposition log rows added). Stage 2's land-path edit scope is
-  exactly REQUIREMENTS / ARCHITECTURE / PROJECT_PLAN /
-  CLAUDE_CODE_PROMPTS plus the checkpoint file itself plus
-  REVIEWS.md. Anything outside that scope (rules files,
-  design-intake docs, CLAUDE.md, README.md) surfaces as a TODO,
-  never an edit.
-- **One finding = one decision.** Composition rule in Step S1.4:
-  every finding gets exactly one `AUDIT NOTE — JAH:` block, and
-  that block records exactly one decision. If a finding's
-  Recommendation spans N independently-decidable items, split into
-  N findings (suffixed IDs `B1a`/`B1b`/`B1c` when they share a
-  narrative root, distinct top-level IDs otherwise). Bundling
-  multiple recommendations under one AUDIT NOTE defeats Jamie's
-  ability to sign each off independently.
-- **First-level decisions primary.** Composition rule in Step S1.4:
-  when a finding presents Option A / B / C, analyze the
-  first-level options deeply but do NOT fully spec downstream
-  sub-options that depend on which first-level option is picked.
-  Surface downstream implications in 1-2 sentences each. If a
-  downstream decision becomes load-bearing after the first-level
-  pick, surface it as a separate finding in the next addendum.
+  ARCHITECTURE / PROJECT_PLAN / CLAUDE_CODE_PROMPTS. Stage 2 is
+  the doc-editing session, but only on the "land" path — "open
+  another round" edits only the checkpoint file (Disposition log
+  rows). Stage 2 land-path edit scope: REQUIREMENTS / ARCHITECTURE
+  / PROJECT_PLAN / CLAUDE_CODE_PROMPTS + checkpoint file +
+  REVIEWS.md. Anything else (rules, design-intake docs, CLAUDE.md,
+  README) surfaces as TODO, never an edit.
+- **One finding = one decision.** Each finding has exactly one
+  `AUDIT NOTE — JAH:` block recording exactly one decision. If a
+  Recommendation has N independently-decidable items, split into
+  N findings (suffix IDs `B1a`/`B1b`/`B1c` when they share a
+  narrative root, distinct top-level IDs otherwise).
+- **First-level decisions primary.** When a finding presents
+  Options A/B/C, analyze first-level options deeply; do NOT fully
+  spec downstream sub-options that depend on the first-level pick
+  (surface downstream implications in 1-2 sentences each). If a
+  downstream decision becomes load-bearing later, raise it as a
+  separate finding in the next addendum.
 - **Disposition log is the round-walked marker.** Stage detection
   uses the `## Disposition log` table's `Round` column to
-  distinguish "Stage 2 hasn't walked the latest round yet" from
-  "Stage 2 walked it; Jamie picked open-another-round." Round
-  values are `Original` (for Round 1 Findings) or `Addendum N`
-  (for the Nth addendum). Rows append-only across rounds —
+  distinguish "Stage 2 hasn't walked latest round" from "Stage 2
+  walked; Jamie chose open-another-round." Round values are
+  `Original` (Round 1) or `Addendum N`. Rows are append-only;
   later-round dispositions on the same root finding ID supersede
-  earlier ones for landing application; earlier rows remain as
-  historical record.
-- **Checkpoint filename convention**:
-  `docs/design/design-review-checkpoint-NNN.md` with **zero-padded
-  3-digit N** (`001`, `002`, ..., `010`, ..., `100`). The pad width
-  is fixed at 3 so files sort lexicographically as numeric order
-  through 999. `/design-review`, `/wind-down`, and any future
-  command that scans checkpoints depend on this glob shape; don't
-  change it without auditing all consumers.
-- **AUDIT NOTE placeholder line is load-bearing.** Stage detection
-  parses for the exact string
+  earlier rows for landing application (earlier rows remain
+  historical).
+- **AUDIT NOTE placeholder is load-bearing.** Stage detection
+  parses the exact string
   `> _[UNMARKED — replace this line with your decision per the legend above]_`
   to distinguish marked from unmarked findings. The placeholder
-  applies to **every** AUDIT NOTE block in the document — Round 1
-  Findings and every Addendum N — and they're all first-class
-  finding markups of identical shape. Stage detection only checks
-  blocks in the **latest round**; earlier rounds are historical
-  record once their dispositions landed in the Disposition log.
-  If the placeholder text changes, stage detection breaks — audit
-  `.claude/commands/design-review.md` Step 0, Step S1.5, and Step
-  S1.A together.
+  applies to every AUDIT NOTE in every round; stage detection
+  only checks the latest round. Changing this text breaks stage
+  detection — audit `.claude/commands/design-review.md` Steps 0,
+  S1.5, S1.A together.
 - **`/design-review` commit handoffs only on artifact boundaries.**
-  Stage 1 *initial* branch (new checkpoint created) and Stage 2
-  *landing* (doc flipped to `LANDED`) surface a rule-7 commit
-  handoff. Stage 1 *addendum* branch and Stage 2 *open another
-  round* are mid-iteration and do NOT surface commit handoffs —
-  wind-down stages any pending changes at session close. Mirrors
-  `/exit-test-plan`'s commit-handoff discipline.
-- **`/exit-test-plan` has two stages** auto-detected from the
-  state of `docs/test-plans/phase-*-exit.md` for the target
-  phase. Stage 1 has two branches (initial plan and addendum
-  authoring); Stage 2 dispositions the newest run log. The full
-  lifecycle is **iterative**: the document can grow with multiple
-  §6.N polish addendums before it lands, and `LANDED` requires
-  every run log (§4 plus every §6.N) to be PASS / SKIP with no
-  outstanding Fix-now items left unverified. Frontmatter stays
-  at `AWAITING-DISPOSITIONS` for the whole iterative loop;
-  Jamie never manually flips it.
-- **Test plan filename convention**:
-  `docs/test-plans/phase-NNN-exit.md` with **zero-padded 3-digit N**
-  (`phase-001-exit.md`, ..., `phase-010-exit.md`, ...,
-  `phase-100-exit.md`). Same pad-width discipline as
-  design-review-checkpoint-NNN. `/exit-test-plan`, `/wind-down`,
-  and any future command that scans test plans depend on this
-  glob shape.
-- **`[PENDING]` placeholder in any run log is load-bearing.**
-  Stage detection parses for the literal uppercase bracketed
-  string `[PENDING]` at the end of each TC row. The placeholder
-  applies to **every** run log in the document — §4 and every
-  §6.N — and they're all first-class run logs of identical shape.
-  If the placeholder text changes, stage detection breaks —
-  audit `.claude/commands/exit-test-plan.md` Step 0, Step S1.5,
-  and Step S1.A together.
-- **§5 grows append-only across rounds.** §5.1's table includes
-  a `Round` column (`Original` for §4 findings, `Addendum N` for
-  §6.N findings). Stage 2 on a later round appends rows to
-  §5.1 and sub-sections to §5.2; it does not modify earlier
-  content. §5.3 (process note) is written once on the first
-  Stage 2 and never modified.
-- **Stage 1 of `/exit-test-plan` is plan-only (rule 4 + rule 8).**
-  Whichever branch fires (initial or addendum), Stage 1 writes
-  only the test plan file. It does not edit any other doc and
-  does not invent project affordances (new CLI commands, new
-  seeders, test-mode routes) to make a test step easier. Stage 2
-  IS the disposition-applying session, and its edit scope is
-  exactly the test plan file + `docs/design-decisions.md` +
+  Stage 1 *initial* (new checkpoint) and Stage 2 *landing*
+  (`LANDED`) surface a rule-7 handoff. Stage 1 *addendum* and
+  Stage 2 *open another round* are mid-iteration — no handoff;
+  wind-down stages pending changes at session close.
+
+### `/exit-test-plan` lifecycle
+
+- **Two stages, iterative** — auto-detected from
+  `docs/test-plans/phase-*-exit.md` state for the target phase.
+  Stage 1 has initial and addendum branches; Stage 2 dispositions
+  the newest run log. The document can grow with multiple §6.N
+  polish addendums before landing. `LANDED` requires every run
+  log (§4 plus every §6.N) to be PASS / SKIP with no outstanding
+  Fix-now items unverified. Frontmatter stays
+  `AWAITING-DISPOSITIONS` for the whole loop; Jamie never
+  manually flips it.
+- **`[PENDING]` placeholder is load-bearing.** Stage detection
+  parses the literal `[PENDING]` at the end of each TC row.
+  Applies to every run log (§4 and every §6.N). Changing this
+  text breaks stage detection — audit
+  `.claude/commands/exit-test-plan.md` Steps 0, S1.5, S1.A
+  together.
+- **§5 grows append-only across rounds.** §5.1's table includes a
+  `Round` column (`Original` for §4 findings, `Addendum N` for
+  §6.N findings). Stage 2 on a later round appends to §5.1 and
+  §5.2; it does not modify earlier content. §5.3 is written once
+  on the first Stage 2 and never modified.
+- **Stage 1 is plan-only (rule 4 + rule 8).** Either branch
+  writes only the test plan file — no other doc edits, no
+  inventing project affordances (new CLI commands, seeders,
+  test-mode routes) to make a step easier. Stage 2 edit scope:
+  test plan file + `docs/design-decisions.md` +
   `docs/open-questions.md` + `TODO.txt`. Spec gaps queue for
-  `/design-review` rather than promoting directly to
-  REQUIREMENTS / ARCHITECTURE.
+  `/design-review` rather than promoting directly to REQUIREMENTS
+  / ARCHITECTURE.
 - **`/exit-test-plan` commit handoffs only on artifact boundaries.**
-  Stage 1 initial branch (new plan created) and Stage 2 landing
-  (doc flipped to `LANDED`) surface a rule-7 commit handoff.
-  Stage 1 addendum branch and Stage 2 "open another round" are
-  mid-iteration and do NOT surface commit handoffs — wind-down
-  stages any pending changes at session close.
-- **README section names, exact spelling**: `Developer setup` and
-  `Deployment`. `/onboard` writes both as stubs; `/bootstrap`
-  replaces the first; `/deployment-plan` replaces the second.
-  Don't rename without updating all three commands.
+  Stage 1 initial (new plan) and Stage 2 landing (`LANDED`)
+  surface a rule-7 handoff. Stage 1 addendum and Stage 2 "open
+  another round" are mid-iteration — no handoff; wind-down
+  stages pending changes at session close.
+
+### Cross-cutting
+
+- **Filename conventions, zero-padded 3-digit N**:
+  `docs/design/design-review-checkpoint-NNN.md` and
+  `docs/test-plans/phase-NNN-exit.md` (e.g. `001`, `010`, `100`).
+  Pad width fixed at 3 so files sort lexicographically through
+  999. `/design-review`, `/exit-test-plan`, `/wind-down`, and any
+  future scanner depend on this glob shape.
+- **README section names, exact spelling**: `Developer setup`
+  (stub by `/onboard`, replaced by `/bootstrap`) and `Deployment`
+  (stub by `/onboard`, replaced by `/deployment-plan`). Don't
+  rename without updating all three commands.
 - **Marker blocks in rules files**:
   `<!-- ONBOARD-FILL: environment -->` in
-  `rules/environment-rules.md` (filled by `/bootstrap`) and
+  `rules/environment-rules.md` (`/bootstrap` fills) and
   `<!-- ONBOARD-FILL: project-scope -->` in
-  `rules/project-rules.md` (filled by `/onboard`).
-- **File ownership doesn't overlap.** Each command's "What this
-  command does NOT do" section lists what the others own. If you
-  add a responsibility to one command, audit the others.
-  `/design-review` owns `docs/design/design-review-checkpoint-*.md`
-  and `docs/design/REVIEWS.md` exclusively. `/exit-test-plan` owns
-  `docs/test-plans/phase-*-exit.md` exclusively. The other
-  commands surface and warn but never edit those files.
+  `rules/project-rules.md` (`/onboard` fills).
+- **File ownership doesn't overlap.** `/design-review` owns
+  `docs/design/design-review-checkpoint-*.md` and
+  `docs/design/REVIEWS.md` exclusively. `/exit-test-plan` owns
+  `docs/test-plans/phase-*-exit.md` exclusively. Other commands
+  surface and warn but never edit. Each command's "What this
+  command does NOT do" section lists what others own — when
+  adding a responsibility, audit the others.
 
 ## Design principles for template changes
 

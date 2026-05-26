@@ -293,3 +293,31 @@ let unattended blockers ride through to landing.
 See `.claude/commands/exit-test-plan.md` Step S1.A Step 2 and
 Step S2.2 BLOCKED rows for the implementation, and Phase 1.1's
 prompt in `docs/CLAUDE_CODE_PROMPTS.md` for the deviation footer.
+
+## `cc-template/CLAUDE.md` reads correctly in both pre- and post-onboard states
+
+**Decision.** The dist `cc-template/CLAUDE.md` placeholder is
+worded so it reads correctly whether a reader is encountering it
+pre-onboard (placeholder state) or post-onboard (the seeded
+`CLAUDE.md` of a downstream project). The Reading-order header has
+no `(configured projects)` parenthetical, and the rules-file
+descriptions have no "filled in by `/bootstrap`" / "filled in by
+`/onboard`" qualifiers.
+
+**Why.** `/onboard` and `/bootstrap` keep "collaboration rules and
+references unchanged," so any pre-onboard qualifier persists
+forever in every downstream project's `CLAUDE.md`. Wording that's
+stable in both states avoids the stale-noise problem with no
+command-side logic to add. The configuration ritual is documented
+in the banner above the Reading-order list — that's where
+pre-onboard readers find context.
+
+**Why not update `/onboard` / `/bootstrap` to strip qualifiers
+after the fact.** More invariants, more work, same outcome. KISS
+wins.
+
+**Why not keep the pre-onboard qualifiers.** They served pre-onboard
+readers but actively confused post-onboard readers, and the latter
+audience is much larger (every downstream session).
+
+Folded into Phase 1.2 cleanup (R4c).

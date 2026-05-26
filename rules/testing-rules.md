@@ -1,50 +1,38 @@
 # Testing Rules
 
 Language-neutral test discipline. `/onboard` appends project-specific
-tooling (test runner, marker syntax, command lines) to the bottom of
-this file when configuring a new project.
+tooling (test runner, marker syntax, command lines) at the bottom.
 
 ---
 
 ## Categories
 
 ### Unit tests
-Pure logic with no external dependencies. Must run with no filesystem
-fixtures, no network, no databases, no real subprocess calls. These
-form the bulk of the test suite and run on every commit, every CI
-build, every machine.
+Pure logic, no external dependencies. No filesystem fixtures, no
+network, no databases, no real subprocess calls. Bulk of the test
+suite; runs on every commit, every CI build, every machine.
 
 ### Functional tests
-Tests that exercise a slice of the application against a real database
-of the **same engine used in production** — HTTP routes, ORM queries,
-migrations, jobs that touch the DB. They run by default (they are not
-integration tests in the marker sense), but they need a real engine
-because behavior diverges across engines.
-
-Functional tests must use a separate test database from the dev
-database, and must use the production engine — never substitute SQLite
-or another "lighter" engine for speed. See "No engine substitution"
-under Discipline below.
+Exercise a slice of the app against a real database **of the same
+engine used in production** — HTTP routes, ORM queries, migrations,
+DB-touching jobs. Run by default. Use a separate test DB from dev,
+and never substitute SQLite or a "lighter" engine for speed (see
+"No engine substitution" below).
 
 ### Integration tests
-Tests that exercise external dependencies — real binaries (ffmpeg,
-ffprobe), real databases, real network calls, real video files, real
-hardware. These live behind a test-runner marker and are **skipped by
-default** in CI and in routine local runs.
-
-Integration tests run when explicitly requested, typically before a
-release or when a change touches the boundary code.
+Exercise external dependencies — real binaries (ffmpeg, ffprobe),
+real databases, real network, real hardware. Live behind a
+test-runner marker and **skipped by default** in CI and routine
+local runs. Run when explicitly requested, typically pre-release or
+when a change touches boundary code.
 
 ### Test fixture data
-Live in a designated `tests/fixtures/` (or equivalent) directory.
-Fixture files must be:
-- Small enough to commit (under a few MB, no full-resolution videos)
-- Stable in name and content (changing a fixture invalidates downstream
-  tests)
-- Documented in a `tests/fixtures/README.md` if non-obvious
-
-Larger integration assets live in a separate, gitignored test-media
-folder; CI fetches them or skips the integration tests.
+Live in a designated `tests/fixtures/` directory. Files must be:
+small enough to commit (under a few MB, no full-resolution videos);
+stable in name and content (changing a fixture invalidates
+downstream tests); documented in `tests/fixtures/README.md` if
+non-obvious. Larger integration assets live in a separate,
+gitignored test-media folder.
 
 ---
 
@@ -53,76 +41,70 @@ folder; CI fetches them or skips the integration tests.
 ### No flaky tests
 
 If a test depends on timing, sleep durations, filesystem ordering,
-clock skew, or "usually passes," fix the test design — don't add
-retries. A test that flakes once will flake again, often at the worst
-moment.
+or "usually passes," fix the test design — don't add retries. A
+test that flakes once will flake again at the worst moment.
 
 ### No skipped tests as a workaround
 
-`@skip` (or equivalent) is for tests that genuinely don't apply to the
-current environment (Windows-only test on Linux). It is not for tests
-that are broken. A broken test gets fixed or deleted.
+`@skip` (or equivalent) is for tests that genuinely don't apply to
+the current environment (Windows-only test on Linux). It is not for
+broken tests — fix or delete those.
 
 ### Tests test behavior, not implementation
 
-Refactoring should not break tests. If your tests assert on private
-state or specific call sequences, they're testing implementation. Test
-the inputs and outputs of public interfaces.
+Refactoring shouldn't break tests. If a test asserts on private
+state or specific call sequences, it's testing implementation. Test
+inputs and outputs of public interfaces.
 
 ### One assertion per concept
 
-A test can have multiple `assert` lines, but it should test one
-concept. "Test that the parser produces correct output for valid input"
-is one concept; "test that it produces correct output for valid input
-AND raises on invalid input" is two — split them.
+A test can have multiple `assert` lines but should test one concept.
+"Parser produces correct output for valid input" is one concept;
+"...AND raises on invalid input" is two — split them.
 
 ### No engine substitution
 
-If production runs on MariaDB, tests run on MariaDB. If production
-runs on Postgres, tests run on Postgres. Do not run functional tests
-against SQLite (or against a different SQL engine — including MySQL
-when production is MariaDB, or vice versa) for speed. Engine
-differences in JSON storage and functions, ENUMs, FULLTEXT,
-foreign-key enforcement defaults, transaction isolation, and string
-collation cause tests to pass while production breaks on the same
-query.
+If production runs on MariaDB, tests run on MariaDB. If on Postgres,
+tests on Postgres. Engine differences in JSON storage / functions,
+ENUMs, FULLTEXT, foreign-key enforcement, transaction isolation, and
+string collation cause tests to pass while production breaks on the
+same query.
 
-Tests that don't need a database don't get one — that's how unit tests
-stay fast, not by swapping engines underneath them.
+Tests that don't need a database don't get one — that's how unit
+tests stay fast, not by swapping engines underneath them.
 
 ---
 
 ## Workflow (rule 8)
 
-Per coding-session rule 8: **Jamie runs the tests, Claude proposes the
-commands.**
+Per coding-session rule 8: **Jamie runs the tests, Claude proposes
+the commands.** When Claude finishes a change that should be tested:
 
-When Claude finishes a change that should be tested:
 1. State which tests should run (unit suite, specific test file,
    integration marker).
 2. Provide the exact command line for Jamie to paste.
 3. State the expected outcome ("expect 47 passed, 2 skipped").
 4. Wait for Jamie to confirm success or paste failures back.
 
-Don't run tests as part of routine implementation; the tests Jamie
-runs are the canonical pass/fail signal.
+Don't run tests as part of routine implementation; Jamie's run is
+the canonical pass/fail signal.
 
 ---
 
 ## Manual phase-exit walkthroughs
 
 Phases in `docs/PROJECT_PLAN.md` typically end with exit criteria a
-human verifies by clicking through the running system. The canonical
-flow is the `/exit-test-plan` command:
+human verifies by clicking through the running system. Canonical
+flow is `/exit-test-plan`:
 
 - **Stage 1** reads the phase's exit criteria, the Prompt body in
-  `docs/CLAUDE_CODE_PROMPTS.md` (including its deviation footer), and
-  the implementation files the criteria touch, then writes a
+  `docs/CLAUDE_CODE_PROMPTS.md` (including its deviation footer),
+  and the implementation files those criteria touch, then writes a
   walkthrough at `docs/test-plans/phase-NNN-exit.md`. Each test case
-  uses a three-block shape: **Steps** (numbered, imperative),
+  has a three-block shape: **Steps** (numbered, imperative),
   **Expected** (bulleted, verifiable, requirements cited inline),
-  **Fail signals** (named regression modes pointing at code sites or
-  requirements).
+  **Fail signals** (named regression modes pointing at code sites
+  or requirements).
 - Jamie runs the plan top-down and marks §4's run log inline.
   Mid-run failures route to normal coding sessions using the TC's
   Fail signals as starting points.
@@ -131,8 +113,8 @@ flow is the `/exit-test-plan` command:
   dispositions across the project's docs (test plan §5,
   `docs/design-decisions.md`, `docs/open-questions.md`, `TODO.txt`).
 
-See `.claude/commands/exit-test-plan.md` for the full spec. The
-plan is the test artifact; Claude does not run the steps.
+See `.claude/commands/exit-test-plan.md` for the full spec. The plan
+is the test artifact; Claude does not run the steps.
 
 ---
 

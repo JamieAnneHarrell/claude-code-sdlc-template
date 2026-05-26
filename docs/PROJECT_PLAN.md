@@ -121,7 +121,7 @@ exit walkthrough.
 
 ---
 
-## Phase 1.2 — Rules and CLAUDE.md cleanup pass
+## Phase 1.2 — Rules and CLAUDE.md cleanup pass (COMPLETE)
 
 **Goal.** Optimize universal rules and CLAUDE.md content for
 context-window cost without removing any load-bearing invariant.

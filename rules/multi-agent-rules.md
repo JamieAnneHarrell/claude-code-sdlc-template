@@ -1,71 +1,63 @@
 # Multi-Agent Rules
 
-This project uses the **explore-plus-plan** multi-agent mode:
-parallel `Explore` subagents for research, plus a `Plan` subagent
-for design proposals. Implementation stays sequential — no
-worktree spawning, no parallel implementation agents.
+This project uses the **explore-plus-plan** mode: parallel
+`Explore` subagents for research, plus a `Plan` subagent for design
+proposals. Implementation stays sequential — no worktree spawning,
+no parallel implementation agents.
 
-The mode was chosen during `/onboard` because the project has
-load-bearing invariant complexity in `CLAUDE.md` (status comment
-vocabulary, marker blocks, zero-pad filename conventions,
-stage-detection placeholder strings) and recurring-command
-lifecycles (`/design-review` and `/exit-test-plan` are both
-two-stage and iterative). Validating an approach with a Plan
-subagent before implementing is worth the round-trip on changes
-that touch those invariants.
+Chosen during `/onboard` because the project has load-bearing
+invariant complexity in `CLAUDE.md` (status comment vocab, marker
+blocks, zero-pad filename conventions, stage-detection placeholder
+strings) and iterative two-stage recurring-command lifecycles
+(`/design-review`, `/exit-test-plan`). Plan-subagent validation
+before implementation is worth the round-trip on changes touching
+those invariants.
 
 ---
 
-## Use Explore for
+## Explore — use for
 
-- Codebase research that will span >3 queries or multiple
-  unrelated areas. *Example: "Find every consumer of the
-  `ONBOARD-STATUS` comment across the six command files and the
-  rules files."*
-- Open-ended "where is X?" / "which files reference Y?"
-  questions where you'd otherwise iterate via Glob + Grep.
+- Codebase research spanning >3 queries or multiple unrelated
+  areas. *Example: "Find every consumer of `ONBOARD-STATUS`
+  across the six command files and rules files."*
+- Open-ended "where is X?" / "which files reference Y?" when
+  you'd otherwise iterate via Glob + Grep.
 - Cross-referencing checks before a load-bearing edit. *Example:
   "Before renaming the AUDIT NOTE placeholder, confirm every file
   that parses it literally."*
 
-## Don't use Explore for
+## Explore — don't use for
 
-- A single Glob or Grep that you already know the shape of —
-  call the tool directly.
-- Code review, design-doc auditing, or any open-ended analysis
-  that needs the reader to hold the whole file in their head.
-  Explore reads excerpts; it misses content past its read window.
-- Cross-file consistency checks. Use `Plan` for those.
+- A single Glob or Grep with known shape — call the tool directly.
+- Code review, design-doc auditing, or open-ended analysis
+  requiring whole-file context. Explore reads excerpts; it misses
+  content past its read window.
+- Cross-file consistency checks. Use Plan.
 
-## Use Plan for
+## Plan — use for
 
-- Designing a change that touches more than one command file or
-  more than one load-bearing invariant. *Example: "Design how
-  `/refresh-from-repository --merge` interacts with the
-  `ONBOARD-FILL` markers across both rules files."*
-- Architectural decisions where the trade-offs are not obvious.
-  *Example: "Should the new BLOCKED disposition be a per-row
-  marker or a per-document status?"*
-- Pre-flight check before a non-trivial implementation. The
-  round-trip catches "this design has a problem I missed" earlier
-  than the implementation does.
+- Changes touching more than one command file or more than one
+  load-bearing invariant. *Example: "Design how
+  `/refresh-from-repository --merge` interacts with `ONBOARD-FILL`
+  markers across both rules files."*
+- Architectural decisions where trade-offs are non-obvious.
+  *Example: "Should the new BLOCKED disposition be per-row or
+  per-document?"*
+- Pre-flight before non-trivial implementation — catches design
+  problems earlier than implementation does.
 
-## Don't use Plan for
+## Plan — don't use for
 
-- One-file changes with an obvious implementation path. Just do
-  the edit.
-- Brainstorming or open-ended creative questions. Plan is for
-  designing a specific change, not generating ideas.
+- One-file changes with an obvious path. Just do the edit.
+- Brainstorming or open-ended creative questions. Plan designs a
+  specific change, not ideas.
 
-## What's NOT enabled in this project
+## Not enabled in this project
 
 - **No implementation agents.** All implementation is sequential
-  and Jamie-driven. Do not spawn an agent to make code edits on
-  your behalf.
-- **No git worktrees.** No `parallel-worktrees` mode for this
-  project. The project is a single-module markdown repo;
-  worktree coordination overhead would dominate any throughput
-  gain.
+  and Jamie-driven. Don't spawn an agent to make code edits.
+- **No git worktrees.** Single-module markdown repo; coordination
+  overhead would dominate any throughput gain.
 
 ---
 

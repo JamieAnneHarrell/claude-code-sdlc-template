@@ -192,45 +192,6 @@ owns it — `/onboard` (most project context is already collected
 there) or `/bootstrap` (knows the stack + commands)? How much
 overlaps with the banner before the duplication starts hurting?
 
-#### Placeholder qualifiers persist into configured CLAUDE.md
-
-*Context.* The dist's `cc-template/CLAUDE.md` placeholder is
-written for the unconfigured state and includes phrasings that
-become stale once onboarding completes:
-
-- `## Reading order at session start (configured projects)` —
-  the `(configured projects)` parenthetical is a flag for
-  pre-onboard readers; after `/onboard` it's redundant.
-- Collaboration rules section: `rules/environment-rules.md —
-  ... Project-specific environment is filled in by /bootstrap.`
-  is stale after `/bootstrap` runs.
-- Same for `rules/multi-agent-rules.md — ... (filled in by
-  /onboard based on the chosen mode).` after `/onboard` runs.
-
-Both `/onboard` and `/bootstrap` specs say "keep collaboration
-rules and references unchanged," so these stale phrasings
-persist forever in every onboarded project. ds-niche-stream has
-them cleaned up — likely Jamie's manual edit.
-
-*Proposed approach.* Two fix shapes:
-
-- **A (KISS).** Reword the placeholder so it reads correctly in
-  both states (drop `(configured projects)`, drop the "filled
-  in by" qualifiers). No command-side logic added. Apply to
-  both root and `cc-template/`.
-- **B.** Update `/onboard` and `/bootstrap` specs to strip the
-  stale qualifiers as part of their CLAUDE.md rewrites. More
-  work, more invariants.
-
-Recommend A; defer the decision to the same `/design-review`
-checkpoint that handles the other CLAUDE.md drift findings
-above.
-
-*Open sub-questions.* Whether shape A breaks the placeholder's
-readability for a developer encountering an unconfigured
-template for the first time — the qualifiers serve a real
-purpose pre-onboard.
-
 #### Universal-rules customization partitions
 
 *Context.* FR-11 says universal rules content — the 9
