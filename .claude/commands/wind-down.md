@@ -239,12 +239,16 @@ before the session ends:
    (subject < 72 chars, body = a few sentences max, bullets cite
    doc IDs over restating implementation) needs to be active in
    working memory before you write a single word.
-2. Run `git status` to confirm what's pending.
-3. Per rule 7, surface a commit handoff. Use the project's formatter
-   in the dry-run sequence (ruff for Python, etc. — read
-   `rules/environment-rules.md` and `rules/testing-rules.md` for the
-   project's specific tooling).
-4. **Do not run the commit yourself.** Jamie pastes the commands.
+2. **Trust Step 1's recap.** Don't re-run `git status`, and don't
+   re-verify state the rules already establish (e.g. TODO.txt is
+   gitignored).
+3. **Project tooling is in `rules/environment-rules.md`'s "Build /
+   run / test commands" subsection.** Don't probe the filesystem
+   for `.pre-commit-config.yaml` or other configs. If the
+   subsection says N/A, skip the formatter and pre-commit steps in
+   rule 7's dry-run.
+4. Per rule 7, surface the commit handoff using that tooling.
+5. **Do not run the commit yourself.** Jamie pastes the commands.
 
 If no uncommitted changes, skip this step.
 
