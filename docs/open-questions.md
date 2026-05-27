@@ -135,91 +135,113 @@ Whether Thread 2's "scan PROJECT_PLAN for high-risk transitions"
 heuristic needs concrete criteria, or whether it's best handled
 as a session-judgment call surfaced for Jamie to disposition.
 
-#### Enforce the "MUST DO before responding" rules re-read (CLAUDE.md is necessary but not sufficient)
+#### Make the rules-read reliably happen — placement, content, enforcement, just-in-time loading
 
 *Context.* Root `CLAUDE.md` Collaboration-rules section says:
 
 > **MUST DO before responding to the first user message of any
-> session.** Read these two files end-to-end — their contents are
-> *not* loaded into context by default. Skipping is the #1 cause of
-> rule drift...
+> session.** Read these two files end-to-end...
 
 In practice Claude regularly skips the re-read and goes straight to
-the user's task. Observed failure mode: CLAUDE.md *summarizes* the
-rules (KISS, rule 4, rule 7 commit shape, etc.), so Claude treats
-the summary as sufficient priors and the end-to-end re-read as
-redundant. The instruction names the failure mode but enforcement
-relies on Claude's judgment, which is biased toward "respond now."
-The downstream consequence is exactly what the rule warns about:
-silent drift on KISS / rule 4 simpler-alternative / rule 7 commit
-brevity, surfaced only when Jamie calls "rule N" mid-session.
+the user's task. The failure has multiple compounding causes —
+addressing any single one in isolation is unlikely to fix it:
+
+- **CLAUDE.md summarizes the rules** (lists all 9 by topic, names
+  KISS and progressive disclosure), so Claude treats the summary as
+  sufficient priors. Story "Trim CLAUDE.md" addresses this surface
+  directly.
+- **The instruction is buried** — it's the third section of
+  CLAUDE.md, after a status banner and a Reading-order list. By the
+  time Claude reaches it, attention is already on the user's
+  request.
+- **Enforcement relies on Claude's judgment**, which is biased
+  toward "respond now." The instruction names the failure mode but
+  depends on the reader to overcome it.
 
 For this template, the cost compounds: every downstream project
 seeded from `cc-template/` inherits the same skip-prone behavior.
-A reliable rules-read is foundational — without it the rest of the
+Reliable rules-read is foundational — without it the rest of the
 collaboration-rules infrastructure is decorative.
 
-*Proposed approach (options to weigh).*
+*Proposed approach — four complementary directions (not mutually exclusive).*
 
-- **Option A — Hooks-based enforcement.** A `UserPromptSubmit` hook
-  on the first message of a session reads
-  `rules/coding-session-rules.md` and `rules/design-philosophy-rules.md`
-  into context unconditionally, removing the judgment call. Hook
-  detects "first message of session" via session state (e.g.
-  absence of prior assistant turns in the transcript, or a sentinel
-  file written on first invocation and cleared at session close).
-  Ships as part of `cc-template/`'s default `.claude/settings.json`.
-  Pro: zero reliance on Claude compliance. Con: hooks are
-  CLI-feature-specific; need to check portability across IDE
-  extension / desktop app / web app per the env list in
-  `rules/environment-rules.md`.
-- **Option B — Inline the rules in CLAUDE.md.** Stop relying on
-  pointers; embed the rules content directly. Pro: no judgment
-  call, no hook. Con: re-inflates CLAUDE.md (Phase 1.2 just cut
-  it); rules duplication across `rules/*.md` and `CLAUDE.md`
-  creates a maintenance liability the marker system is designed
-  to handle but doesn't fix the duplication itself.
-- **Option C — Sentinel-file ritual.** First response in a session
-  must include a specific acknowledgment token (e.g. "Rules
-  re-read: coding-session + design-philosophy") that a hook
-  validates and blocks the response if absent. Pro: forces the
-  read. Con: ritual visible to Jamie every session; brittle if
-  hook can't enforce.
-- **Option D — Skill that wraps first-message handling.** A
-  `/start` or auto-fired skill at session begin reads the rules
-  and primes the session. Pro: explicit, debuggable. Con: requires
-  Jamie to remember to run it, OR requires hook integration
-  anyway — degrades to Option A.
+**Direction 1 — Move the rules-read instruction to the top of
+CLAUDE.md.** "STOP. Read `rules/coding-session-rules.md` and
+`rules/design-philosophy-rules.md` end-to-end before responding."
+First line, no preamble. Optionally extend with session-type clues —
+if the user's message hints at commits, wind-down, or testing,
+suggest additional rule files (lines up with Direction 4). *Pro:*
+free; minimal mechanical change. *Con:* still relies on Claude's
+judgment.
 
-*Implementation surfaces to touch (Option A — most likely pick).*
+**Direction 2 — Strip rule summaries from CLAUDE.md, move
+drift-phrases into the rule files themselves.** Don't tell Claude
+what the rules *are* — tell Claude to read them. CLAUDE.md's
+current hints ("the rule-7 commit handoff format," "the rule-4
+simpler-alternative self-check") let Claude pattern-match as if
+it had absorbed them. Move key phrases *into* the rule files so
+reading the actual rule is the only path to those priors. Pairs
+with Story "Trim CLAUDE.md." *Pro:* removes the "I already know
+the rules" pattern-match. *Con:* unverified that this alone
+changes behavior; Claude may still skip and rely on training.
 
-- `cc-template/.claude/settings.json` — add `UserPromptSubmit`
-  hook config that runs on first message of session.
-- A small shell/PowerShell script (cross-platform per
-  `rules/environment-rules.md`) that detects first-message
-  state and emits the rules content into the context channel
-  the hook supports.
-- Validate the hook works in VSCode extension, CLI, desktop app —
-  per `update-config` skill notes, hooks are settings.json-based
-  and harness-executed; need to confirm the harness fires
-  `UserPromptSubmit` consistently across surfaces.
-- Document the mechanism in `cc-template/CLAUDE.md` (e.g. a
-  one-line note under Collaboration-rules explaining the hook
-  handles the re-read so downstream consumers don't have to know).
-- Decision needed: does the hook fire on every session start, or
-  only on sessions that don't already have rules content in the
-  initial context window? (Cheaper second option but harder to
-  detect reliably.)
+**Direction 3 — Hooks-based enforcement.** A `UserPromptSubmit`
+hook on the first message of a session reads both rules files into
+context unconditionally, removing the judgment call. Hook detects
+"first message of session" via session state (e.g. absence of
+prior assistant turns, or a sentinel file written on first
+invocation and cleared at session close). Ships as part of
+`cc-template/`'s default `.claude/settings.json`. *Pro:* zero
+reliance on Claude compliance. *Con:* hooks are CLI-feature-specific
+— portability across IDE extension / desktop app / web app needs
+validation per the env list in `rules/environment-rules.md`;
+sentinel detection is non-trivial.
 
-*Open sub-questions.* Whether hook enforcement should extend to
+**Direction 4 — Rules co-located with skills; skills load rule
+context just-in-time.** Move specific rules into the skill that
+exercises them — e.g., rule 7 (commit handoff format and brevity)
+lives with `/wind-down`, since `/wind-down` should be the only
+command that ever surfaces a commit handoff (cross-refs Story
+"Artifact-boundary command landings → `/wind-down`"). Skills load
+on invocation, so the relevant rule context arrives fresh,
+just-in-time, and doesn't compete for attention with other rules
+at session start. Companion change: configure other commands/skills
+NOT to surface commit handoffs — they defer to `/wind-down`. *Pro:*
+rule context is loaded when relevant and not before; rules stay
+short because they don't have to live in CLAUDE.md's permanent
+budget. *Con:* not every rule has a canonical skill home (KISS,
+rule 4 simpler-alternative are session-pervasive); requires a
+per-rule audit.
+
+**Direction 4b — Session entry-point via skill.** Extends
+Direction 4: if a session begins without an obvious skill
+invocation, Claude asks the user's intent and suggests the
+appropriate skill ("Are we onboarding? Running a phase prompt?
+Doing a design review? Winding down?"). The selected skill loads
+its rule context. *Pro:* makes "the right rules for this work"
+the default. *Con:* a friction step on every session start; risks
+feeling bureaucratic; needs careful ergonomics (skip when intent
+is obvious from the user's first message).
+
+*Open sub-questions.* Per-rule audit for Direction 4: which rules
+have a canonical skill home (rule 7 → `/wind-down`, rule 9 →
+`/wind-down`, rule 8 manual walkthrough → `/exit-test-plan`) and
+which stay session-pervasive (KISS, rules 1–6). Whether Direction
+4 changes how `/design-review` and `/exit-test-plan` surface their
+commit handoffs today (lines up with the artifact-boundary-commands
+story — landing that one first is a prerequisite). Whether
+Directions 1 + 2 should land first as a nearly-free baseline
+before investing in 3 or 4. Whether Direction 3's hook should be
+opt-in or default-on for downstream consumers (default-on matches
+the template's "reliable behavior out of the box" stance). Whether
+Direction 4b is annoying when the user's first message *is* the
+intent ("read TODO and run Prompt 2.1") — needs an
+intent-obvious bypass. Whether hook enforcement should extend to
 `/wind-down` rule 9 doc-coherence sweep (the rule the 2026-05-26
 checkpoint-002 landing missed — same class of "instruction
-present, judgment skipped" failure). Whether the hook should be
-opt-in for downstream consumers (some projects may prefer the
-judgment call) or default-on (matches the template's
-"reliable behavior out of the box" stance). Whether
+present, judgment skipped" failure). Whether
 `environment-rules.md` needs a section on hook authoring
-conventions if Option A lands.
+conventions if Direction 3 lands.
 
 #### In-flight artifact status callout at top of CLAUDE.md
 
@@ -289,4 +311,125 @@ zero-pad width changes in checkpoint/test-plan filenames).
 
 *Proposed approach.* Phase 3 roadmap. Specifics deferred until we
 have a real regression to motivate the work.
+
+#### Trim CLAUDE.md — content that lives in TODO.txt or the rules files shouldn't be repeated here
+
+*Context.* CLAUDE.md is the only file loaded into every session's
+initial context, so every line in it is permanent weight on every
+session start. Three drift modes have accumulated:
+
+1. **Self-edited "next phase" banners.** Root CLAUDE.md currently
+   opens with a status banner ("✅ Onboarded and bootstrapped.
+   Ready for the next phase prompt in `docs/CLAUDE_CODE_PROMPTS.md`
+   (Phase 1.1 — add `BLOCKED` disposition to `/exit-test-plan`)
+   ..."). The banner duplicates TODO.txt, which CLAUDE.md *itself*
+   names as the next-step source of truth. When TODO.txt updates
+   and the banner doesn't, they disagree. As of 2026-05-27 the
+   banner still names "Phase 1.1 — add BLOCKED" even though that
+   landed three commits ago.
+
+2. **Recurring-command cadence prose in `cc-template/CLAUDE.md`.**
+   The template's banner describes when `/design-review` and
+   `/exit-test-plan` run ("two recurring commands run on Jamie's
+   cadence... post-onboarding sanity check; between phases that
+   touch schema, multi-tenancy, auth..."). The cadence is the
+   skill's own job to know — the consumer doesn't need to be told
+   at session start. Context bloat that doesn't change session
+   behavior.
+
+3. **Rule summaries in the Collaboration-rules section.**
+   CLAUDE.md lists each of the 9 rules by topic and gestures at
+   KISS / progressive disclosure ("the rule-7 commit handoff
+   format," "the rule-4 simpler-alternative self-check"). Claude
+   (by its own admission, observed repeatedly) treats the summary
+   as sufficient priors and skips the end-to-end re-read. Pairs
+   with Story "Rules-read reliability."
+
+*Proposed approach.* Treat CLAUDE.md as a thin index — not a state
+report, not a rules summary.
+
+- Remove the self-edited "next phase" banner from root CLAUDE.md;
+  no command should write next-phase prose into CLAUDE.md. TODO.txt
+  is authoritative for "what's next."
+- Strip `cc-template/CLAUDE.md`'s recurring-command cadence prose.
+  Skills describe themselves; CLAUDE.md doesn't need to.
+- Replace the "9 rules summarized" section with a pointer only —
+  "9 rules; read `coding-session-rules.md` end-to-end before
+  responding." No topical list Claude can pattern-match as having
+  absorbed.
+
+*Open sub-questions.* This story is in tension with existing
+"In-flight artifact status callout at top of CLAUDE.md" — that
+story proposed automating a 🟡 status banner; this one argues
+banners drift and TODO.txt already serves the purpose. Resolve
+before either lands; probably retire the callout story in favor of
+this one. Whether the configuration-ritual banner (status-comment-
+driven, top of `cc-template/CLAUDE.md`) qualifies as bloat —
+probably earns its place because it's the entry-point on a fresh
+project, but worth a second look. Whether the "Reading order at
+session start" section is itself bloat: it tells Claude to read
+TODO.txt, PROJECT_PLAN, CLAUDE_CODE_PROMPTS — habits that might
+belong in a hook or a skill (see Direction 3 / 4 in Story
+"Rules-read reliability"), not in CLAUDE.md prose.
+
+#### Seed `cc-template/TODO.txt` as the active onboarding checklist; teach the TODO-driven habit from day one
+
+*Context.* The first thing a downstream user does is open their
+freshly-copied `cc-template/` and look for "what do I do now?"
+CLAUDE.md and README both name TODO.txt as the next-step surface.
+Today's seeded TODO.txt has one item: "Run /onboard to configure
+this project from the design doc in `docs/design/`." That makes
+`/onboard` look like the literal first action, but the README
+correctly says the user should review the rules first to confirm
+they agree with them. That review step is silently expected, and
+TODO.txt doesn't reflect it.
+
+This compounds with the in-progress `/refresh-from-repository`
+work and the CC-TEMPLATE-BLOCK marker design (the current
+TODO.txt's first item). Once markers exist, the *correct*
+customization sequence is: review the rules, decide which
+TEMPLATE-BLOCK sections to keep verbatim vs. lift out of markers
+for local edits, edit accordingly, THEN `/onboard`. None of that
+is in the seeded TODO.txt today.
+
+Two outcomes today:
+
+1. New users skip the rules review and run `/onboard` cold; later
+   discover a rule doesn't match their team with no clean
+   divergence path (or, post-`/refresh-from-repository`, get
+   caught off-guard by marker constraints).
+2. Users don't learn the TODO-driven habit. TODO.txt is treated as
+   a Claude-maintained tracking file, not a checklist humans work
+   through.
+
+*Proposed approach.* Seed `cc-template/TODO.txt` with the actual
+customization-and-onboarding sequence as a numbered checklist the
+user walks through:
+
+1. Read `README.md` to understand the template shape.
+2. Read each `rules/*.md` file; edit anything you disagree with
+   (or, once markers ship, lift it out of its CC-TEMPLATE-BLOCK
+   so `/refresh-from-repository` leaves your edits alone).
+3. Drop a design doc into `docs/design/`.
+4. Run `/onboard`.
+5. (next session) Run `/bootstrap`.
+6. (when distribution mechanism is pinned) Run `/deployment-plan`.
+
+Update `cc-template/README.md` to describe the rule-divergence
+workflow (review → edit → optionally lift from markers) and point
+at TODO.txt as the working checklist. Frame TODO.txt explicitly as
+"the human's checklist for this and every future session," not
+just an automated handoff. Set the habit early.
+
+*Open sub-questions.* Whether the seeded checklist should branch
+by user intent ("customizing before use" vs "accepting defaults,
+skip to /onboard") — risks complexity for marginal value. Whether
+step 2's depth ("read every rules file") is realistic — users
+often want to get to /onboard fast and only diverge later; a
+softer "skim now, refine later" framing may be more honest.
+Whether `/onboard` should check that TODO.txt has been walked
+(e.g., does the user know they can edit rules?) or whether that's
+paternalistic. Whether the seeded TODO.txt should be a sample
+users can rewrite freely vs. a structured artifact whose shape
+`/wind-down` preserves.
 
