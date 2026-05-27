@@ -334,16 +334,21 @@ Reading-order entry for `docs/design/`). Must land before Phase
 ## Prompt 2.1: `/refresh-from-repository`
 
 **Read first.**
-- [`docs/REQUIREMENTS.md`](REQUIREMENTS.md) FR-13
+- [`docs/REQUIREMENTS.md`](REQUIREMENTS.md) FR-13, NFR-4
 - [`docs/PROJECT_PLAN.md`](PROJECT_PLAN.md) Phase 2.1
 - [`docs/design-decisions.md`](design-decisions.md): the five
   refresh-from-repository entries (single-stage with skills-first
   staging; template marks its own content; source-repo refresh
   syncs cc-template/ → root; progressive-disclosure flags;
   vendored-template lock-in)
-- [`docs/open-questions.md`](open-questions.md) `Reconciliation
-  algorithm for /refresh-from-repository` and the pre-Phase-2.1
-  design-review checkpoint that resolves it
+- [`docs/design/design-review-checkpoint-002.md`](design/design-review-checkpoint-002.md)
+  (the pre-Phase-2.1 review — pinned algorithm, marker syntax,
+  state file, R6 granularity, R3 partition, R2b conflict UX,
+  R2d cross-file upgrade-offer, B1-A1 source-mode three-way)
+- [`docs/open-questions.md`](open-questions.md) — verify the
+  reconciliation-algorithm and "Before running this prompt"
+  header-block entries have moved to `design-decisions.md` as
+  closed (per checkpoint 002 follow-up TODOs); flag if not
 
 **Scope.**
 1. Author
@@ -351,35 +356,77 @@ Reading-order entry for `docs/design/`). Must land before Phase
    per FR-13. Single-stage by default; auto-detects merge-logic
    drift before pulling and stages skills-first when warranted,
    asking the consumer to re-invoke.
-2. Pin the template-marker syntax (open/close strings + any
-   embedded metadata). Becomes load-bearing per NFR-4 once
-   shipped.
-3. Implement the reconciliation algorithm chosen in the
-   pre-Phase-2.1 design review. Block-level matrix per
-   `docs/design-decisions.md`.
+2. Use the template-marker syntax pinned by checkpoint 002:
+   `<!-- CC-TEMPLATE-BLOCK: <id> --> ... <!-- /CC-TEMPLATE-BLOCK -->`
+   with `<id>` a stable human-readable kebab-case identifier (no
+   inline metadata; per-block hashes live in the state file).
+3. Implement **Option D (hybrid)** reconciliation per checkpoint
+   002: per-block content hash for inline-edit detection +
+   file-level baseline reference for deletion-vs-never-existed
+   disambiguation. Three-way comparison (downstream-current /
+   upstream-current / baseline-from-state-file).
 4. Wrap refresh-managed regions of rules files and (post-onboard)
-   CLAUDE.md in the new markers. `ONBOARD-FILL` blocks remain as
-   the inverse primitive — consumer-owned, refresh never touches.
-5. Source-mode behavior: if `cc-template/` exists as a subdir at
+   CLAUDE.md in the pinned markers. **Coarse-grained wrapping**
+   (per checkpoint 002 R6): one TEMPLATE-BLOCK per top-level rule
+   section, not per paragraph. Compact kebab-case ids (file-scoped,
+   file prefix implicit). `ONBOARD-FILL` blocks remain as the
+   inverse primitive — consumer-owned, refresh never touches.
+   **CLAUDE.md merge partition** (per checkpoint 002 R3):
+   Collaboration-rules + Reading-order sections wrap in
+   TEMPLATE-BLOCK; banner / project-specific context / Load-bearing
+   invariants stay consumer-owned (free regions, refresh never
+   touches).
+5. Create `.claude/claude-code-sdlc-template-refresh-state.md`
+   per checkpoint 002 R4-A1 — single machine-managed markdown
+   file with sections: Upstream baseline (last-synced-commit,
+   last-synced-at), Block hashes (table of file → id → hash),
+   Refresh logic version (drift detection integer), Upstream
+   directives (force-skills-only-from). Refresh reads/writes;
+   consumers don't hand-edit. Format sketch in checkpoint 002
+   R4-A1's recommendation.
+6. Source-mode behavior: if `cc-template/` exists as a subdir at
    cwd, treat it as upstream. Same code path serves the
    source-of-truth root↔dist sync and the vendored-template
-   lock-in pattern.
-6. Flags: `--refresh-skills-only` (manual override for skills-
+   lock-in pattern. **Preserves three-way reconciliation
+   semantics** (per checkpoint 002 B1-A1) — baseline reference
+   for source-mode comes from the state file (subtree
+   content-hash or source-repo HEAD at last sync). On first
+   source-mode invocation in a repo, content-inspect the
+   `cc-template/` subdir to confirm it's this template; cache
+   determination in CLAUDE.md (per checkpoint 002 N1).
+7. Flags: `--refresh-skills-only` (manual override for skills-
    first staging); `--no-claudemd` (skip CLAUDE.md from merge).
-7. Semantic conflict surfacing between upstream's new/changed
-   blocks and downstream's personalized content is the executing
-   Claude session's job — the command spec instructs the session
-   to do this analysis directly, not via a heuristic engine.
-8. Mirror to `.claude/commands/refresh-from-repository.md` at
-   root.
-9. Documentation: shipping `cc-template/README.md` covers the
-   default invocation, both flags, and the vendored-lock-in
-   pattern; root `README.md` adds a one-paragraph pointer.
-10. After markers exist on-disk, update root `CLAUDE.md`
+   Upstream-directive in the state file can also force
+   `--refresh-skills-only` on next downstream run (per checkpoint
+   002 R3 caveat).
+8. **Inline-edit conflict UX** (per checkpoint 002 R2b): when
+   refresh detects an inline-edit divergence in a TEMPLATE-BLOCK,
+   surface inline to the running session, one block at a time,
+   showing downstream-current vs upstream-current; ask the
+   consumer to choose accept upstream / keep downstream /
+   hand-merge. No sidecar conflict files; no git-style conflict
+   markers.
+9. **Cross-file migration upgrade-offer** (per checkpoint 002
+   R2d): when a consumer-deleted block's hash matches a known
+   template block in one of the six template-managed rules files
+   (`coding-session-rules.md`, `design-philosophy-rules.md`,
+   `multi-agent-rules.md`, `project-rules.md`,
+   `environment-rules.md`, `testing-rules.md`), refresh detects
+   the migration and offers to apply upstream's update.
+10. Semantic conflict surfacing between upstream's new/changed
+    blocks and downstream's personalized content is the executing
+    Claude session's job — the command spec instructs the session
+    to do this analysis directly, not via a heuristic engine.
+11. Mirror to `.claude/commands/refresh-from-repository.md` at
+    root.
+12. Documentation: shipping `cc-template/README.md` covers the
+    default invocation, both flags, and the vendored-lock-in
+    pattern; root `README.md` adds a one-paragraph pointer.
+13. After markers exist on-disk, update root `CLAUDE.md`
     "Load-bearing invariants" section to add the marker syntax
-    alongside `ONBOARD-FILL`. (The markers are real at this point,
-    not a future plan — pinning them is appropriate here, not
-    earlier.)
+    and the state-file path alongside `ONBOARD-FILL`. (The
+    markers are real at this point, not a future plan — pinning
+    them is appropriate here, not earlier.)
 
 **Exit criteria.**
 - Sandbox downstream (copy of an earlier `cc-template/` commit)
@@ -388,26 +435,31 @@ Reading-order entry for `docs/design/`). Must land before Phase
   preserved; consumer-edited template blocks surface as
   divergences rather than silent overwrites; consumer-deleted
   blocks are not re-added.
+- Refresh state file populated correctly across sandbox + source-
+  mode + vendored runs.
 - Source-mode invocation at this project's root syncs
-  `cc-template/` up to root correctly.
+  `cc-template/` up to root correctly with three-way semantics
+  preserved.
 - Drift auto-detection stages skills-first when locally-loaded
   refresh is meaningfully behind upstream's current refresh.
 - `--refresh-skills-only` and `--no-claudemd` each work as named.
 - Root `CLAUDE.md` Load-bearing invariants section reflects the
-  new markers by phase close.
+  new markers and state-file path by phase close.
 
-**Revisions since this prompt ran:** none tracked.
+**Revisions since this prompt ran:**
+
+- 2026-05-26 — Scope and Read-first rewritten to reflect pinned
+  decisions from checkpoint 002 (Round 1 + 1 addendum): Option D
+  algorithm; CC-TEMPLATE-BLOCK marker syntax (id-only);
+  `.claude/claude-code-sdlc-template-refresh-state.md` state file;
+  coarse-grained TEMPLATE-BLOCK granularity (R6); CLAUDE.md merge
+  partition (R3); inline-edit conflict UX (R2b); cross-file
+  migration hash-upgrade-offer (R2d); source-mode three-way
+  semantics (B1-A1); source-mode content-inspection caching (N1).
 
 ---
 
 ## Prompt 2.2: `/write-user-documentation`
-
-**Before running this prompt:** this is a good place to run
-`/design-review` to surface findings against the architecture as
-it stands now — Phase 2.1's `/refresh-from-repository` is the
-first network-touching command in the template, and Phase 2.2's
-user-documentation command is the first content-generating one.
-Worth a checkpoint before scope freezes.
 
 **Read first.**
 - [`docs/REQUIREMENTS.md`](REQUIREMENTS.md) FR-14
@@ -452,17 +504,16 @@ Worth a checkpoint before scope freezes.
   the output and use the template without consulting internal docs.
   (`/exit-test-plan` is not used in this project per NFR-6.)
 
-**Revisions since this prompt ran:** none tracked.
+**Revisions since this prompt ran:**
+
+- 2026-05-26 — Removed "Before running this prompt" header-block
+  per checkpoint 002 R5 (retire the gate-assertion/next-session-
+  reminder conflated pattern; rely on PROJECT_PLAN.md first-class
+  checkpoint entries instead).
 
 ---
 
 ## Prompt 3: Regression-test automation
-
-**Before running this prompt:** this is a good place to run
-`/design-review` to surface findings against the architecture as
-it stands now — Phase 3 introduces tooling (a script that runs
-diffs and parses invariants out of markdown), which is a
-qualitative shift from the markdown-only stack to date.
 
 **Read first.**
 - [`docs/REQUIREMENTS.md`](REQUIREMENTS.md) FR-16
@@ -508,4 +559,9 @@ qualitative shift from the markdown-only stack to date.
 - Documentation in root `CLAUDE.md` describes when to run it
   (before tagging a new dist release, at minimum).
 
-**Revisions since this prompt ran:** none tracked.
+**Revisions since this prompt ran:**
+
+- 2026-05-26 — Removed "Before running this prompt" header-block
+  per checkpoint 002 R5 (retire the gate-assertion/next-session-
+  reminder conflated pattern; rely on PROJECT_PLAN.md first-class
+  checkpoint entries instead).

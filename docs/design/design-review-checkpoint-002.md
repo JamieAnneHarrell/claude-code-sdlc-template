@@ -2,7 +2,7 @@
 checkpoint: 002
 date: 2026-05-26
 reviewer: Claude (Opus 4.7) with Jamie
-status: AWAITING-DECISIONS
+status: LANDED 2026-05-26
 trigger: Pre-Phase-2.1 sanity check — /refresh-from-repository design contract and consumer-edit reconciliation
 ---
 
@@ -155,7 +155,7 @@ storage it requires) are named in 1–2 sentences each.
   one drifts, the other still catches most cases.
 
 > AUDIT NOTE — JAH:
-> _[UNMARKED — replace this line with your decision per the legend above]_
+> _DECISION: OPTION D - Hybrid. CAVEAT: How does this work with a local cc-template project such as a maintainer version or one that intentionally choses to pin a version by having a cc-template copied into their local repo? Need to resolve._
 
 ### Recommendations — resolve before Phase 2.1 implementation
 
@@ -219,7 +219,7 @@ invariants section at Phase 2.1 landing (per Prompt 2.1 scope
 item 10).
 
 > AUDIT NOTE — JAH:
-> _[UNMARKED — replace this line with your decision per the legend above]_
+> _DECISION: CC-TEMPLATE-BLOCK: <id> where ID is a block hash_
 
 #### R2a. Consumer-edit scenario — wholesale rule deletion (Android case)
 
@@ -266,7 +266,7 @@ iPhone-rule" example must work cleanly or the contract is
 misleading.
 
 > AUDIT NOTE — JAH:
-> _[UNMARKED — replace this line with your decision per the legend above]_
+> _DECISION: B1 landed with BLOCK ID and FILE HASH (Option D). That should provide sufficient markers for the contract. If any list of commit stamps needs to be stored, don't polute user readable files with those. Chose a header or footer within the skill itself. Unrecognized local block IDs could be a marker to suggest a --refresh-skills-only pass to ensure we know of all markers._
 
 #### R2b. Consumer-edit scenario — partial edit inside marker (UX of conflict surfacing)
 
@@ -303,7 +303,7 @@ existing Stage-2-style "walk one at a time" pattern from
 `/design-review` is a working precedent.
 
 > AUDIT NOTE — JAH:
-> _[UNMARKED — replace this line with your decision per the legend above]_
+> _Accepted._
 
 #### R2c. Consumer-edit scenario — rules-file section reordering
 
@@ -334,7 +334,7 @@ won't predict and will be pleasantly surprised by, but only if
 the contract names it.
 
 > AUDIT NOTE — JAH:
-> _[UNMARKED — replace this line with your decision per the legend above]_
+> _Accepted._
 
 #### R2d. Consumer-edit scenario — cross-file rule migration
 
@@ -383,7 +383,7 @@ and the limitation is consistent with the existing "personalized
 rules are yours forever" stance.
 
 > AUDIT NOTE — JAH:
-> _[UNMARKED — replace this line with your decision per the legend above]_
+> _Accepted with Caveat: if it is wholesale moved within one of our own known files and the hash matches we should be able to detect the rule that hash matched and offer to upgrade it with a newer version._
 
 #### R3. CLAUDE.md merge boundary — what's template-owned post-onboard?
 
@@ -439,7 +439,7 @@ and the `--no-claudemd` flag covers the consumer who needs
 upstream's invariant updates.
 
 > AUDIT NOTE — JAH:
-> _[UNMARKED — replace this line with your decision per the legend above]_
+> _Accepted with caveats: An upstream revision that wants to add invariants should be able to force a --refresh-skills-only. A contract needs to be made such that a downstream looks at the upstream before running and determines if refresh is necessary before running. This allows a future version of the code to solve mergin issues differently than we guess will work now in this first pass._
 
 #### R4. Drift-detection version-stamp mechanism
 
@@ -487,7 +487,7 @@ so future maintainers (including future-Claude editing the spec)
 know when to increment.
 
 > AUDIT NOTE — JAH:
-> _[UNMARKED — replace this line with your decision per the legend above]_
+> _Acceoted with Caveat: Couldn't metadata be stored in a .claude-code-sdlc-template-version.md file with the commit number in the commands directory? what is the KISS option here that we're missing?_
 
 #### R5. "Before running this prompt" header-block pattern — disposition
 
@@ -537,7 +537,7 @@ to `docs/design-decisions.md` as a resolved decision. Option B
 visibility but not recommended.
 
 > AUDIT NOTE — JAH:
-> _[UNMARKED — replace this line with your decision per the legend above]_
+> _Accepted._
 
 ### Notes — acceptable now, revisit later
 
@@ -570,7 +570,7 @@ would foreground a corner case the consumer doesn't need to
 think about (per progressive disclosure).
 
 > AUDIT NOTE — JAH:
-> _[UNMARKED — replace this line with your decision per the legend above]_
+> _DECISION: We're smart enough to know if a cc-template subdirectory IS or IS NOT an instance of our own code. First time we see it we can check the contents to determine if it's us or a random naming collision and save that informatino to CLAUDE.md_
 
 ## What the design got right (preserve)
 
@@ -634,7 +634,20 @@ the purposes of Stage 2's landing application.*
 
 | Round | Finding | Disposition | Reason |
 |-------|---------|-------------|--------|
-| <empty until Stage 2> | | | |
+| Original | B1 | Decision | Option D (hybrid: per-block hash + file-level commit stamp); investigation directive — source-mode interaction (maintainer / vendored-pin local cc-template) with hybrid baseline needs resolution. |
+| Original | R1 | Decision | Marker `<!-- CC-TEMPLATE-BLOCK: <id> --> ... <!-- /CC-TEMPLATE-BLOCK -->`; `<id>` is a stable human-readable kebab-case identifier; per-block hash carried as a separate `hash=` field on the open marker. |
+| Original | R2a | Decision | Baseline metadata lives within the skill itself (not in user-facing files); unrecognized local block IDs surface as a `--refresh-skills-only` suggestion; specific storage mechanism deferred to Addendum 1 alongside B1 + R4. |
+| Original | R2b | Accepted | Inline-edit conflicts surface inline to the running session, one block at a time: accept upstream / keep downstream / hand-merge. |
+| Original | R2c | Accepted | Refresh matches blocks by id, not by position; consumer reordering preserved across refreshes. |
+| Original | R2d | Accepted with Caveats | Default = no cross-file tracking (deletion + new content). Caveat: when a moved block's hash matches a known template block in one of the template-managed rules files this project ships (today's six: coding-session-rules / design-philosophy-rules / multi-agent-rules / project-rules / environment-rules / testing-rules), refresh detects the migration and offers to apply upstream's update. Scope explicitly excludes arbitrary `.md` files the consumer adds. |
+| Original | R3 | Accepted with Caveats | Partition pinned (Collaboration-rules + Reading-order = template-owned; banner / project-specific / Load-bearing invariants = consumer-owned). Caveat: downstream fetches upstream's `refresh-from-repository.md` and checks whether refresh is necessary before running; upstream can force `--refresh-skills-only` via a signal in that file. Mechanism overlaps with R4 — resolved together in Addendum 1. |
+| Original | R4 | Decision | Drift detection is required; storage mechanism deferred to Addendum 1 discovery — candidates include a sidecar version file (e.g. `.claude-code-sdlc-template-version.md`), a version number in `cc-template/README.md`, a pre-commit-generated incrementing id per skill, or a cleaner KISS option TBD. |
+| Original | R5 | Accepted | Retire the "Before running this prompt" header-block-note form from `/onboard`'s spec; remove from forward-looking Prompts 2.2 and 3 at landing; landed Prompts 1.1 and 1.2 keep historical-state blocks per the "don't edit landed prompts retroactively" convention. |
+| Original | N1 | Decision | First source-mode invocation content-inspects the `cc-template/` subdir to determine whether it's our own template; cache the determination in CLAUDE.md so subsequent invocations don't re-check. |
+| Addendum 1 | B1-A1 | Accepted | Source-mode preserves three-way semantics; baseline reference for source-mode comes from R4-A1 storage (subtree content-hash or source-repo HEAD at sync time). Same algorithm in public and source modes; only the "fetch baseline" step branches. |
+| Addendum 1 | R1-A1 | Accepted | Marker carries id only, no inline metadata: `<!-- CC-TEMPLATE-BLOCK: <id> --> ... <!-- /CC-TEMPLATE-BLOCK -->`. Per-block hashes live in R4-A1 storage. |
+| Addendum 1 | R4-A1 | Decision | Candidate 6 with filename `.claude/claude-code-sdlc-template-refresh-state.md` (namespace-disambiguated to avoid collision with other tools that may use `refresh-state.md`). Single file carries upstream baseline + per-block hash map + drift-version stamp + upstream directives. |
+| Addendum 1 | R6 | Accepted | Three coupled prongs land: coarse-grained wrapping (one TEMPLATE-BLOCK per top-level rule), per-block hashes in R4-A1 storage (not inline in markers), compact kebab-case ids. Bounds added line count to ~5-7% of post-Phase-1.2 baseline. |
 
 ## Sign-off Summary
 
@@ -643,9 +656,338 @@ section — sign-offs go inline above.*
 
 | ID | Final disposition |
 |----|-------------------|
-| <empty until landing> | |
+| B1 / B1-A1 | Decision: Option D (hybrid: per-block hash + file-level baseline reference); source-mode preserves three-way semantics. |
+| R1 / R1-A1 | Decision: marker `<!-- CC-TEMPLATE-BLOCK: <id> --> ... <!-- /CC-TEMPLATE-BLOCK -->`, id-only (kebab-case, file-scoped); per-block hashes live in state file. |
+| R2a | Decision: baseline metadata lives in `.claude/claude-code-sdlc-template-refresh-state.md` (not in user-facing files); unrecognized local block IDs suggest `--refresh-skills-only`. |
+| R2b | Accepted: inline-edit conflict surfaces inline, one block at a time, three resolution choices (accept upstream / keep downstream / hand-merge). |
+| R2c | Accepted: refresh matches blocks by id, not by position; consumer reordering preserved. |
+| R2d | Accepted with Caveats: default = no cross-file tracking; caveat — when a moved block's hash matches a known template block in one of the six template-managed rules files, refresh detects and offers to apply upstream's update. |
+| R3 | Accepted with Caveats: CLAUDE.md partition pinned (Collaboration-rules + Reading-order template-owned; banner + project-specific + Load-bearing invariants consumer-owned); caveat — downstream pre-flight checks upstream's refresh state before running; upstream can force `--refresh-skills-only` via a directive in the state file. |
+| R4 / R4-A1 | Decision: storage = `.claude/claude-code-sdlc-template-refresh-state.md` (Candidate 6, namespace-disambiguated); single file carries Upstream baseline + Block hashes + Refresh logic version + Upstream directives sections. |
+| R5 | Accepted: retire "Before running this prompt" header-block-note form from `/onboard`'s spec; remove from forward-looking Prompts 2.2 and 3 at landing; landed prompts keep historical-state blocks. |
+| R6 | Accepted: coarse-grained wrapping (one TEMPLATE-BLOCK per top-level rule) + per-block hashes in state file (not inline in markers) + compact kebab-case ids. Bounds added line count to ~5-7% of post-Phase-1.2 baseline. |
+| N1 | Decision: first source-mode invocation content-inspects `cc-template/` subdir to confirm it's this template; cache determination in CLAUDE.md. |
 
 ## Follow-up actions landed
 
-*Filled when Stage 2 lands the doc. Lists every doc edit and
-every TODO that landed during the landing pass.*
+**Doc edits applied (Stage 2 edit scope):**
+
+- B1 / B1-A1 / R1 / R1-A1 / R2b / R4 / R4-A1 / N1: edited `docs/REQUIREMENTS.md` FR-13 — added Option D algorithm, pinned CC-TEMPLATE-BLOCK marker syntax, state file location, inline-edit UX, source-mode content-inspection caching, source-mode three-way semantics.
+- R1 / R1-A1 / R4 / R4-A1: edited `docs/REQUIREMENTS.md` NFR-4 — pinned the template-marker syntax (was "TBD by Phase 2.1") and added the state file path + schema as load-bearing.
+- B1 / B1-A1 / R1 / R1-A1 / R2b / R2d / R3 / R4 / R4-A1 / R6 / N1: edited `docs/PROJECT_PLAN.md` Phase 2.1 deliverables — pinned algorithm, marker syntax, state file, R6 granularity, R3 partition, source-mode three-way + content-inspection, inline-edit conflict UX, cross-file migration upgrade-offer.
+- edited `docs/PROJECT_PLAN.md` "Design Review Checkpoint — pre-Phase-2.1" header — flipped to `LANDED 2026-05-26 (checkpoint 002)` with one-line summary of what landed.
+- B1 / B1-A1 / R1 / R1-A1 / R2b / R2d / R3 / R4 / R4-A1 / R6 / N1: edited `docs/CLAUDE_CODE_PROMPTS.md` Prompt 2.1 — Read-first adds checkpoint 002; Scope rewritten to reflect all pinned decisions; deviation footer entry added.
+- R5: edited `docs/CLAUDE_CODE_PROMPTS.md` Prompt 2.2 — removed "Before running this prompt" header block; deviation footer entry added.
+- R5: edited `docs/CLAUDE_CODE_PROMPTS.md` Prompt 3 — removed "Before running this prompt" header block; deviation footer entry added.
+
+**TODOs surfaced (out of Stage 2 edit scope; queued for separate sessions):**
+
+- **T1.** Update `docs/design-decisions.md` refresh entries to reflect checkpoint 002 dispositions: Option D algorithm specifics (B1 / B1-A1); CC-TEMPLATE-BLOCK marker syntax (R1 / R1-A1); state file format and rationale (R4 / R4-A1, R2a); R6 coarse-grained granularity strategy; R2d cross-file hash-match upgrade-offer; R3 pre-flight check + upstream force-skills-only; N1 source-mode content-inspection caching.
+- **T2.** Update `.claude/commands/onboard.md` to retire the "Before running this prompt" header-block-note instruction from its `docs/CLAUDE_CODE_PROMPTS.md` authoring step (R5 spec edit). Mirror to `cc-template/.claude/commands/onboard.md`.
+- **T3.** Move resolved `docs/open-questions.md` entries to `docs/design-decisions.md` as closed: "Reconciliation algorithm for `/refresh-from-repository`" (closed by B1 / B1-A1) and "'Before running this prompt' header-block pattern in CLAUDE_CODE_PROMPTS.md" (closed by R5).
+- **T4.** Plan-mode → `/wind-down` user-story session (carryover from prior TODO; queued before Phase 2.1 build session).
+- **T5.** Add a new `docs/open-questions.md` "Deferred User Stories" entry: closing a `/design-review` (Stage 2 landing) should also review the overall project plan and, if a high-risk transition is approaching, insert a future `/design-review` checkpoint into `docs/CLAUDE_CODE_PROMPTS.md` as a *first-class entry* between prompts (the `## Design Review Checkpoint — pre-Prompt-N` shape already used for pre-Phase-2.1). Keeps design reviews in the prompt flow as first-class items that surface in TODO.txt at session start. Distinct from the header-block-note form retired by R5 — first-class entries are discoverable via reading-order, not embedded in prompt bodies.
+
+---
+
+## Addendum 1 — 2026-05-26
+
+### Why this addendum exists
+
+Round 1 closed with three threads asking for further investigation
+before final disposition: **B1** (Option D hybrid's behavior under
+source-mode and vendored-lock-in), **R4** (drift-detection
+metadata storage mechanism — Jamie's caveat made the question
+explicit: "what is the KISS-cleanest option here?"), and **R1**
+(final marker syntax, downstream of B1 + R4). Two Round 1 caveats
+— R2a's "baseline within the skill itself" and R3's "downstream
+checks upstream first; upstream can force `--refresh-skills-only`"
+— fold into R4's scope as mechanism details.
+
+Addendum 1 re-opens those three findings with concrete options
+analysis and adds one new finding (R6) on a concern Jamie surfaced
+during the disposition walk: would marker insertion in rules
+files create significant context-window bloat that erodes the
+gains from Phase 1.2's cleanup pass?
+
+Scope stays inside the existing `/refresh-from-repository`
+contract: mechanism resolution, not new design directions.
+
+### Round 1 dispositions that stand (not re-opened here)
+
+- **R2b** — Inline-edit conflict UX (one-block-at-a-time inline;
+  accept upstream / keep downstream / hand-merge). Final.
+- **R2c** — Block matching by id, not by position; reordering
+  preserved. Final.
+- **R2d** — Cross-file migration: no default tracking; caveated
+  upgrade-offer when a moved block's hash matches one of the six
+  template-managed rules files this project ships. Final.
+- **R2a partition half** — "Don't pollute user files with baseline
+  metadata; unrecognized local block IDs trigger a
+  `--refresh-skills-only` suggestion." Direction final; the
+  *where exactly does metadata live* part is R4-A1.
+- **R3 partition half** — CLAUDE.md template/consumer partition
+  pinned (Collaboration-rules + Reading-order = template-owned;
+  banner / project-specific / Load-bearing invariants =
+  consumer-owned). The pre-flight-check caveat is R4-A1.
+- **R5** — Retire "Before running this prompt" header-block-note
+  from `/onboard`'s spec; remove from forward-looking Prompts 2.2
+  and 3 at landing; landed prompts keep historical-state blocks.
+  Final.
+- **N1** — Source-mode auto-detection via content inspection; cache
+  in CLAUDE.md. Final.
+
+### Investigation summary — metadata storage mechanism candidates
+
+Six candidates from the Round 1 walk and Jamie's reflection.
+Evaluated on KISS, progressive disclosure (markers shouldn't
+intrude on the rules-reading experience), R6 context-bloat
+impact, and source-mode behavior (does the same primitive work
+when upstream is local on disk?).
+
+- **Candidate 1 — `.claude-code-sdlc-template-version.md`
+  sidecar at repo root.** Single file at repo root carries
+  upstream commit + per-block hash map. *Pro:* single source of
+  truth; rules stay marker-id-only. *Con:* new top-level file
+  consumers wonder about; commits into git history every refresh.
+- **Candidate 2 — Version line in `cc-template/README.md`.**
+  Reuse existing file. *Pro:* no new artifacts. *Con:* one signal
+  only (commit), can't hold per-block hashes; breaks when consumer
+  renames the `cc-template/` directory (the FR-2 default flow).
+- **Candidate 3 — Pre-commit-generated id per skill.** Source-repo
+  hook bumps an integer per command file on modify. *Pro:* no
+  consumer-side state. *Con:* requires hook infrastructure
+  (project is markdown-only today); misses unhook-bypassed edits;
+  doesn't carry per-block hashes.
+- **Candidate 4 — `<!-- REFRESH-LOGIC-VERSION: N -->` in
+  `refresh-from-repository.md` only** (Round 1 R4 recommendation).
+  Solves drift detection only; forces per-block hashes into
+  markers (worst for R6) and per-file baseline-commit into a
+  separate stamp somewhere.
+- **Candidate 5 — Header block inside
+  `refresh-from-repository.md` itself** ("within the skill
+  itself"). Skill becomes a state carrier. *Pro:* no new files;
+  source-mode identical. *Con:* skill self-modifies on every
+  refresh → diff noise on the command file; drift detection has
+  to ignore the state block when comparing for logic changes.
+  - **Variant 5b** — separate `refresh-state.md` peer file in
+    `.claude/commands/`. Resolves the self-modifying concern;
+    costs one extra file in `.claude/commands/`.
+- **Candidate 6 — `.claude/refresh-state.md`.** Single file in
+  the conventional machine-state location (`.claude/` already
+  hosts commands and settings). Markdown-table format keeps
+  NFR-6 markdown-only. Carries upstream baseline + per-block hash
+  map + drift-version + upstream directives. *Pro:* single source
+  of truth; rules stay marker-id-only (R6 solved); source-mode
+  identical; consumers rarely look in `.claude/`. *Con:* slight
+  format choice (markdown table vs other) but stays inside
+  NFR-6.
+
+**Synthesis.** Candidate 6 and Variant 5b both meet the criteria
+cleanly (metadata outside user-facing files, source-mode
+identical, single source of truth). Candidate 1 also works but
+puts the file at repo root where it'd be ambient. Candidates 2,
+3, 4 leave per-block hashes in markers and don't resolve R6.
+
+### How to mark up Addendum 1
+
+Each finding below has its own `AUDIT NOTE — JAH:` block.
+Replace each placeholder line per the legend at the top of the
+document. Addendum 1 dispositions supersede earlier rounds for
+re-opened findings (B1-A1 supersedes B1; R1-A1 supersedes R1 on
+final field decisions; R4-A1 supersedes R4 on storage-mechanism
+specifics).
+
+### Findings
+
+#### Blockers (re-opened + new)
+
+##### B1-A1. Source-mode + vendored-lock-in behavior under Option D [re-opened from B1]
+
+**Sources.** Round 1 B1 (DECISION: Option D); Round 1 B1 caveat
+("How does this work with a local cc-template such as a maintainer
+version or one that intentionally pins a version by having a
+cc-template copied into their local repo? Need to resolve.");
+`docs/design-decisions.md` "Source-repo refresh syncs local
+cc-template/ → root" and "Vendored-template lock-in as a documented
+use case"; `docs/REQUIREMENTS.md` FR-13 source-mode clause.
+
+**Problem.** Option D (hybrid: per-block hash + file-level commit
+stamp) was specified against the public-upstream-via-GitHub model
+— refresh fetches the commit's version of each file as the
+baseline for three-way comparison. Source-mode (root↔dist sync or
+vendored-lock-in) has no GitHub round-trip; baseline content sits
+on disk in `./cc-template/`. Two readings of how the algorithm
+should behave:
+
+1. **Degenerate to copy-if-changed.** In source-mode, treat the
+   local `cc-template/` as both upstream AND baseline. Refresh
+   copies files where upstream-cc-template differs from
+   downstream-root; no three-way comparison. Simpler, but loses
+   the ability to detect "consumer edited the synced file at
+   root since the last sync."
+2. **Preserve three-way semantics.** The local `cc-template/` is
+   upstream; baseline comes from the last successful refresh's
+   stored state (whatever R4-A1's storage holds). Source-mode
+   keeps the same inline-edit detection that Option D was picked
+   for. Costs the R4-A1 storage mechanism in source-mode too
+   (it'd be required anyway for the public-upstream case).
+
+**Recommendation.** Reading 2 — preserve three-way semantics in
+source-mode. The R4-A1 storage stores the baseline reference; in
+source-mode that reference is whatever identifies the local
+`cc-template/`'s state at last sync (a content-hash of the subtree
+or the source repo's HEAD commit at sync time — exact choice is
+downstream of R4-A1). Source-mode and public-mode share the same
+algorithm; only the "fetch baseline" step branches (network for
+public, disk for source). The inline-edit detection that
+motivated Option D over Option B works identically in both modes.
+
+> AUDIT NOTE — JAH:
+> _Accepted._
+
+#### Recommendations (re-opened + new)
+
+##### R1-A1. Final marker syntax — fields and compactness [re-opened from R1]
+
+**Sources.** Round 1 R1 (DECISION: `<!-- CC-TEMPLATE-BLOCK: <id> --> ... <!-- /CC-TEMPLATE-BLOCK -->`, kebab-case id + separate `hash=` field). Now downstream of R4-A1 (storage location) and R6 (context-bloat).
+
+**Problem.** Round 1 R1's marker shape is settled at the
+conceptual level. What's open is whether the open marker carries
+the `hash=` field inline or pushes the hash into R4-A1's storage.
+Inline `hash=` adds ~12-16 characters per marker per block;
+pushed-to-storage keeps markers minimal
+(`<!-- CC-TEMPLATE-BLOCK: rule-1 -->`).
+
+**Recommendation.** Conditional on R4-A1: if R4-A1 picks a storage
+mechanism that can hold per-block hashes (Candidates 1, 5b, or
+6), pin the marker as:
+
+```
+<!-- CC-TEMPLATE-BLOCK: <id> -->
+...block content...
+<!-- /CC-TEMPLATE-BLOCK -->
+```
+
+— id only, no inline metadata. Storage carries the {id → hash,
+file → baseline} map. If R4-A1 picks a mechanism that can't carry
+hashes (Candidates 2, 3, 4), fall back to inline `hash=` and
+accept R6's context-bloat impact. Decision here is essentially
+"trust R4-A1's pick to enable the minimal marker shape."
+
+> AUDIT NOTE — JAH:
+> _Accepted._
+
+##### R4-A1. Metadata storage mechanism — pick a candidate [re-opened from R4]
+
+**Sources.** Round 1 R4 ("Accepted with Caveat: Couldn't metadata
+be stored in a `.claude-code-sdlc-template-version.md` file with
+the commit number in the commands directory? what is the KISS
+option here that we're missing?"); Round 1 R2a caveat ("don't
+pollute user readable files with those. Chose a header or footer
+within the skill itself"); Round 1 R3 caveat ("upstream-driven
+force `--refresh-skills-only`; downstream checks upstream before
+running"); investigation summary above (six candidates).
+
+**Problem.** The storage mechanism carries four pieces of state:
+(a) last-synced upstream baseline reference, (b) per-block-id →
+hash map for inline-edit detection, (c) drift-detection version
+stamp for refresh logic itself, (d) optional upstream-set signal
+that forces `--refresh-skills-only` on next downstream run. All
+four should live in one place (single source of truth) and outside
+user-facing content (R6 context-bloat).
+
+**Recommendation.** Pick **Candidate 6** — a single
+`.claude/refresh-state.md` (markdown table format to stay inside
+NFR-6) carrying all four pieces of state. Format sketch:
+
+```markdown
+<!-- machine-managed; refresh-from-repository writes this file. Do not hand-edit. -->
+
+## Upstream baseline
+
+- last-synced-commit: <sha-or-subtree-hash-for-source-mode>
+- last-synced-at: 2026-05-26
+
+## Block hashes
+
+| File | Block ID | Hash |
+|------|----------|------|
+| rules/coding-session-rules.md | rule-1-fix-root-causes | abc12345 |
+| ... | ... | ... |
+
+## Refresh logic version (drift detection)
+
+- local-refresh-logic-version: 2
+
+## Upstream directives
+
+- force-skills-only-from: <upstream-commit-or-empty>
+```
+
+Rationale: `.claude/` is the conventional machine-state location;
+markdown stays inside NFR-6; single file makes storage atomic per
+refresh; rules files stay free of hash metadata (R6 solved);
+source-mode reads/writes the same file regardless of whether
+upstream is GitHub or local `cc-template/`. The pre-flight
+upstream check from R3's caveat reads the "Upstream directives"
+section.
+
+Alternative: **Variant 5b** (peer `.claude/commands/refresh-state.md`)
+— also acceptable; co-locates state with the skill rather than at
+`.claude/` root. Choose between Candidate 6 and Variant 5b at
+markup via DECISION. Candidates 1-5 (non-variant) have the
+drawbacks named in the investigation summary.
+
+> AUDIT NOTE — JAH:
+> _DECISION: Candidate 6 but name the file .claude/claude-code-sdlc-template-refresh-state.md to avoid namespace collision_
+
+##### R6. Context-bloat impact of template-marker insertion in rules files [new]
+
+**Sources.** Phase 1.2 deviation footer (LANDED 2026-05-25 with
+-11.7%, short of the 25% reduction target — "load-bearing content
+density was the limit"); `CLAUDE.md` Collaboration-rules section
+("MUST DO before responding to the first user message of any
+session" — `coding-session-rules.md` + `design-philosophy-rules.md`
+read end-to-end every session); `docs/REQUIREMENTS.md` NFR-6
+(markdown-only); the six template-managed rules files this
+project ships.
+
+**Problem.** Phase 1.2 cut what it could from rules content and
+came up short of target because content was already dense. Adding
+template-marker wrappers around refresh-managed blocks re-inflates
+the line count. Per-session this cost is paid every time rules
+files are read (mandatory per CLAUDE.md). Coarse estimate: ~9
+rules in `coding-session-rules.md`, ~3-4 sections in
+`design-philosophy-rules.md`, ~4-6 sections each across the four
+placeholder rules files. Coarse-grained wrapping (one block per
+rule) adds 2 lines per block; fine-grained wrapping (per
+paragraph) multiplies that 3-5x. Inline `hash=` per marker grows
+each line further.
+
+**Recommendation.** Three coupled prongs that together bound the
+bloat impact:
+
+1. **Coarse-grained wrapping** — one TEMPLATE-BLOCK per
+   top-level rule section, not per paragraph. Keeps marker count
+   to ~25-30 across all six rules files.
+2. **Per-block hashes in R4-A1 storage, not inline in markers**
+   (already covered by R1-A1's conditional). Per-marker overhead
+   shrinks from ~80 chars to ~40 chars.
+3. **Compact id naming** — kebab-case but short
+   (`rule-1-fix-root-causes`, not
+   `coding-session-rule-1-fix-root-causes-only`). Ids are
+   file-scoped per R1, so file prefixes are implicit.
+
+Combined, these keep R6's added line count under ~60 across the
+six rules files (~5-7% of post-Phase-1.2 baseline) — bounded
+trade-off for refresh capability. The three prongs are a single
+disposition: pick all three or accept materially higher bloat
+(in which case a separate finding should re-open the question).
+
+> AUDIT NOTE — JAH:
+> _Accepted._
+
+#### Notes (re-opened + new)
+
+*No findings in this tier in Addendum 1.*

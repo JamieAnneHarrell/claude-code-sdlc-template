@@ -192,24 +192,59 @@ using block-level reconciliation against template-owned markers.
   detected drift`, `Template marks its own content; reconciliation
   tolerates divergence`, `Source-repo refresh syncs local
   cc-template/ → root`, `Refresh progressive-disclosure flags`,
-  `Vendored-template lock-in as a documented use case`).
-- Template marker syntax pinned (open/close strings, embedded
-  metadata fields). Becomes load-bearing per NFR-4 once shipped.
-- Reconciliation algorithm chosen from the options in
-  [`docs/open-questions.md`](open-questions.md) (per-block hash,
-  file-level commit-stamp baseline, git-3-way, or hybrid),
-  sanity-checked in the pre-Phase-2.1 `/design-review`.
+  `Vendored-template lock-in as a documented use case`) and the
+  checkpoint 002 dispositions.
+- Template marker syntax (pinned by checkpoint 002):
+  `<!-- CC-TEMPLATE-BLOCK: <id> --> ... <!-- /CC-TEMPLATE-BLOCK -->`
+  with `<id>` a stable human-readable kebab-case identifier,
+  no inline metadata. Load-bearing per NFR-4.
+- Reconciliation algorithm: **Option D (hybrid)** per checkpoint
+  002 — per-block content hash for inline-edit detection +
+  file-level baseline reference for deletion-vs-never-existed
+  disambiguation. Three-way comparison (downstream-current /
+  upstream-current / baseline-from-state-file).
+- Refresh state file `.claude/claude-code-sdlc-template-refresh-state.md`
+  created per checkpoint 002 R4-A1 — single machine-managed
+  markdown file with sections: Upstream baseline, Block hashes,
+  Refresh logic version, Upstream directives. Refresh
+  reads/writes; consumers don't hand-edit.
 - Template markers added to refresh-managed regions of rules
-  files and CLAUDE.md (post-onboard wrapping is part of this
-  phase's work; the consumer contract requires markers to exist
-  before refresh can target them).
+  files and CLAUDE.md. **Coarse-grained wrapping** per
+  checkpoint 002 R6: one TEMPLATE-BLOCK per top-level rule
+  section (not per paragraph); compact kebab-case ids (file-
+  scoped, file prefix implicit). **CLAUDE.md merge partition**
+  per checkpoint 002 R3: Collaboration-rules + Reading-order
+  sections wrap in TEMPLATE-BLOCK; banner / project-specific
+  context / Load-bearing invariants stay consumer-owned (free
+  regions, refresh never touches).
 - Auto-detected drift → skills-first staging logic implemented;
-  manual `--refresh-skills-only` flag exposed.
+  manual `--refresh-skills-only` flag exposed; upstream-directive
+  in state file can also force `--refresh-skills-only` on next
+  downstream run (per checkpoint 002 R3 caveat).
 - `--no-claudemd` flag exposed.
 - Source-mode behavior: detect `cc-template/` subdir at cwd and
   treat it as upstream; same code path serves the source-of-truth
   repo's root↔dist sync and the vendored-template-lock-in use
-  case.
+  case. **Preserves three-way reconciliation semantics** per
+  checkpoint 002 B1-A1 — baseline reference for source-mode comes
+  from the state file (subtree content-hash or source-repo HEAD
+  at last sync). On first source-mode invocation in a repo,
+  content-inspect the `cc-template/` subdir to confirm it's this
+  template; cache determination in CLAUDE.md (per checkpoint 002
+  N1).
+- Inline-edit conflict UX per checkpoint 002 R2b: when refresh
+  detects an inline-edit divergence in a TEMPLATE-BLOCK, surface
+  inline to the running session, one block at a time, with three
+  resolution choices (accept upstream / keep downstream /
+  hand-merge). No sidecar conflict files; no git-style conflict
+  markers.
+- Cross-file migration upgrade-offer per checkpoint 002 R2d: when
+  a consumer-deleted block's hash matches a known template block
+  in one of the six template-managed rules files
+  (`coding-session-rules.md`, `design-philosophy-rules.md`,
+  `multi-agent-rules.md`, `project-rules.md`,
+  `environment-rules.md`, `testing-rules.md`), refresh detects
+  the migration and offers to apply upstream's update.
 - Semantic conflict surfacing across template/personalized regions
   is the executing session's job (per
   `docs/design-decisions.md` "Template marks its own content").
@@ -218,8 +253,8 @@ using block-level reconciliation against template-owned markers.
   lock-in pattern); this project's
   `docs/CLAUDE_CODE_PROMPTS.md` Prompt 2.1 records the build
   prompt; root `CLAUDE.md` Load-bearing invariants section
-  updated *after* markers exist on-disk (pinning their syntax as
-  load-bearing).
+  updated *after* markers exist on-disk (pinning their syntax and
+  the state-file path as load-bearing).
 
 **Exit criteria.** Sandbox downstream project (copy of an earlier
 `cc-template/` commit) runs refresh cleanly: command files
@@ -234,14 +269,19 @@ refresh.
 
 **Design review checkpoint:** before Phase 2.1 begins.
 
-## Design Review Checkpoint — pre-Phase-2.1
+## Design Review Checkpoint — pre-Phase-2.1 (LANDED 2026-05-26)
 
-Run `/design-review`. Trigger: pre-Phase-2.1 scrutiny —
-`/refresh-from-repository` introduces a two-stage self-modifying
-command, a merge strategy for `CLAUDE.md` (open question today),
-and the first piece of network-touching behavior in the template.
-This is the highest-risk transition in the roadmap; a checkpoint
-before scope freezes is cheap insurance.
+Ran `/design-review`. Trigger: pre-Phase-2.1 scrutiny —
+`/refresh-from-repository` introduces a self-modifying command,
+a merge strategy for `CLAUDE.md`, and the first piece of
+network-touching behavior in the template. Highest-risk
+transition in the roadmap. Landed as
+[checkpoint 002](design/design-review-checkpoint-002.md) across
+Round 1 + 1 addendum — pinned Option D (hybrid) algorithm,
+CC-TEMPLATE-BLOCK marker syntax,
+`.claude/claude-code-sdlc-template-refresh-state.md` state file,
+coarse-grained TEMPLATE-BLOCK wrapping (R6), CLAUDE.md merge
+partition (R3), and the inline-edit conflict UX (R2b).
 
 ---
 

@@ -105,18 +105,34 @@ single-stage command shipped in the dist that pulls latest
 `.claude/commands/*.md` from upstream and merges latest
 `rules/*.md` + `CLAUDE.md` against the downstream's current state
 using block-level reconciliation against template-owned marker
-blocks. Auto-detects "merge-logic drift" (locally-loaded refresh
-logic is N generations behind upstream) and stages skills-first when
-warranted, prompting the consumer to re-invoke. Source-mode behavior:
-when invoked in a repo containing a `cc-template/` subdirectory at
-cwd, "upstream" is the local `cc-template/` subdir rather than the
-public GitHub URL (serves the source-of-truth repo's root↔dist sync
-and the vendored-template-lock-in use case). Two progressive-
-disclosure flags ship in v1: `--refresh-skills-only` (manual override
-for the drift-staging path) and `--no-claudemd` (skip CLAUDE.md from
-the merge). Full design contract in `docs/design-decisions.md`
-"Template marks its own content; reconciliation tolerates
-divergence."
+blocks. Reconciliation uses Option D (hybrid: per-block content
+hash for inline-edit detection + file-level baseline reference for
+deletion-vs-never-existed disambiguation). Markers use the pinned
+syntax `<!-- CC-TEMPLATE-BLOCK: <id> --> ... <!-- /CC-TEMPLATE-BLOCK -->`
+(id-only, no inline metadata). Refresh state — upstream baseline,
+per-block hashes, drift-version stamp, upstream directives — lives
+in a single machine-managed file at
+`.claude/claude-code-sdlc-template-refresh-state.md`. Inline-edit
+conflicts surface inline to the running session one block at a
+time, with three resolution choices (accept upstream / keep
+downstream / hand-merge). Auto-detects "merge-logic drift"
+(locally-loaded refresh logic behind upstream) and stages
+skills-first when warranted, prompting the consumer to re-invoke.
+Source-mode behavior: when invoked in a repo containing a
+`cc-template/` subdirectory at cwd, "upstream" is the local
+`cc-template/` subdir rather than the public GitHub URL (serves
+the source-of-truth repo's root↔dist sync and the vendored-template-
+lock-in use case). On first source-mode invocation in a repo,
+refresh content-inspects the `cc-template/` subdir to confirm it's
+this template and caches the determination in CLAUDE.md. Source-mode
+preserves the same three-way reconciliation semantics as public mode;
+only the "fetch baseline" step branches (network for public, disk
+for source). Two progressive-disclosure flags ship in v1:
+`--refresh-skills-only` (manual override for the drift-staging path)
+and `--no-claudemd` (skip CLAUDE.md from the merge). Full design
+contract in `docs/design-decisions.md` "Template marks its own
+content; reconciliation tolerates divergence" + checkpoint 002
+dispositions.
 
 **FR-14: `/write-user-documentation` is a Phase 2 deliverable.** A
 command that authors end-user documentation. Shipped in the dist;
@@ -171,11 +187,17 @@ load-bearing.** Stage detection parses for exact strings:
 placeholder text breaks stage detection — audit `Step 0`, `Step
 S1.5`, and `Step S1.A` of the relevant command file together. The
 template-marker syntax for `/refresh-from-repository` is similarly
-load-bearing (exact strings TBD by the Phase 2.1 build session,
-sanity-checked in pre-Phase-2.1 `/design-review`) — once shipped,
-the open/close marker text and any metadata fields embedded in
-markers cannot drift without auditing the refresh logic and all
-template files that carry markers.
+load-bearing — pinned by checkpoint 002 as
+`<!-- CC-TEMPLATE-BLOCK: <id> --> ... <!-- /CC-TEMPLATE-BLOCK -->`
+with `<id>` a stable human-readable kebab-case identifier (no
+inline metadata; per-block hashes live in the state file). The
+refresh state file at
+`.claude/claude-code-sdlc-template-refresh-state.md` is also
+load-bearing: refresh writes it; consumers don't hand-edit.
+Changing the marker open/close strings, the state-file path, or
+the state-file schema (sections: Upstream baseline / Block hashes
+/ Refresh logic version / Upstream directives) requires auditing
+the refresh logic and all template files that carry markers.
 
 **NFR-5: Failures refuse explicitly.** Commands refuse with a
 pointer to the right command when prerequisites aren't met (e.g.
