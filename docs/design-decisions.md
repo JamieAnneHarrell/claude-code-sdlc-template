@@ -413,12 +413,10 @@ says always-X; your personalized rule says never-X") using language
 understanding, not a heuristic engine. The command spec instructs
 the session to do this analysis directly.
 
-**Scope note.** The exact reconciliation algorithm (per-block hash
-in the marker, file-level commit stamp at the top, both, or git-3-way
-against tagged upstream commits) is deferred to the Phase 2.1 build
-session and the pre-Phase-2.1 `/design-review` will sanity-check the
-choice. What's settled here is the contract and the matrix; the
-mechanism is a build-time decision.
+**Scope note.** This entry settles the contract and the matrix; the
+mechanism (algorithm, marker syntax, state file) was settled by
+checkpoint 002 — see "`/refresh-from-repository` reconciliation
+mechanism" below.
 
 ---
 
@@ -503,3 +501,149 @@ operation and would drift relative to source-mode refresh.
 action (`git fetch` + copy / `git subtree` / similar) — not
 something `/refresh-from-repository` automates. The command's job is
 to apply whatever the vendored subdir currently holds.
+
+---
+
+## `/refresh-from-repository` reconciliation mechanism
+
+**Decision.** Option D hybrid: per-block content hashes detect inline
+edits, file-level baseline references detect deletions, three-way
+comparison (downstream-current / upstream-current / baseline) drives
+the merge. Template content is wrapped in
+`<!-- CC-TEMPLATE-BLOCK: <id> --> ... <!-- /CC-TEMPLATE-BLOCK -->`
+markers (id-only kebab-case, file-scoped, no inline metadata).
+Per-block hashes and baseline live in a single machine-managed
+`.claude/claude-code-sdlc-template-refresh-state.md` carrying four
+sections: Upstream baseline, Block hashes, Refresh logic version,
+Upstream directives. Source-mode uses the same algorithm with a
+subtree content-hash of local `cc-template/` as the baseline.
+
+**Why.** Hash and baseline together resolve the consumer-edit matrix
+— inline edit, deletion, never-existed, reorder — that hash-alone or
+baseline-alone leave ambiguous (the canonical "Android deletes
+'iPhone, not Android'" case silently re-adds under hash-only).
+Pushing hashes into the state file rather than the marker is what
+makes coarse-grained wrapping (one block per top-level rule section)
+bounded to ~5-7% added line count, important because Phase 1.2 just
+came up short of its rules-file cleanup target.
+
+**Why not per-block hash alone (Option A).** Can't distinguish
+block-never-existed-yet from block-deliberately-deleted; silently
+re-adds rules consumers removed on purpose.
+
+**Why not file-level baseline alone (Option B).** Solves deletion
+but requires re-fetching upstream's historical file content per
+refresh to detect inline edits. Local hash carries that signal
+cheaply.
+
+**Why not git-3-way against tagged upstream releases (Option C).**
+Forces release-tag discipline on a one-maintainer upstream; exposes
+git conflict-marker syntax to consumers reading `.md` files. Real
+maintenance cost for negligible upside.
+
+**Why not inline `hash=` on each marker.** Re-inflates rules-file
+line count after Phase 1.2's cleanup. State-file storage keeps
+markers minimal.
+
+**Why not baseline metadata in user-facing files.** Pollutes the
+rules-reading experience consumers do every session per CLAUDE.md.
+`.claude/` is the conventional machine-state location and consumers
+rarely look there.
+
+**Scope note.** Refresh matches blocks by `id`, not file position —
+consumer reordering is preserved (R2c). Inline-edit divergences
+surface to the running session one block at a time with three
+choices: accept upstream / keep downstream / hand-merge (R2b).
+Unrecognized local block IDs surface a `--refresh-skills-only`
+suggestion (R2a). First source-mode invocation in a repo
+content-inspects the `cc-template/` subdir to confirm it's this
+template and caches the determination in CLAUDE.md (N1). Marker
+syntax, state-file path, and state-file schema are load-bearing per
+NFR-4 — future changes require auditing refresh logic and every
+file that carries markers. Full disposition log:
+[design-review-checkpoint-002.md](design/design-review-checkpoint-002.md).
+
+---
+
+## `/refresh-from-repository` consumer-boundary partition
+
+**Decision.** CLAUDE.md is partitioned post-onboard: Collaboration-
+rules section and Reading-order section are template-owned (wrapped
+in CC-TEMPLATE-BLOCK markers); banner, Project-specific context,
+and Load-bearing invariants are consumer-owned (free regions;
+refresh never touches), with `--no-claudemd` as the escape hatch
+for consumers who've heavily customized. Cross-file block migration
+is not tracked by default, with one exception: when a
+consumer-deleted block's hash matches a known block in another of
+the six shipped rules files, refresh offers to apply upstream's
+update. Refresh pre-flights by fetching upstream's
+`refresh-from-repository.md` to check for merge-logic drift AND
+reads the state file's Upstream directives section so upstream can
+force `--refresh-skills-only` via a directive.
+
+**Why.** The CLAUDE.md partition lets refresh push improvements to
+the load-bearing collaboration infrastructure (Collaboration-rules,
+Reading-order) without overwriting the per-project content consumers
+customize. The cross-file migration exception catches the case
+where a consumer reorganized a template rule into their own
+personalized-rules file — without it, that consumer is locked out
+of upstream's improvements to that rule forever, which is
+inconsistent with the "respect deletion, surface inline edits"
+contract elsewhere in the design.
+
+**Why not wrap Load-bearing invariants too.** Hardest section to
+partition cleanly — template-defined invariants and project-defined
+ones interleave. The `--no-claudemd` escape hatch covers consumers
+who need upstream's invariant updates merged.
+
+**Why not track arbitrary cross-file moves.** Consumer can paste
+any content anywhere; tracking arbitrary moves requires either an
+opt-in `TEMPLATE-MIGRATED-FROM` marker consumers wouldn't know to
+add, or expensive cross-file hash-matching across every consumer
+file on every refresh. Scoping the exception to the six shipped
+rules files is bounded and matches the realistic migration pattern.
+
+**Scope note.** "Six shipped rules files" =
+`coding-session-rules.md`, `design-philosophy-rules.md`,
+`multi-agent-rules.md`, `project-rules.md`, `environment-rules.md`,
+`testing-rules.md`. Adding a seventh in a future phase extends the
+migration-detection set.
+
+---
+
+## Retire "Before running this prompt" header-block from `/onboard`'s `CLAUDE_CODE_PROMPTS.md` spec
+
+**Decision.** `/onboard`'s spec for `docs/CLAUDE_CODE_PROMPTS.md`
+no longer plants a "Before running this prompt:" header-block note
+on forward-looking prompts. Between-phase `/design-review`
+checkpoints are signaled only via first-class
+`## Design Review Checkpoint — pre-Phase-N` entries in
+`docs/PROJECT_PLAN.md`. Landed prompts (1.1, 1.2) keep their
+historical-state header blocks per the
+don't-edit-landed-prompts-retroactively convention; forward-looking
+Prompts 2.2 and 3 lost theirs at checkpoint 002 landing.
+
+**Why.** The header-block conflated two things: (a) a gate
+assertion the prompt has no way to verify — false positives caught
+only mid-work; (b) a next-session reminder that belongs in TODO.txt
+at pickup time, not embedded in the prompt body. PROJECT_PLAN.md
+first-class checkpoint entries already carry the authoritative
+between-phase signal — they live in the phase-queue file that
+session-start reading-order points to. Reproducing the same signal
+inside the prompt body duplicates the source of truth and dates
+fast when phases reshuffle.
+
+**Why not rewrite the header-block as a gate-check** ("if the
+pre-Phase-X review hasn't landed, stop and run it first"). Still
+relies on prompt-body content to substitute for what PROJECT_PLAN.md
+already does discoverably. KISS — pick one signal location.
+
+**Why not keep landed-prompt header-blocks AND forward-looking
+ones.** The historical-record argument applies only to landed
+prompts (record of what context existed when the prompt was run).
+Forward-looking prompts are not history; they're upcoming work,
+and the signal belongs in the discoverable place.
+
+**Scope note.** Spec edit applies to root and dist
+`.claude/commands/onboard.md`. Tracked as T2 from checkpoint 002's
+Follow-up actions; spec edit deferred to a separate session.

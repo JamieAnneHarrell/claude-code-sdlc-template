@@ -44,147 +44,182 @@ would unblock an answer.
 
 ---
 
-### Open Questions
-
-#### Reconciliation algorithm for `/refresh-from-repository`
-
-*What we know.* The 2026-05-26 design cleanup settled the contract
-for `/refresh-from-repository` (template marks its own content,
-block-level reconciliation matrix, semantic conflict detection runs
-in-session — see `docs/design-decisions.md` "Template marks its own
-content; reconciliation tolerates divergence"). What it did *not*
-settle is the precise mechanism the merge uses to compare
-downstream-current against upstream-current and a baseline.
-
-*Options to consider.*
-- **Per-block content hash recorded in the marker.** Each template
-  block carries `hash=<sha>` in its open marker; refresh recomputes
-  the live hash and compares. Self-contained per file; no out-of-
-  band state needed.
-- **File-level commit-stamp baseline.** A `last-synced-at:
-  <upstream-commit>` stamp at the top of each refresh-managed file;
-  refresh fetches that upstream commit's version of the file as the
-  baseline. Requires upstream to keep history accessible (already
-  true via GitHub).
-- **Git 3-way merge against tagged upstream releases.** Upstream
-  tags releases; downstream records the tag it sync'd from; refresh
-  runs `git merge-file` between downstream, current upstream, and
-  the baseline-tag content. Leverages git's merge engine; requires
-  release-tag discipline upstream.
-- **Hybrid.** Hash per block (cheap inline-edit detection) PLUS
-  file-level commit stamp (baseline for the in-baseline-vs-new
-  decision). The two signals are complementary.
-
-*What would unblock.* The Phase 2.1 build session picks one and the
-pre-Phase-2.1 `/design-review` sanity-checks the choice. Constraints:
-must support the matrix in `docs/design-decisions.md`; should not
-require maintaining release-tag discipline upstream as a hard
-prerequisite (acceptable as part of a hybrid).
-
 ### Deferred User Stories
 
-#### Plan-mode / checklist execution should surface `/wind-down`, not inline commit handoffs
+#### Artifact-boundary command landings should route session-end through `/wind-down`
 
-*Context.* When Claude finishes a plan-mode execution (or any ad-hoc
-checklist-driven multi-step task that ends at session close), the
-natural last step Claude surfaces today is a rule-7 commit handoff
-— stage list, `git status`, `git commit -m "..."` block. That gets
-the changes committed, but it skips the rest of `/wind-down`'s job:
-TODO.txt refresh (rule 9), `docs/design-decisions.md` /
-`docs/open-questions.md` / `docs/CLAUDE_CODE_PROMPTS.md` deviation-
-footer / `docs/ARCHITECTURE.md` / `docs/REQUIREMENTS.md` /
-command-doc coherence sweep, and any artifact-status callouts. The
-consumer who follows the inline commit handoff lands the changes
-but leaves the rest of the repo's docs in whatever state the plan
-execution left them.
+*Context.* When Claude finishes a self-contained multi-step task
+that ends at session close — plan-mode execution, TodoWrite-driven
+checklist work, OR an artifact-boundary command like
+`/design-review` Stage 2 landing or `/exit-test-plan` Stage 2
+landing — the natural last step Claude surfaces today is a rule-7
+commit handoff (stage list, `git status`, `git commit -m "..."`
+block). That gets the immediate scope committed, but it skips
+the rest of `/wind-down`'s job: TODO.txt refresh (rule 9),
+`docs/design-decisions.md` / `docs/open-questions.md` /
+`docs/CLAUDE_CODE_PROMPTS.md` deviation-footer /
+`docs/ARCHITECTURE.md` / `docs/REQUIREMENTS.md` / command-doc
+coherence sweep, and any artifact-status callouts. The result:
+the immediate scope lands but the surrounding doc cluster drifts.
 
-Jamie surfaced this at the end of the 2026-05-26 Prompt-2.1 cleanup:
-the surfaced commit block worked, but `/wind-down` would have
-duplicated the commit check AND done the doc coherence pass.
-Running both is wasteful; choosing only the inline commit skips work.
+Jamie surfaced this twice on 2026-05-26 — first at the end of the
+Prompt-2.1 cleanup, then again at the end of checkpoint 002's
+Stage 2 landing. Both times, the artifact-boundary command's
+commit handoff fired (its job done by spec), but the *session*
+had additional doc work that only `/wind-down` would have caught
+(design-decisions updates, open-questions migrations, etc.). The
+session-aware wind-down beats next-session drift discovery —
+in-session, we know what we just did; next session has to
+rediscover it.
 
-Distinct from artifact-boundary handoffs in commands like
-`/onboard`, `/bootstrap`, `/design-review` Stage 1 initial / Stage
-2 landing, `/exit-test-plan` Stage 1 initial / Stage 2 landing —
-those commit at their own artifact boundary and are by design
-separate from session-end wind-down. The user story is about
-**plan-mode / checklist-driven** execution that has no
-artifact-boundary handoff of its own.
+*Proposed approach (two coupled threads).*
 
-*Proposed approach.* Update the plan-mode workflow (and any future
-checklist-driven execution conventions) so the final step is
-"propose `/wind-down`" — Claude says "all plan steps complete;
-run `/wind-down` to commit and refresh docs" rather than surfacing
-the inline git block. `/wind-down`'s existing Step 4 (re-read rule
-7 then surface the commit handoff) absorbs the commit work; its
-other steps cover the doc coherence pass.
+**Thread 1 — Route session-end commits through `/wind-down`.**
+Update the plan-mode workflow, TodoWrite-driven execution
+conventions, AND artifact-boundary command landings
+(`/design-review` Stage 2 land path; `/exit-test-plan` Stage 2
+land path) so the final step is "propose `/wind-down`" — Claude
+says "all steps complete; run `/wind-down` to commit and refresh
+docs" rather than surfacing the inline git block as the terminal
+action. `/wind-down`'s existing Step 4 (re-read rule 7 then
+surface the commit handoff) absorbs the commit work; its other
+steps cover the doc coherence pass. Stage 1 artifact-boundary
+commits (e.g. checkpoint authored, plan authored) are
+mid-iteration and stay as-is — they're not session-end events.
 
-Implementation surfaces to touch:
+**Thread 2 — `/design-review` Stage 2 landing should also review
+the overall project plan.** When a checkpoint lands, Stage 2 should
+take a pass at `docs/PROJECT_PLAN.md` to ask: "given what was just
+decided, are any future high-risk transitions in the plan now
+worth a first-class `/design-review` checkpoint?" If yes, insert
+a `## Design Review Checkpoint — pre-Prompt-N` first-class entry
+into `docs/CLAUDE_CODE_PROMPTS.md` between the relevant prompts.
+This keeps design reviews in the prompt flow as discoverable
+first-class items that surface in TODO.txt at session start.
+Distinct from the header-block-note form retired by checkpoint
+002 R5 — first-class entries live in the phase queue, not embedded
+in prompt bodies.
+
+*Implementation surfaces to touch.*
 
 - `rules/coding-session-rules.md` rule 9 — add a line clarifying
-  that plan-mode and checklist execution route session-end commits
-  through `/wind-down` rather than surfacing them inline.
-- Anywhere in Claude Code's plan-mode behavior that auto-surfaces
-  commit handoffs at plan completion (if any — may be
-  emergent-from-rule-7 rather than configured).
-- `.claude/commands/wind-down.md` — add a "called-from-plan-mode"
-  intake path if needed (most likely just an extra reminder in the
-  command preamble: "if you came here from plan-mode completion,
-  do the full doc-coherence pass before the commit").
+  that plan-mode, TodoWrite-driven execution, AND artifact-boundary
+  command landings route session-end commits through `/wind-down`
+  rather than surfacing them inline.
+- `.claude/commands/wind-down.md` — add an intake path for
+  "called from an artifact-boundary command's landing" so wind-down
+  picks up where the command's Stage 2 left off (likely just a
+  preamble note: "if you came here from a `/design-review` or
+  `/exit-test-plan` landing, the artifact-boundary commit was
+  already drafted there; bundle it with this wind-down's edits").
+- `.claude/commands/design-review.md` Stage 2 S2.6 land path — add
+  a step that walks `docs/PROJECT_PLAN.md` for high-risk
+  transitions and proposes first-class checkpoint inserts in
+  `docs/CLAUDE_CODE_PROMPTS.md` when appropriate (per Thread 2).
+- `.claude/commands/design-review.md` and
+  `.claude/commands/exit-test-plan.md` Stage 2 S2.7 — replace the
+  terminal commit handoff with "propose `/wind-down`" on the land
+  path. Mid-iteration paths (open-another-round) stay as-is —
+  they already defer to wind-down for staging.
+- Mirror all spec edits to `cc-template/.claude/commands/` per
+  NFR-9.
 
-*Open sub-questions.* Whether artifact-boundary commands
-(`/onboard`, `/bootstrap`, `/design-review`, `/exit-test-plan`)
-should also route through `/wind-down` at their artifact boundaries
-(probably no — those *are* the artifact boundary, and forcing them
-through `/wind-down` collapses two distinct moments). Whether
+*Open sub-questions.* Whether `/onboard` and `/bootstrap` Stage 2
+landings should also route through `/wind-down` (probably no —
+those are configuration-ritual commands whose landings are also
+typically the last action of their session by design; the
+artifact-boundary IS the session boundary for them). Whether
 "checklist-driven execution" needs a more precise definition
-(e.g., does TodoWrite-tracked work count? It probably should).
+(e.g., does any TodoWrite-tracked work count? Probably yes).
+Whether Thread 2's "scan PROJECT_PLAN for high-risk transitions"
+heuristic needs concrete criteria, or whether it's best handled
+as a session-judgment call surfaced for Jamie to disposition.
 
-#### "Before running this prompt" header-block pattern in CLAUDE_CODE_PROMPTS.md
+#### Enforce the "MUST DO before responding" rules re-read (CLAUDE.md is necessary but not sufficient)
 
-*Context.* `/onboard`'s spec for `docs/CLAUDE_CODE_PROMPTS.md`
-(see `.claude/commands/onboard.md` step `docs/CLAUDE_CODE_PROMPTS.md`,
-"Design-review checkpoints between prompts") plants a "Before
-running this prompt:" header-block note at the top of each
-forward-looking prompt to signal a between-phase `/design-review`
-checkpoint. The same checkpoint is *also* recorded as a first-class
-entry in `docs/PROJECT_PLAN.md` for high-risk transitions (e.g.
-`## Design Review Checkpoint — pre-Phase-2.1`).
+*Context.* Root `CLAUDE.md` Collaboration-rules section says:
 
-The header-block notes ended up conflating two things:
+> **MUST DO before responding to the first user message of any
+> session.** Read these two files end-to-end — their contents are
+> *not* loaded into context by default. Skipping is the #1 cause of
+> rule drift...
 
-- **Gate assertion** — "the pre-Phase-X review has landed" stated as
-  a fact, but the prompt has no way to verify the gate at execution
-  time. If false, the consumer notices only after starting the work.
-- **Next-session reminder** — content that arguably belongs in
-  `TODO.txt` at the moment the consumer picks up the prompt, not
-  inside the prompt body.
+In practice Claude regularly skips the re-read and goes straight to
+the user's task. Observed failure mode: CLAUDE.md *summarizes* the
+rules (KISS, rule 4, rule 7 commit shape, etc.), so Claude treats
+the summary as sufficient priors and the end-to-end re-read as
+redundant. The instruction names the failure mode but enforcement
+relies on Claude's judgment, which is biased toward "respond now."
+The downstream consequence is exactly what the rule warns about:
+silent drift on KISS / rule 4 simpler-alternative / rule 7 commit
+brevity, surfaced only when Jamie calls "rule N" mid-session.
 
-Jamie surfaced this during the 2026-05-26 cleanup of Prompt 2.1 and
-the block was stripped from that prompt specifically. The other
-forward-looking prompts (2.2, 3) still carry it. Landed prompts
-(1.1, 1.2) carry historical-state header blocks; the file's
-convention is to leave landed prompts unedited retroactively.
+For this template, the cost compounds: every downstream project
+seeded from `cc-template/` inherits the same skip-prone behavior.
+A reliable rules-read is foundational — without it the rest of the
+collaboration-rules infrastructure is decorative.
 
-*Proposed approach.* The pre-Phase-2.1 `/design-review` should
-evaluate the pattern across the file:
+*Proposed approach (options to weigh).*
 
-- Retire the `/onboard` header-block-note form entirely; rely on
-  PROJECT_PLAN.md first-class checkpoint entries alone as the
-  between-phase signal.
-- Or, keep the header-block pattern but rewrite the language so it
-  reads as a gate-check rather than a gate-assertion ("If the
-  pre-Phase-X review hasn't landed yet, stop and run it first.").
-- Or, hybrid: keep landed prompts' header blocks (historical
-  record) and retire only the forward-looking-prompt form.
+- **Option A — Hooks-based enforcement.** A `UserPromptSubmit` hook
+  on the first message of a session reads
+  `rules/coding-session-rules.md` and `rules/design-philosophy-rules.md`
+  into context unconditionally, removing the judgment call. Hook
+  detects "first message of session" via session state (e.g.
+  absence of prior assistant turns in the transcript, or a sentinel
+  file written on first invocation and cleared at session close).
+  Ships as part of `cc-template/`'s default `.claude/settings.json`.
+  Pro: zero reliance on Claude compliance. Con: hooks are
+  CLI-feature-specific; need to check portability across IDE
+  extension / desktop app / web app per the env list in
+  `rules/environment-rules.md`.
+- **Option B — Inline the rules in CLAUDE.md.** Stop relying on
+  pointers; embed the rules content directly. Pro: no judgment
+  call, no hook. Con: re-inflates CLAUDE.md (Phase 1.2 just cut
+  it); rules duplication across `rules/*.md` and `CLAUDE.md`
+  creates a maintenance liability the marker system is designed
+  to handle but doesn't fix the duplication itself.
+- **Option C — Sentinel-file ritual.** First response in a session
+  must include a specific acknowledgment token (e.g. "Rules
+  re-read: coding-session + design-philosophy") that a hook
+  validates and blocks the response if absent. Pro: forces the
+  read. Con: ritual visible to Jamie every session; brittle if
+  hook can't enforce.
+- **Option D — Skill that wraps first-message handling.** A
+  `/start` or auto-fired skill at session begin reads the rules
+  and primes the session. Pro: explicit, debuggable. Con: requires
+  Jamie to remember to run it, OR requires hook integration
+  anyway — degrades to Option A.
 
-The review's disposition should update `/onboard`'s spec
-accordingly so future onboards don't reproduce the pattern.
+*Implementation surfaces to touch (Option A — most likely pick).*
 
-*Open sub-questions.* Whether the same critique applies to other
-inside-prompt-body content that arguably belongs in TODO.txt at
-prompt-pickup time (e.g. "Read first" lists that re-state the
-file-level reading-order banner).
+- `cc-template/.claude/settings.json` — add `UserPromptSubmit`
+  hook config that runs on first message of session.
+- A small shell/PowerShell script (cross-platform per
+  `rules/environment-rules.md`) that detects first-message
+  state and emits the rules content into the context channel
+  the hook supports.
+- Validate the hook works in VSCode extension, CLI, desktop app —
+  per `update-config` skill notes, hooks are settings.json-based
+  and harness-executed; need to confirm the harness fires
+  `UserPromptSubmit` consistently across surfaces.
+- Document the mechanism in `cc-template/CLAUDE.md` (e.g. a
+  one-line note under Collaboration-rules explaining the hook
+  handles the re-read so downstream consumers don't have to know).
+- Decision needed: does the hook fire on every session start, or
+  only on sessions that don't already have rules content in the
+  initial context window? (Cheaper second option but harder to
+  detect reliably.)
+
+*Open sub-questions.* Whether hook enforcement should extend to
+`/wind-down` rule 9 doc-coherence sweep (the rule the 2026-05-26
+checkpoint-002 landing missed — same class of "instruction
+present, judgment skipped" failure). Whether the hook should be
+opt-in for downstream consumers (some projects may prefer the
+judgment call) or default-on (matches the template's
+"reliable behavior out of the box" stance). Whether
+`environment-rules.md` needs a section on hook authoring
+conventions if Option A lands.
 
 #### In-flight artifact status callout at top of CLAUDE.md
 
