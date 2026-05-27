@@ -309,6 +309,22 @@ Reading-order entry for `docs/design/`). Must land before Phase
   limit. Validation was per `rules/testing-rules.md`
   "Project-specific tooling" — the `/exit-test-plan` bullet was a
   drafting carry-over (this project doesn't use that command).
+- 2026-05-27 — Intersession cleanup (T2 from checkpoint 002
+  Follow-up; recorded here as the most-recently-landed prompt):
+  - `/onboard`'s spec retired the "Before running this prompt"
+    header-block-note form (root + cc-template mirror).
+  - Convention shift landed alongside: design reviews are now
+    first-class numbered phases in PROJECT_PLAN.md and matching
+    numbered prompts in CLAUDE_CODE_PROMPTS.md, sharing the
+    surrounding minor-version numbering (no X.Y.5 sub-numbering;
+    insert renumbers downstream). The between-phases marker form
+    and the freestanding `## Design Review Checkpoint` block form
+    are both retired with R5's header-block form. See
+    `docs/design-decisions.md` "Design reviews are first-class
+    phases and prompts".
+  - This project's own PROJECT_PLAN.md and CLAUDE_CODE_PROMPTS.md
+    were NOT retroactively reshaped — landed Phase 2.1 design
+    review block stays as historical record.
 - 2026-05-26 — Intersession cleanup between Prompt 1.2 landing and
   Prompt 2.1 starting (orthogonal to 1.2's scope; recorded here as
   the most-recently-landed prompt):

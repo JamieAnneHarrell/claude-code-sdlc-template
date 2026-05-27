@@ -200,27 +200,44 @@ names the two recurring close-out commands:
 
 > Phases close with `/exit-test-plan` (manual walkthrough against
 > the phase's exit criteria) when the phase ships user-observable
-> behavior. High-risk transitions between phases also get a
-> `/design-review` checkpoint — see the markers below.
+> behavior. High-risk transitions get their own design-review
+> phase in the queue — a numbered phase whose deliverable is a
+> landed `docs/design/design-review-checkpoint-NNN.md`.
 
 Phases that ship no user-observable surface (docs-only,
 pure-infrastructure, pure-refactor) can skip the manual
 walkthrough — don't force one. The orientation paragraph is
 enough; per-phase exit-test-plan markers would be noise.
 
-**Design-review checkpoints between phases.** For each high-risk
-transition identified above (the same set used for
-CLAUDE_CODE_PROMPTS.md checkpoint touchpoints), insert a one-line
-checkpoint entry after the prior phase's exit criteria:
+**Design-review phases.** For each high-risk transition identified
+above, insert a dedicated design-review phase into the queue.
+Design reviews are first-class numbered phases, not between-phase
+markers. Each carries the standard phase shape:
 
 ```
-**Design review checkpoint:** before Phase N+1 begins. Run
-`/design-review`.
+## Phase N — Design review: <scope>
+
+**Goal.** Surface findings against <what's being reviewed> before
+<next phase> begins. Trigger: <one-line rationale>.
+
+**Deliverables.**
+- `docs/design/design-review-checkpoint-NNN.md` LANDED with
+  dispositions walked.
+
+**Exit criteria.** Checkpoint flips to `LANDED <date>`; all
+Blocker findings have dispositions; any Recommendations that
+require doc edits are applied or surfaced as TODO.
 ```
 
-PROJECT_PLAN.md is the at-a-glance phase queue, so the checkpoint
-shows up alongside phase boundaries — Jamie sees the gate when she
-scans the plan, separately from the prompt body.
+Numbering: design-review phases share the same minor-version
+numbering as the surrounding phases. Inserting one between
+Phase X.Y and Phase X.(Y+1) bumps the downstream phase to
+Phase X.(Y+2) and so on within the same minor family — don't
+introduce sub-numbering like X.Y.5. The corresponding prompt in
+`docs/CLAUDE_CODE_PROMPTS.md` is numbered to match.
+
+PROJECT_PLAN.md is the at-a-glance phase queue, so design reviews
+show up as phases Jamie sees when she scans the plan.
 
 ### `docs/CLAUDE_CODE_PROMPTS.md`
 
@@ -264,36 +281,33 @@ reading-order pointers — go after the deviation block.)
 Pattern reference: this template's own
 `docs/CLAUDE_CODE_PROMPTS.md` is the canonical shape.
 
-**Design-review checkpoints between prompts.** Identify high-risk
-transitions in the phase queue — schema/migrations, multi-tenancy,
-auth, anything Jamie flagged in Step 3 as expensive-to-retrofit, or
-the post-Phase-0 transition where scaffolding hands off to the first
-functional phase. At each transition, plant a review touchpoint in
-`docs/CLAUDE_CODE_PROMPTS.md` in one of two forms (default to the
-header-block note; reserve first-class entries for transitions where
-skipping the review would be expensive):
+**Design-review prompts.** Every design-review phase in
+PROJECT_PLAN.md gets a matching numbered prompt entry in
+`docs/CLAUDE_CODE_PROMPTS.md`, alongside the feature prompts.
+Design reviews live in the prompt flow as real prompts — never as
+"Before running this prompt" preambles attached to other prompts.
 
-- **Header-block note** (default). Add a line at the top of the next
-  prompt's body, before its first numbered scope item:
+Prompt shape (matches PROJECT_PLAN.md phase numbering — Prompt 2.2
+corresponds to Phase 2.2):
 
-  ```
-  **Before running this prompt:** this is a good place to run
-  `/design-review` to surface findings against the architecture as
-  it stands now.
-  ```
+```
+## Prompt N: Design review — <scope>
 
-- **First-class entry** (major transitions only). Insert a standalone
-  block between two prompts:
+**Read first.**
+- [`docs/PROJECT_PLAN.md`](PROJECT_PLAN.md) Phase N
+- <any docs the review specifically scrutinizes>
 
-  ```
-  ## Design Review Checkpoint — pre-Prompt-N
+**Scope.** Run `/design-review`. Trigger: <one-line — matches the
+PROJECT_PLAN Phase N "Goal" line>.
 
-  Run `/design-review`. Trigger: <one-line — e.g. "Pre-Prompt-1
-  scrutiny: tenant scoping and migration ordering">.
-  ```
+**Exit criteria.** Checkpoint LANDED per Phase N exit criteria.
 
-Routine phases (UI polish, docs-only work) get no checkpoint. The
-goal is gating the high-risk transitions, not every boundary.
+**Revisions since this prompt ran:** none tracked.
+```
+
+Routine phases (UI polish, docs-only work) get no design-review
+phase and therefore no design-review prompt. The goal is gating
+the high-risk transitions, not every boundary.
 
 ### `docs/design-decisions.md`
 Already exists as a header skeleton. Add a first decision describing
@@ -461,9 +475,9 @@ Jamie explicitly asks in this same session.
 Summarize for Jamie:
 - Files generated (one bullet per file with one-line description)
 - Multi-agent mode chosen
-- Which phase transitions got design-review checkpoints (in
-  CLAUDE_CODE_PROMPTS.md and PROJECT_PLAN.md), and which form was
-  used (header-block note vs first-class entry)
+- Which phases are design-review phases (numbered in
+  PROJECT_PLAN.md and CLAUDE_CODE_PROMPTS.md alongside the
+  feature phases they precede)
 - What the next session should do: run `/design-review` for the
   post-onboarding sanity check, then `/bootstrap`, then Prompt 0
   from `CLAUDE_CODE_PROMPTS.md`. The first action in `TODO.txt` is
@@ -519,11 +533,10 @@ is deferrable — run it when test/prod planning is needed."
 - Does not write CI workflows. Phase 0 handles that for the project.
 - Does not delete files Jamie created.
 - Does not run design reviews — `/design-review` does. `/onboard`
-  plants checkpoint touchpoints in `docs/CLAUDE_CODE_PROMPTS.md`
-  (header-block notes and/or first-class entries) and in
-  `docs/PROJECT_PLAN.md` (one-line checkpoint entries), and seeds
-  `TODO.txt` so the post-onboarding review runs first. It never
-  writes a checkpoint file at
+  plants design-review phases in `docs/PROJECT_PLAN.md` and
+  matching numbered prompts in `docs/CLAUDE_CODE_PROMPTS.md`, and
+  seeds `TODO.txt` so the post-onboarding review runs first. It
+  never writes a checkpoint file at
   `docs/design/design-review-checkpoint-NNN.md` — that's
   `/design-review`'s domain.
 - Does not author exit test plans — `/exit-test-plan` does.

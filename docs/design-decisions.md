@@ -644,6 +644,104 @@ prompts (record of what context existed when the prompt was run).
 Forward-looking prompts are not history; they're upcoming work,
 and the signal belongs in the discoverable place.
 
-**Scope note.** Spec edit applies to root and dist
-`.claude/commands/onboard.md`. Tracked as T2 from checkpoint 002's
-Follow-up actions; spec edit deferred to a separate session.
+**Scope note.** Spec edit landed 2026-05-27 (T2 from checkpoint
+002's Follow-up actions, applied to root and dist
+`.claude/commands/onboard.md`). Partially superseded by the next
+entry ("Design reviews are first-class phases and prompts"): the
+header-block retirement stands, but the
+"first-class `## Design Review Checkpoint — pre-Phase-N` entry in
+PROJECT_PLAN.md" form named here is itself retired in favor of
+design reviews being numbered phases. Forward-looking signaling
+now lives at parity with feature phases/prompts.
+
+---
+
+## Design reviews are first-class phases and prompts
+
+**Decision.** A planned design review is a **numbered phase** in
+`docs/PROJECT_PLAN.md` and a **matching numbered prompt** in
+`docs/CLAUDE_CODE_PROMPTS.md`, with shared minor-version
+numbering (Phase 2.2 ↔ Prompt 2.2). Inserting a design review
+between Phase X.Y and Phase X.(Y+1) renumbers the downstream
+phase to Phase X.(Y+2) and so on within the same minor family
+— no sub-numbering like X.Y.5. The phase carries the standard
+Goal / Deliverables / Exit-criteria shape (deliverable: a
+LANDED `docs/design/design-review-checkpoint-NNN.md`). The
+corresponding prompt has a minimal body: Read first / Scope:
+"Run `/design-review`" / Exit criteria / revisions footer.
+
+Three older forms are retired by this convention:
+
+1. "Before running this prompt" header-block preambles inside
+   another prompt's body (already retired at checkpoint 002 R5
+   landing; T2 spec-edit landed 2026-05-27).
+2. The one-line "`**Design review checkpoint:** before Phase N+1
+   begins. Run `/design-review`.`" marker that `/onboard`'s old
+   spec inserted into PROJECT_PLAN.md after a phase's exit
+   criteria. Gone — design reviews are no longer "between"
+   phases.
+3. The freestanding `## Design Review Checkpoint — pre-Phase-N`
+   block in CLAUDE_CODE_PROMPTS.md, sitting between two
+   prompts. Gone — that block becomes its own `## Prompt N`
+   entry.
+
+**Why.** The three retired forms each duplicated a signal
+across surfaces with different shapes — a marker in
+PROJECT_PLAN.md and a preamble or freestanding block in
+CLAUDE_CODE_PROMPTS.md. Different shapes meant the eye scanned
+past them differently than it scanned feature work, and the two
+representations drifted. Making design reviews first-class
+phases/prompts puts them in the same flow as feature work:
+they're numbered, they appear in the phase queue and prompt
+queue Jamie reads at session start, and TODO.txt references
+them by ID (`Prompt N`) like any other prompt. Jamie's framing:
+"force it into the flow, because then it gets treated just like
+a prompt because it IS a prompt and step in the project plan."
+
+The convention also resolves a recurring confusion: when a
+between-phases marker or freestanding block sits next to a
+prompt, the *body* of the next prompt sometimes restated the
+signal ("Before running this prompt:..."), which would then get
+pasted into the running Claude session as if it were
+prompt-instruction content — but it was human-consumption
+guidance about *whether* to run the prompt. Removing the
+duplicate signaling layer removes the temptation.
+
+**Why not keep the between-phases marker form.** Reproduces the
+signal in two locations with two shapes. Reading PROJECT_PLAN.md,
+the eye scans by phase header — adjacent markers between phases
+are easy to miss and don't show up the same way in tooling that
+treats the file as a phase queue.
+
+**Why not full Prompt shape (Read first / numbered Scope items /
+Constraints / Exit criteria) for design-review prompts.** A
+design review is one slash-command invocation; numbered scope
+items would invent structure. Minimal body is honest about what
+the prompt does — point at the right Read-first context and
+invoke `/design-review`.
+
+**Why not sub-numbering like X.Y.5 for inserted design
+reviews.** Sub-numbering would create a second-class tier of
+phases. Renumbering downstream phases is cheap (markdown edits;
+no code paths depend on phase numbers) and preserves the
+"design reviews are equal citizens" property.
+
+**Why not retroactively reshape this project's landed Phase 2.1
+design-review block.** Don't-edit-landed-prompts-retroactively
+convention. The existing PROJECT_PLAN.md "`## Design Review
+Checkpoint — pre-Phase-2.1 (LANDED 2026-05-26)`" block stays as
+historical record. Future design reviews planned for this
+project use the new convention.
+
+**Scope note.** Spec lives in `.claude/commands/onboard.md`
+(root + cc-template mirror per NFR-9), landed 2026-05-27.
+Downstream impact for the queued "Artifact-boundary commands →
+`/wind-down`" OQ user story (Thread 2): when that work lands,
+`/design-review` Stage 2 landing's "propose-a-future-checkpoint"
+behavior will produce design-review phases under this
+convention (numbered, with a matching prompt) rather than
+inserting standalone marker blocks. No spec edits required to
+`/design-review` itself as part of this convention shift —
+`/design-review` Stage 1 still reads checkpoint inputs and
+writes `docs/design/design-review-checkpoint-NNN.md` the same
+way regardless of how its trigger was scheduled.
