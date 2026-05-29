@@ -245,6 +245,16 @@ using block-level reconciliation against template-owned markers.
   `multi-agent-rules.md`, `project-rules.md`,
   `environment-rules.md`, `testing-rules.md`), refresh detects
   the migration and offers to apply upstream's update.
+- **Pre-marker migration** per checkpoint 003 R10: when invoked
+  in a downstream project that has rules files but no
+  `CC-TEMPLATE-BLOCK` markers (consumer onboarded pre-Phase-2.1),
+  the command performs a one-time migration — insert
+  coarse-grained markers at top-level rule-section boundaries,
+  seed the refresh state file with per-block hashes from current
+  content, and surface block-by-block divergences via the standard
+  inline-edit conflict UX. Per checkpoint 003 N5 (HTML comments
+  are stripped before Claude context-load), the fine-vs-coarse-
+  grained block-boundary decision is relaxed.
 - Semantic conflict surfacing across template/personalized regions
   is the executing session's job (per
   `docs/design-decisions.md` "Template marks its own content").

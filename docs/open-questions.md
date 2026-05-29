@@ -433,3 +433,94 @@ paternalistic. Whether the seeded TODO.txt should be a sample
 users can rewrite freely vs. a structured artifact whose shape
 `/wind-down` preserves.
 
+#### Skills that process human input shouldn't paraphrase-and-confirm each element back
+
+*Context.* `/design-review` Stage 2's S2.2 walks marked AUDIT NOTE
+blocks one at a time, restating Jamie's marking back and asking
+for confirmation before appending each Disposition log row. With
+16 findings in checkpoint 003 that produced 16 round-trips of "you
+said X; I'll record X; confirm?" — busywork, because Jamie's
+inline markings are already her settled position. She does her
+thinking once, in the doc, before re-invoking. The friction is
+the skill treating already-written input as if it needed
+re-elicitation.
+
+The same shape risks repeating in `/exit-test-plan` Stage 2, where
+the spec also walks each TC's run-log entry, and in any future
+skill that processes a batch of pre-written human decisions.
+
+*Proposed approach.* Update the relevant skill specs (starting
+with `/design-review` S2.2 and `/exit-test-plan` S2.2) to:
+
+1. Scan all latest-round markings first and triage into
+   *unambiguous* (record silently, in batch, in one write) vs
+   *genuinely ambiguous* (surface that specific question).
+2. Define "genuinely ambiguous" with explicit triggers — malformed
+   marking, internally contradictory caveats, scope conflict
+   between two findings, novel disposition shape not in the
+   legend (until REJECTED lands as a first-class shape per the
+   companion finding in checkpoint 003 Addendum 1).
+3. Default to batching the recording into one Disposition log
+   write rather than N confirmations. Surface only the
+   genuinely-ambiguous items inline.
+
+Generalizes as a design principle: *skills processing pre-written
+human input read it as authoritative, not as a prompt to
+re-elicit.* The human's act of writing the input IS the
+confirmation.
+
+*Open sub-questions.* Where exactly to draw the "ambiguous" line —
+should the spec enumerate triggers (malformed line; caveat
+unclear; cross-finding conflict) or trust the skill's judgment?
+How does this interact with the analogous walk step in
+`/exit-test-plan` Stage 2 (same friction risk over many TCs)?
+Whether the triage step itself should be visible to Jamie ("I'll
+batch-record N markings; pausing on M for clarification") or
+silent until the questions surface — visible probably wins for
+trust, but silent is leaner.
+
+#### Add REJECTED to `/design-review`'s AUDIT-NOTE legend as a first-class disposition shape
+
+*Context.* The current `/design-review` AUDIT-NOTE legend has four
+shapes: Accepted / Accepted with caveats / Defer Approved /
+DECISION. In checkpoint 003 Round 1, Jamie used a fifth shape —
+**REJECTED** — five times (B2, R1, R3, R4, R6). The semantic
+emerged organically: "none of the listed recommendations are
+satisfactory; opens another addendum; the rejection prose is the
+reframing input for Stage 1's addendum-branch authoring." It works
+as session behavior but is not encoded in the spec — Step S2.1's
+classification step would surface it as "malformed — surface and
+ask" in a fresh project, blocking the round.
+
+*Proposed approach.* Formalize REJECTED as a fifth legend item in
+both copies of `/design-review` (`.claude/commands/design-review.md`
+and `cc-template/.claude/commands/design-review.md`):
+
+1. Step S1.5's checkpoint-template legend gains a fifth bullet:
+   `REJECTED: <your reframing prose>`, with the definition above.
+2. Step S2.1's classification list adds REJECTED as a fifth
+   classification.
+3. Step S2.5's land-or-addendum recommendation logic: any REJECTED
+   in the latest round is an automatic recommend-open-another-round
+   trigger.
+4. Step S2.4's read-state explicitly foregrounds REJECTED count.
+5. Step 0's placeholder check is unchanged — REJECTED is a
+   non-placeholder marking like the other four.
+6. Disposition log column value: record `REJECTED` verbatim.
+7. Stage 1 addendum authoring (S1.A) convention: rejection prose
+   is the authoritative reframe input — do not generate
+   alternatives from scratch.
+
+*Open sub-questions.* Whether REJECTED in earlier-but-not-latest
+rounds should affect Stage 2's read-state or be treated as
+historical record like other earlier-round dispositions (probably
+the latter — supersession by latest round applies). Whether the
+legend needs an "REJECTED with caveats" variant for rejections
+that partially accept some sub-options (probably no — caveats
+that change scope are already a DECISION shape; REJECTED with
+caveats would be ambiguous). Whether `/exit-test-plan` should
+gain an analogous REJECTED shape for its dispositions list
+(probably yes for symmetry — though `/exit-test-plan`'s walk
+disposes test-case run-log entries rather than finding
+recommendations, so the analog is less direct).
+

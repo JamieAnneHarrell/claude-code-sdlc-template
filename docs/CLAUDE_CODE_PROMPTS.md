@@ -443,6 +443,23 @@ Reading-order entry for `docs/design/`). Must land before Phase
     and the state-file path alongside `ONBOARD-FILL`. (The
     markers are real at this point, not a future plan — pinning
     them is appropriate here, not earlier.)
+14. **Pre-marker migration.** When `/refresh-from-repository` is
+    invoked in a downstream project that has rules files but no
+    `CC-TEMPLATE-BLOCK` markers (the consumer was onboarded
+    pre-Phase-2.1), the command performs a one-time migration:
+    insert coarse-grained markers (per checkpoint 002 R6) at
+    top-level rule-section boundaries; seed
+    `.claude/claude-code-sdlc-template-refresh-state.md` with
+    per-block hashes computed from the consumer's current
+    content; surface block-by-block any boundaries where the
+    consumer's content diverges from upstream's block boundaries,
+    using the standard inline-edit conflict UX (per scope item
+    8). After migration, normal refresh applies. Per checkpoint
+    003 N5 (HTML-comment content is stripped from Claude
+    context-load before reading), the fine-vs-coarse-grained
+    block decision is relaxed — human-only rationale prose can
+    live in HTML comments at zero context cost, so block-boundary
+    placement need not minimize comment overhead.
 
 **Exit criteria.**
 - Sandbox downstream (copy of an earlier `cc-template/` commit)
@@ -472,6 +489,11 @@ Reading-order entry for `docs/design/`). Must land before Phase
   partition (R3); inline-edit conflict UX (R2b); cross-file
   migration hash-upgrade-offer (R2d); source-mode three-way
   semantics (B1-A1); source-mode content-inspection caching (N1).
+- 2026-05-29 — Scope item 14 added per checkpoint 003 R10:
+  pre-marker migration for downstream projects onboarded before
+  Phase 2.1 ships. Includes the N5 HTML-comment-stripping caveat
+  that relaxes the fine-vs-coarse-grained block-boundary
+  decision.
 
 ---
 

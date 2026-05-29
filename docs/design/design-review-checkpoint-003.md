@@ -2,7 +2,7 @@
 checkpoint: 003
 date: 2026-05-27
 reviewer: Claude (Opus 4.7) with Jamie
-status: AWAITING-DECISIONS
+status: LANDED 2026-05-29
 trigger: Pre-Phase-2.1 rules-clean checkpoint — clean cc-template before /refresh-from-repository wraps it
 ---
 
@@ -98,7 +98,7 @@ Wrap-lock: Phase 2.1 R3 places the Collaboration-rules section inside a CC-TEMPL
 - **Option C — Leave the summaries; rely on the foregrounded MUST-DO directive (B2) alone.** Trust that B2's repositioning will fix the read-skip behavior; keep the summaries as accessible reference. *Downstream:* simpler-alternative per rule 4 — does nothing here, defers all the work to B2's placement. Cost: the failure mode the rules-read story names (false-prior pattern-match) survives this checkpoint and gets locked in by the wrap. If B2 alone doesn't fix the behavior, reopening B1 post-wrap is expensive.
 
 > AUDIT NOTE — JAH:
-> _[UNMARKED — replace this line with your decision per the legend above]_
+> _Accepted with caveat: design-philosophy-rules does exactly what we just said to strip - it names KISS & Progressive disclosure, which could cause CLAUDE to gloss over those now. Remove that as well. Add one sentence after those: After reading rules, confirm you read and understand them before proceeding._
 
 #### B2. Foreground the rules-read directive in `cc-template/CLAUDE.md`
 
@@ -132,7 +132,7 @@ Wrap-lock partial: if the directive moves to the banner-or-above region (consume
 - **Option D (simpler-alternative per rule 4) — Leave the directive where it is.** Accept that placement isn't the bottleneck and rely on Claude's attention training. *Downstream:* the failure mode the story names survives the checkpoint. Cost: same as B1's Option C — the read-skip behavior persists.
 
 > AUDIT NOTE — JAH:
-> _[UNMARKED — replace this line with your decision per the legend above]_
+> _REJECTED. Option A is preferred, but need clarifcation on why this isn't either another invariant owned by the template or wrapped. This reject specifically opens another adendum for digging into this detail. Additionally, prose here appears to serve minimal purpose if the prose from B1 is selected. Additinally, I have discorered single line inline HTML comments are ignored / stripped by Claude's CLAUD.md pre-processor. Anything specifically meant for human consumption should be in an HTML inline Comment. Do not_
 
 ### Recommendations — resolve before Phase 2.1
 
@@ -168,7 +168,7 @@ Diagnostic evidence: the root rule 7 (this project's local consumer) inherits th
 - **Option C (simpler-alternative per rule 4) — Leave rule 7 as it is.** Phase 1.2 R4b just touched it; rate-limit further changes until a new failure mode emerges. *Downstream:* rule 7's churn cost is real and Phase 1.2 only one cycle ago. Accept the bloat as paid-for safety prose. Cost: every consumer inherits the bloated rule 7 for the foreseeable future; structural drift becomes a long-term cost.
 
 > AUDIT NOTE — JAH:
-> _[UNMARKED — replace this line with your decision per the legend above]_
+> _REJECTED. I think this is best handled in the wind-down skill as specific skill ability for delivering git commands. This means wind down signals need to be recognized or wind-down suggested as the current session is obviously near closing. Rule 7 becomes simlar to "Jamie runs all commits. When you think it's time to suggest commits, instead run a wind-down skill._
 
 #### R2. Rule 9 per-doc guidance migrates to `/wind-down`'s spec
 
@@ -193,7 +193,7 @@ Future-Claude effect: a downstream Claude reading rule 9 in a session that doesn
 - **Option C (simpler-alternative per rule 4) — Leave both lists as-is.** Accept the duplication as an unavoidable cost. *Downstream:* no behavior change; new docs require two edits; the next compression checkpoint will see the same opportunity.
 
 > AUDIT NOTE — JAH:
-> _[UNMARKED — replace this line with your decision per the legend above]_
+> _ACCEPTED WITH CAVEAT: Yes to the concept in Option A - move rules and enumeration to wind-down.md skill. But eliminate rule not. Given changes now required to Rule 7, it should reference wind-down as the cononical way to issue commits. This eliminates Rule 9._
 
 #### R3. Rule 8 manual-test paragraph — collapse to a one-line pointer
 
@@ -218,7 +218,7 @@ Two angles. The teaser names the protocol skeleton (Stage 1 authors plan, Jamie 
 - **Option C (simpler-alternative per rule 4) — Leave as-is.** Accept the teaser as paid-for orientation. *Downstream:* the drift between rule 8's paragraph and `exit-test-plan.md`'s spec is a maintenance discipline issue (must update both); next /exit-test-plan revision needs to remember to sync rule 8.
 
 > AUDIT NOTE — JAH:
-> _[UNMARKED — replace this line with your decision per the legend above]_
+> _Rejected as misunderstood. During a coding session we often run automated unit tests, functional tests, and occasional integration tests. Those are separate from exit-test-plan invocations. Exit test plans occur at specific phases where large scale UI work or changes have occurred that require human testing of an interactive product. The build of "Jamie Runs All tests" is specifc to post-code changes that should trigger automated unit/functional/integartion tests. It wasts context and tokens for Claue to run these test for a human, AND make humans less aware of the testing procedures and plans if Claude tests everything._
 
 #### R4. Environment-rules version-freshness — consolidate the "Where this fires" surfaces
 
@@ -243,7 +243,7 @@ Future-Claude reading environment-rules.md gets the rule (canonical) plus an enu
 - **Option C (simpler-alternative per rule 4) — Leave both enumerations as-is.** Accept the duplication as orientation overhead. *Downstream:* future command additions create drift risk (inventory in rules file doesn't track new commands). Maintenance burden continues.
 
 > AUDIT NOTE — JAH:
-> _[UNMARKED — replace this line with your decision per the legend above]_
+> _REJECTED. Honestly I think this deserves to be moved to coding-session-rules, as a reminder to never assume what version of any software is current. This is a source of several bad decisions - however MOST of those come during the spec development process using Claude but not in claude code. So the onboard skill MUST have specific guardrails about surfacing latest LTS versions even if the spec already pinned versions. Ask if the version was intentionally chosen, or provided by Claude based on what was current at the time of the model training. Skills that write design documents, or design review should be given the instructions expllicity in their skill. The rule in coding-session-rules can be short an sweet._
 
 #### R5. "Simpler alternative in the same message" — canonical source
 
@@ -266,7 +266,7 @@ The question Stage 2 will resolve: which file owns the canonical text? The two a
 - **Option C (simpler-alternative per rule 4) — Leave both files as-is.** Both restatements continue; cross-references stand. *Downstream:* the duplication is a real cost; both files must stay in sync if the phrasing evolves. Acceptable if the imperative is so load-bearing that two anchor points actively help — but the cross-references make this an opinion call, not evidence-based.
 
 > AUDIT NOTE — JAH:
-> _[UNMARKED — replace this line with your decision per the legend above]_
+> _Approved_
 
 #### R6. Strip recurring-command cadence prose from `cc-template/CLAUDE.md` banner
 
@@ -293,7 +293,7 @@ Banner is consumer-owned per R3 (not wrapped). So this isn't wrap-locked; reshap
 - **Option C (simpler-alternative per rule 4) — Leave the paragraph as-is.** Accept the banner bloat as orientation. *Downstream:* the cadence prose drift continues; the next downstream consumer's CLAUDE.md inherits it until /onboard rewrites the banner.
 
 > AUDIT NOTE — JAH:
-> _[UNMARKED — replace this line with your decision per the legend above]_
+> _REJECTED. Consider removing altogether. Is there any benefit to CLAUDE reading this if the skills alrady know it? Seems like bloat or human-directed conten in a claude-directed file._
 
 #### R7. Constrain self-edited "next-phase" banners in onboarded CLAUDE.md
 
@@ -316,7 +316,7 @@ What `cc-template/` *should* ship that would have prevented this drift:
 - **Option E (simpler-alternative per rule 4) — Leave it.** Accept that downstream consumers maintain their banner as they choose; the drift in this project's own root CLAUDE.md is acceptable noise. *Downstream:* this project's own banner stays drift-prone; future downstream consumers inherit the same pattern. The diagnostic that motivated the finding remains unaddressed at the template surface.
 
 > AUDIT NOTE — JAH:
-> _[UNMARKED — replace this line with your decision per the legend above]_
+> _Approved._
 
 #### R8. Retire the in-flight artifact status callout deferred story
 
@@ -337,7 +337,7 @@ The pairing is direct: R7 (and B1 separately) argue against banners in CLAUDE.md
 - **Option C (simpler-alternative per rule 4) — Leave the story as-is.** Don't touch open-questions.md; let the next checkpoint re-decide. *Downstream:* the unresolved tension persists in the deferred-stories list; no commitment either way.
 
 > AUDIT NOTE — JAH:
-> _[UNMARKED — replace this line with your decision per the legend above]_
+> _Option B. I believe this exists so that side quests which might actually also alter TODO.txt which could remove the "where are we block" from the point at which a side quest starts. Defer, but consdier that some SKILLS might be able to own banners, and those banners are meant for claude to surface that a skill iteration is incomplete even if TODO doesn't say to complete it._
 
 #### R9. Seed `cc-template/TODO.txt` as a walkable onboarding checklist
 
@@ -392,7 +392,7 @@ Phase 2.1 interaction: the CC-TEMPLATE-BLOCK markers ship as part of Phase 2.1. 
 - **Option D (simpler-alternative per rule 4) — Leave the single-line "Run /onboard" seed.** Accept that consumers find the rules-review step on their own. *Downstream:* the silent-expectation drift continues; the TODO-driven habit isn't taught at day one.
 
 > AUDIT NOTE — JAH:
-> _[UNMARKED — replace this line with your decision per the legend above]_
+> _Approved_
 
 #### R10. Universal-rules customization partitioning — what Phase 2.1's prompt must address
 
@@ -423,7 +423,7 @@ The diagnostic note in checkpoint 002 R2d is relevant: refresh already does hash
 - **Option D (simpler-alternative per rule 4) — Don't address it.** /refresh-from-repository refuses to run when markers are absent; document the manual migration in `cc-template/README.md` as a one-time procedure. *Downstream:* the JAH NOTE has a home (in the README), but the consumer experience is poorer.
 
 > AUDIT NOTE — JAH:
-> _[UNMARKED — replace this line with your decision per the legend above]_
+> _Approved with Caveat: We have determined that inline HTML contents do not create context bloat - they are stripped before Claude reads them. So the line between fine- and coarse- grained blocks is less important._
 
 ### Notes — acceptable now, revisit later
 
@@ -442,7 +442,7 @@ This finding's purpose is to record the "don't compress" decision so future clea
 **Recommendation.** Mark Accepted; Stage 2 records the decision in the Sign-off Summary as "Keep as-is; documented in checkpoint 003 N1 as intentional preservation." No doc edit other than the checkpoint itself.
 
 > AUDIT NOTE — JAH:
-> _[UNMARKED — replace this line with your decision per the legend above]_
+> _Approved with caveat: Remove "the simpler alternative is to do nothing" and put "the simpler alternative is to do Y. At multiple places in this design review, you've suggested the "simpler case is to do nothing and leave this as is". That's not simplifcation, that's lazy thinking. The simpler case, in this exact case, is to simplify this messaging while maintaining it's strenth and load bearing requirements - KISS doesn't mean do nothing, it means simplify things to the best minimial implementation._
 
 #### N2. Project quick orientation section — formal re-deferral
 
@@ -462,7 +462,7 @@ Counter-evidence might accumulate via: a third downstream consumer that also evo
 The open-questions.md entry stays as-is; Stage 2 appends a "Re-open trigger added 2026-05-27 per checkpoint 003 N2" line to the entry's body.
 
 > AUDIT NOTE — JAH:
-> _[UNMARKED — replace this line with your decision per the legend above]_
+> _Approved._
 
 #### N3. Defer rules-read Directions 3+4 with concrete observable re-open triggers
 
@@ -481,7 +481,7 @@ Per the answers to Step S1.3 (Question 3), the defer recording should name concr
 The open-questions.md entry stays as-is; Stage 2 adds the trigger subsection without rewriting the existing analysis.
 
 > AUDIT NOTE — JAH:
-> _[UNMARKED — replace this line with your decision per the legend above]_
+> _DECISION: For now reject Direction 3 (hooks-based enforecment). Direction 4 should be a guiding principal of this project - where applicable a skill specific rule should live in the skill. Eg, wind-down owns commits, so the skill should contain a commit ritual. this may require a rule added that suggests "any time you feel like offereing git commit commands, that's a definitive signal to call wind-down to handle it. So the pattern is - the skill owns the ritual if it is the unique owner of that ritual, a rule reminds claude not to offer that separately._
 
 #### N4. Defer the artifact-boundary → /wind-down user story
 
@@ -496,7 +496,7 @@ The work is real but not Phase-2.1-blocking. Phase 2.1's scope is /refresh-from-
 The story stays as-is; the re-open trigger pins it to a calendar event (Phase 2.1 landing) rather than indefinite parking.
 
 > AUDIT NOTE — JAH:
-> _[UNMARKED — replace this line with your decision per the legend above]_
+> _DECISION. I would like skills to call wind-down as they wrap up, and spcifically to keep documents the skill doesn't own up to date and to have wind-down be the owner of the git commands skill._
 
 ## What the design got right (preserve)
 
@@ -521,7 +521,32 @@ the purposes of Stage 2's landing application.*
 
 | Round | Finding | Disposition | Reason |
 |-------|---------|-------------|--------|
-| <empty until Stage 2> | | | |
+| Original | B1 | Accepted with Caveats | Option A applied, plus strip KISS/Progressive-disclosure naming from the design-philosophy pointer, plus append a "confirm you read and understood them" directive after the pointer block. |
+| Original | B2 | REJECTED | Option A is the right direction but placement (wrapped invariant vs consumer-owned banner) isn't settled; addendum reframes around three threads — wrap-status, B1 interaction, and the HTML-comment-stripping insight (single-line `<!-- -->` content is preprocessor-stripped per Claude-web confirmation, so human-only prose is free and shouldn't count against rule size). |
+| Original | R1 | REJECTED | Three-section consolidation is the wrong frame; addendum reframes around relocating commit-handoff ownership to `/wind-down` and reducing rule 7 to a thin "Jamie runs all commits — when you'd suggest commits, call /wind-down instead." |
+| Original | R2 | Accepted with Caveats | Apply Option A's migration (per-doc enumeration moves to `/wind-down`'s spec) AND eliminate rule 9 entirely — its discipline is absorbed by /wind-down ownership per R1 addendum; landing application gated on R1-A1 closing. |
+| Original | R3 | REJECTED | Rule 8's automated-test discipline was misread by the finding — Claude shouldn't run automated tests for humans is the load-bearing core; addendum reframes around a tweak to paragraph 2 (lines 156–162, the /exit-test-plan teaser) without collapsing the rule. |
+| Original | R4 | REJECTED | Version-freshness check belongs in coding-session-rules.md as a short rule (don't assume training-time versions are current); addendum specs onboard/design-doc-writing skill guardrails to surface latest LTS even when the spec already pinned a version. |
+| Original | R5 | Accepted | Option A applied — rule 4 owns the canonical "simpler alternative in the same message" statement; design-philosophy KISS section becomes a one-line reference to it. |
+| Original | R6 | REJECTED | "Replace with one-line pointer" is too conservative; addendum specs removing the cadence prose altogether (or moving it to an HTML comment per B2's stripping insight) since /design-review and /exit-test-plan know their own cadence. |
+| Original | R7 | Accepted | Option D applied — /onboard and /bootstrap write a static banner without next-step prose AND rule 9 / wind-down gets a consistency check; growth offsets the rule-9 trim in R2. |
+| Original | R8 | Decision: Option B with skill-owned-banners caveat | Defer with re-open trigger as written, but consider that skills might own banners to surface skill-iteration-incomplete state independently of TODO.txt; the trigger framing should accommodate that direction. |
+| Original | R9 | Accepted | Option A applied — seed `cc-template/TODO.txt` with the 6-step onboarding checklist; update `cc-template/README.md` to describe the rule-divergence workflow. |
+| Original | R10 | Accepted with Caveats | Option A's pre-marker-migration scope item added to Phase 2.1's prompt; HTML-stripping insight (confirmed via Claude web) relaxes the fine-vs-coarse-grained-block decision since human-only prose in HTML comments doesn't cost context weight. |
+| Original | N1 | Accepted with Caveats | Preserve the rule 4 self-check framing AND substantively revise it — replace any "the simpler alternative is to do nothing / leave as-is" wording with "the simpler alternative is to do Y"; "do nothing" is lazy thinking, not simplification. |
+| Original | N2 | Accepted | Re-defer the Project Quick Orientation story with the documented re-open triggers (third independent consumer evolves the section, or Jamie's session-start experience surfaces the gap); open-questions.md edit is out of Stage 2 scope → queued as TODO. |
+| Original | N3 | Decision: reject Direction 3, adopt Direction 4 as guiding principle | Hooks-based enforcement is overengineered; instead, *skills own rituals* — when a skill is the unique owner of a behavior (e.g. /wind-down owns commits), the ritual lives in the skill, and a rule reminds Claude not to offer it separately. Addendum specs the principle and concrete first instances. |
+| Original | N4 | Decision: skills call /wind-down to wrap, /wind-down owns git commands | Concrete application of N3's principle: artifact-boundary commands (`/design-review` Stage 2 landing, `/exit-test-plan` Stage 2 landing) route session-end through `/wind-down`; doc-coherence sweep for docs the original skill doesn't own happens there. Addendum specs the routing protocol. |
+| Addendum 1 | B2-A1 | Accepted | Option C — hybrid template-owned wrapped block at line 1 of `cc-template/CLAUDE.md`, above the consumer-owned banner; ~3–4 lines; B1's "confirm you read and understood" directive joins the wrapped block. |
+| Addendum 1 | R1-A1 | Accepted | Option A — thin rule 7 (~6 lines: "Jamie runs all commits; offering commit commands is the signal to invoke `/wind-down`"); pre-commit dry-run sequence, message brevity, PowerShell mechanics relocate to `/wind-down`'s Step 4. |
+| Addendum 1 | R3-A1 | Accepted | Option A — tweak rule 8 paragraph 2 to explicitly disambiguate automated tests (Claude proposes, Jamie runs to stay aware) from manual phase-exit walkthroughs (`/exit-test-plan` artifact-driven flow). |
+| Addendum 1 | R4-A1 | Accepted | Option A — new short rule in `coding-session-rules.md` ("never assume training-time versions are current"); per-skill guardrails added to `/onboard` Step 3, `/bootstrap` Steps 3+5, `/deployment-plan` Steps 3+5, and `/design-review` Step S1.5; `environment-rules.md` version-freshness section reduces to a cross-reference. |
+| Addendum 1 | R6-A1 | Decision: Option B with caveat | Remove cadence prose from `cc-template/CLAUDE.md` banner entirely; `/onboard` gains a lightweight CLAUDE.md note such as "check test plans or review checkpoints in progress before proceeding"; exact wording left to the coding session. |
+| Addendum 1 | R11 | Accepted | Option A — formalize REJECTED as a fifth AUDIT-NOTE legend shape in both `.claude/commands/design-review.md` and `cc-template/.claude/commands/design-review.md` (Steps S1.5, S2.1, S2.4, S2.5, S1.A); REJECTED auto-triggers open-another-round at S2.5. |
+| Addendum 1 | N3-A1 | Accepted | Option A — two-surface codification: principle "Skills own rituals" added to `project-rules.md`; operational rule added to `coding-session-rules.md` ("when Claude would offer a behavior a skill canonically owns, invoke the skill instead"). |
+| Addendum 1 | N4-A1 | Accepted with Caveats | Option A with timing caveat: artifact-boundary skills invoke `/wind-down` only when session work is truly complete; iterative mid-loop paths (Stage 1 addendum, Stage 2 open-another-round, in-flight design-review pass) remain commit-free and do NOT route to `/wind-down`. |
+| Addendum 1 | N5 | Accepted with Caveats | Option A but the rule must be very short, written for Claude, with parenthetical content pruned where not necessary. |
+| Addendum 1 | N6 | Decision: Option B | Spec changes only — triage-then-batch in `/design-review` S2.2 and `/exit-test-plan` S2.2 (in both `cc-template/` and project-root copies); skip the `design-philosophy-rules.md` one-line principle. |
 
 ## Sign-off Summary
 
@@ -530,9 +555,310 @@ section — sign-offs go inline above.*
 
 | ID | Final disposition |
 |----|-------------------|
-| <empty until landing> | |
+| B1 | Accepted with Caveats — strip rule-topical summaries from `cc-template/CLAUDE.md` Collaboration-rules + design-philosophy-pointer KISS/PD naming; append "confirm you read and understood them" sentence after the pointer block. |
+| B2 / B2-A1 | Accepted — Option C hybrid: ~3–4 line template-owned wrapped block at line 1 of `cc-template/CLAUDE.md`, above the consumer-owned banner; B1's "confirm you read" directive joins this block. |
+| R1 / R1-A1 | Accepted — Option A: thin rule 7 (~6 lines, "Jamie runs all commits; offering commit commands is the signal to invoke `/wind-down`"); pre-commit dry-run, message brevity, PowerShell mechanics relocate to `/wind-down`'s Step 4. |
+| R2 | Accepted with Caveats — per-doc enumeration migrates to `/wind-down`'s Step 3; rule 9 eliminated entirely. Application gated on R1-A1 (met). |
+| R3 / R3-A1 | Accepted — Option A: tweak rule 8 paragraph 2 to disambiguate automated-test discipline from manual phase-exit walkthroughs. |
+| R4 / R4-A1 | Accepted — Option A: new short rule in `coding-session-rules.md` ("never assume training-time versions are current"); per-skill guardrails added to `/onboard`, `/bootstrap`, `/deployment-plan`, `/design-review`; `environment-rules.md` version-freshness section reduces to a cross-reference. |
+| R5 | Accepted — rule 4 owns canonical "simpler alternative in the same message"; `design-philosophy-rules.md` KISS section becomes a one-line reference. |
+| R6 / R6-A1 | Decision: Option B with caveat — remove cadence prose entirely from `cc-template/CLAUDE.md` banner; `/onboard` writes a lightweight CLAUDE.md note such as "check test plans or review checkpoints in progress before proceeding"; exact wording left to the coding session. |
+| R7 | Accepted — Option D: `/onboard` and `/bootstrap` write static banner without next-step prose AND `/wind-down` gains a CLAUDE.md/TODO.txt consistency check (the rule 9 piece folds into `/wind-down` per R2). |
+| R8 | Decision: Option B — defer with re-open triggers documented; consider skill-owned banners as a future direction (skills surface mid-iteration state independently of TODO.txt). |
+| R9 | Accepted — seed `cc-template/TODO.txt` with the 6-step onboarding checklist; update `cc-template/README.md` to describe the rule-divergence workflow. |
+| R10 | Accepted with Caveats — Option A pre-marker migration scope item added to Prompt 2.1 (this Stage 2's in-scope edit); N5 HTML-stripping insight relaxes the fine-vs-coarse-grained block-boundary decision. |
+| R11 | Accepted — Option A: formalize REJECTED as a fifth AUDIT-NOTE legend shape in both `.claude/commands/design-review.md` copies (Steps S1.5, S2.1, S2.4, S2.5, S1.A); REJECTED auto-triggers open-another-round at S2.5. |
+| N1 | Accepted with Caveats — preserve rule 4 self-check framing AND substantively revise: replace "the simpler alternative is to do nothing / leave as-is" wording with "the simpler alternative is to do Y." "Do nothing" is lazy thinking, not simplification. |
+| N2 | Accepted — re-defer Project Quick Orientation story with documented re-open triggers (third independent consumer evolves the section, or Jamie's session-start experience surfaces the gap). |
+| N3 / N3-A1 | Accepted — Option A: "Skills own rituals" principle added to `project-rules.md`; operational rule added to `coding-session-rules.md` (invoke the owning skill instead of inlining its ritual). Rejects Direction 3 (hooks-based enforcement). |
+| N4 / N4-A1 | Accepted with Caveats — Option A with timing caveat: artifact-boundary skills route to `/wind-down` ONLY when session work is truly complete; iterative mid-loop paths (Stage 1 addendum, Stage 2 open-another-round, in-flight design-review pass) stay commit-free and do NOT invoke `/wind-down`. |
+| N5 | Accepted with Caveats — HTML-comment content is free (preprocessor-stripped before Claude reads CLAUDE.md/rules context); the rule must be very short, written for Claude, with parenthetical content pruned. |
+| N6 | Decision: Option B — spec changes only: triage-then-batch in `/design-review` S2.2 and `/exit-test-plan` S2.2 (both `cc-template/` and project-root copies); skip the `design-philosophy-rules.md` one-line principle. |
 
 ## Follow-up actions landed
 
-*Filled when Stage 2 lands the doc. Lists every doc edit and
-every TODO that landed during the landing pass.*
+**In-scope doc edits applied this Stage 2 (R10 + N5 caveat):**
+
+- R10: edited `docs/CLAUDE_CODE_PROMPTS.md` Prompt 2.1 — added scope item 14 (pre-marker migration) with N5 HTML-stripping caveat; appended a "Revisions since this prompt ran" entry.
+- R10: edited `docs/PROJECT_PLAN.md` Phase 2.1 deliverables — added pre-marker migration bullet mirroring the Prompt 2.1 scope item.
+
+**Out-of-scope follow-ups (queued as TODOs — pre-Phase-2.1 cleanup bundle):**
+
+Per Jamie's landing directive, ALL `cc-template/` rules / commands / CLAUDE.md cleanup lands BEFORE the Phase 2.1 `/refresh-from-repository` coding session begins; items inherent to Phase 2.1's coding (rule markers, state file, three-way reconciliation) stay in Phase 2.1 scope.
+
+Cleanup bundle for the next session(s):
+
+- B1: `cc-template/CLAUDE.md` Collaboration-rules — strip rule-topical summaries; strip KISS/Progressive-disclosure naming from the design-philosophy pointer; append "confirm you read and understood them" sentence.
+- B2-A1: `cc-template/CLAUDE.md` — add the ~3–4 line template-owned wrapped rules-read directive block at line 1, above the consumer-owned banner. B1's "confirm you read" directive joins this block.
+- R1-A1 + R2: `cc-template/rules/coding-session-rules.md` — replace rule 7 with the ~6-line thin form; eliminate rule 9 entirely. `cc-template/.claude/commands/wind-down.md` Step 4 — absorb the pre-commit dry-run sequence, message brevity, and PowerShell mechanics from former rule 7. `cc-template/.claude/commands/wind-down.md` Step 3 — absorb the per-doc enumeration from former rule 9.
+- R3-A1: `cc-template/rules/coding-session-rules.md` rule 8 paragraph 2 — tweak to explicitly disambiguate automated-test discipline from manual phase-exit walkthroughs.
+- R4-A1: `cc-template/rules/coding-session-rules.md` — add new short rule "never assume training-time versions are current." `cc-template/rules/environment-rules.md` version-freshness section — reduce to a one-line cross-reference. `cc-template/.claude/commands/onboard.md` Step 3, `bootstrap.md` Steps 3+5, `deployment-plan.md` Steps 3+5, `design-review.md` Step S1.5 — add explicit per-skill guardrails to surface latest LTS even when the input doc pinned a version.
+- R5: `cc-template/rules/design-philosophy-rules.md` KISS section — replace with one-line reference to rule 4 ("apply rule 4's simpler-alternative self-check").
+- R6-A1: `cc-template/CLAUDE.md` banner — remove cadence prose lines 32–45 entirely. `cc-template/.claude/commands/onboard.md` Step 5 — when writing the post-onboard CLAUDE.md banner, include a lightweight note such as "check test plans or review checkpoints in progress before proceeding."
+- R7: `cc-template/.claude/commands/onboard.md` Step 5 and `bootstrap.md` Step 6 — banner templates lose next-step prose (static framing only). `cc-template/.claude/commands/wind-down.md` — add CLAUDE.md/TODO.txt banner-consistency check.
+- R8: `docs/open-questions.md` — append to the "In-flight artifact status callout" entry: "Deferred 2026-05-29 per checkpoint 003 R8 — re-open if downstream consumers report difficulty discovering mid-flight artifacts despite `/wind-down` safety nets; consider skill-owned banners as a possible mechanism (skills surface mid-iteration state independently of TODO.txt)."
+- R9: `cc-template/TODO.txt` — replace single-line seed with the 6-step onboarding checklist (read README → review rules → drop design doc → /onboard → /bootstrap → /deployment-plan). `cc-template/README.md` — describe the rule-divergence workflow (review → edit → optionally lift from markers once Phase 2.1 ships) and point at TODO.txt as the walkable checklist.
+- R11: `.claude/commands/design-review.md` AND `cc-template/.claude/commands/design-review.md` — formalize REJECTED as a fifth AUDIT-NOTE legend shape; updates to Step 0 (no change — REJECTED is non-placeholder), S1.5 (legend), S2.1 (classification), S2.4 (read-state), S2.5 (auto-open-another-round trigger), S1.A (rejection prose as authoritative reframe input). Also update `CLAUDE.md` § Load-bearing invariants → `/design-review` lifecycle to reflect five-shape legend.
+- N1: `cc-template/rules/coding-session-rules.md` rule 4 — replace any "the simpler alternative is to do nothing / leave as-is" wording with "the simpler alternative is to do Y." Sweep for similar "do nothing" framings across all rules files.
+- N2: `docs/open-questions.md` — append to the "Project quick orientation section" entry: "Re-open trigger added 2026-05-29 per checkpoint 003 N2 — when a third downstream consumer (beyond ds-niche-stream and ds-auto-dailies) evolves a Project quick orientation section independently, OR when Jamie's session-start experience surfaces the banner alone is consistently too thin."
+- N3-A1: `cc-template/rules/project-rules.md` — add "Skills own rituals" section (principle in 1–2 paragraphs with examples). `cc-template/rules/coding-session-rules.md` — add operational rule ("when Claude would offer a behavior a skill canonically owns, invoke the skill instead"). Also append to `docs/open-questions.md` "Rules-read reliability" entry the Direction 3+4 deferral subsection with re-open triggers.
+- N4-A1: `cc-template/.claude/commands/design-review.md` Steps S1.8 + S2.7 and `exit-test-plan.md` Steps S1.7 + S2.7 — replace inline rule-7 handoff with explicit `/wind-down` invocation, AND only when session work is truly complete (iterative mid-loop paths remain commit-free; preserve current behavior there). `cc-template/.claude/commands/wind-down.md` — absorb commit handoff and doc-coherence sweep for docs the calling skill doesn't own. Mirror to project-root copies.
+- N5: `cc-template/rules/design-philosophy-rules.md` (or `environment-rules.md`) — add a very short rule (Claude-facing, no unnecessary parentheses) stating HTML-comment content is preprocessor-stripped; human-only prose is free; Claude-must-read content cannot live in comments.
+- N6: `cc-template/.claude/commands/design-review.md` S2.2 and `exit-test-plan.md` S2.2 (both `cc-template/` and project-root copies) — replace per-finding confirm-then-record with triage-then-batch (scan all latest-round markings, record unambiguous ones in one batch, surface only genuinely ambiguous markings).
+
+**Future-checkpoint markers:** none added this landing pass. Phase 2.1 already has a "Design review checkpoint" marker upstream of it (lines 270 in PROJECT_PLAN.md); checkpoints 002 and 003 both satisfied that gate. Future checkpoints surface when the next gate emerges.
+
+---
+
+## Addendum 1 — 2026-05-28
+
+### Why this addendum exists
+
+Round 1's dispositions produced two clusters of investigation directives plus three new findings that emerged from the markup process itself.
+
+The **architectural spine** — R1 / R2 / N3 / N4 — converges on one decision: *skills own rituals; `/wind-down` is the canonical owner of git-commit handoffs.* Round 1 approached this from four angles (rule 7 restructure, rule 9 elimination, skills-own-rituals principle, skill-to-`/wind-down` routing); Addendum 1 reframes them as one architectural decision with four implementation surfaces (R1-A1, R2 stands but entangled, N3-A1, N4-A1).
+
+The **independent reframes** — B2, R3, R4, R6 — each came back REJECTED in Round 1 with concrete reframing directives. Addendum 1 carries them with those directives as authoring input (B2-A1, R3-A1, R4-A1, R6-A1).
+
+The **new findings** captured during Round 1 markup:
+
+- **R11** formalizes REJECTED as a first-class `/design-review` legend item. Round 1 produced five REJECTED markings; the shape works as user-introduced shorthand but isn't in the spec, so future-Claude in a fresh project will misinterpret it.
+- **N5** documents the HTML-comment-stripping insight Jamie confirmed via Claude web: single-line `<!-- -->` content is preprocessor-stripped from CLAUDE.md context-load. Comment lines don't count against rule size. This was a B2 sub-thread; promoting to its own finding makes downstream implications first-class.
+- **N6** captures the friction Stage 2's walk hit this session — 16 round-trips of restate-and-confirm when Jamie's inline markings were already settled. Spec-change scope spans `/design-review` S2.2 and `/exit-test-plan` S2.2.
+
+### Round 1 dispositions that stand (not re-opened here)
+
+- **B1** (Accepted with Caveats) — strip rule-topical summaries; also strip KISS/Progressive-disclosure naming from the design-philosophy pointer; add a "confirm you read and understood them" sentence after the pointer block.
+- **R2** (Accepted with Caveats) — Option A's migration of per-doc enumeration to `/wind-down`, AND elimination of rule 9 entirely. Application is gated on R1-A1's `/wind-down` ownership spec landing; the Round 1 disposition itself is final.
+- **R5** (Accepted) — rule 4 owns canonical "simpler alternative" statement; design-philosophy KISS section becomes one-line reference.
+- **R7** (Accepted) — Option D: `/onboard` and `/bootstrap` write static banner without next-step prose AND rule 9 / `/wind-down` (or successor per R1-A1 / R2) gets a consistency check.
+- **R8** (Decision: Option B with caveat) — defer with documented re-open triggers; consider skill-owned banners as a future direction.
+- **R9** (Accepted) — seed `cc-template/TODO.txt` with the 6-step onboarding checklist; update `cc-template/README.md` to describe the rule-divergence workflow.
+- **R10** (Accepted with Caveats) — Option A's pre-marker migration scope item added to Phase 2.1's prompt; HTML-stripping insight per N5 relaxes the fine-vs-coarse-grained-block decision.
+- **N1** (Accepted with Caveats) — preserve rule 4 self-check framing AND substantively revise to remove "do nothing" framings (replace with "do Y").
+- **N2** (Accepted) — re-defer Project Quick Orientation with documented re-open triggers; `docs/open-questions.md` edit queued as TODO.
+
+### How to mark up Addendum 1
+
+Each finding below has its own `AUDIT NOTE — JAH:` block. Replace each placeholder line per the legend at the top of the document. Per Round 1's organic introduction and R11 below, **REJECTED** is now a fifth legend shape — "none of the recommendations are satisfactory; opens another addendum; rejection prose is the reframing input." Stage 2 will record REJECTED in the Disposition log and treat it as an automatic open-another-round trigger.
+
+Addendum 1 dispositions supersede Round 1 for re-opened findings.
+
+### Findings
+
+#### Blockers (re-opened + new)
+
+##### B2-A1. Rules-read directive — wrap status and placement [re-opened from B2]
+
+**Sources.** [`cc-template/CLAUDE.md` lines 1-72](../../cc-template/CLAUDE.md#L1-L72) (full pre-Collaboration-rules region). Round 1 B2 disposition (this checkpoint). Checkpoint 002 R3's partition (banner is consumer-owned/free; Collaboration-rules is template-owned/wrapped). N5 in this addendum (HTML-comment stripping confirmed).
+
+**Problem.** Round 1 REJECTED B2's Option A (lift directive to top-of-file pre-banner block) as "preferred direction but placement question unsettled." Specifically: should the rules-read directive be a *template invariant* (wrapped, locked across refresh) or *consumer-owned* (free, editable per project)? The original Option A put it in the banner region (consumer-owned free per R3); Round 1's marking asked why it isn't another invariant the template owns.
+
+Wrap-status drives placement, which drives every downstream concern (residual prose value after B1's strip; HTML-comment use per N5; consumer-vs-maintainer ownership of the directive's exact text).
+
+**Recommendation.** Pick one at markup. Option C recommended.
+
+- **Option A — Consumer-owned banner + top-of-file.** Directive lives ABOVE any CC-TEMPLATE-BLOCK markers, in the free region per R3. Consumers can edit per project. *Downstream:* maximum consumer flexibility; risk a consumer accidentally weakens the directive without realizing it's load-bearing.
+
+- **Option B — Template invariant + wrapped + top-of-file.** Directive lives inside a CC-TEMPLATE-BLOCK at the top of `cc-template/CLAUDE.md`, above (or alongside) the banner. *Downstream:* behavior is locked across refresh; consumer customization requires inline-edit conflict UX. Foregrounded placement preserved.
+
+- **Option C (Recommended) — Hybrid: template-owned wrapped block + top-of-file placement.** Same as Option B in placement, but the wrapped block is small (just the directive itself, ~3-4 lines) and lives at line 1 of `cc-template/CLAUDE.md`, before the consumer-owned banner region. *Downstream:* behavior locked; consumer banner is unaffected; placement is maximally foregrounded. Per N5, any human-only commentary about *why* the directive matters can live in HTML comments at zero context cost. The B1 caveat directive ("confirm you read and understood them") joins this wrapped block.
+
+> AUDIT NOTE — JAH:
+> _Approved_
+
+#### Recommendations (re-opened + new)
+
+##### R1-A1. Rule 7 reshape around `/wind-down` ownership [re-opened from R1]
+
+**Sources.** [`cc-template/rules/coding-session-rules.md` rule 7 lines 67-148](../../cc-template/rules/coding-session-rules.md#L67-L148). [`cc-template/.claude/commands/wind-down.md` Step 4 lines 232-253](../../cc-template/.claude/commands/wind-down.md#L232-L253). R2 Round 1 caveat (rule 9 elimination). N3-A1 and N4-A1 in this addendum.
+
+**Problem.** Round 1 REJECTED R1's three-section consolidation as the wrong frame. Jamie's reframe: rule 7 becomes ~3-5 lines (Jamie runs commits; any commit-handoff moment is a definitive signal to call `/wind-down` instead). The 6-step pre-commit dry-run sequence and PowerShell mechanics relocate to `/wind-down`'s Step 4. The first-level decision is the shape of the relocation.
+
+**Recommendation.** Pick one at markup. Option A recommended.
+
+- **Option A (Recommended) — Thin rule 7; full mechanics in `/wind-down`.** Rule 7 becomes:
+
+  > **Rule 7: Jamie runs all commits.** Claude does not run `git commit`, `git push`, or `git tag`. When Claude would offer commit commands, that is a definitive signal to invoke `/wind-down` instead — `/wind-down` owns the commit-handoff ritual including pre-commit dry-run, message brevity, and PowerShell mechanics. Commits are the durable record; Jamie audits each one before it lands. This supersedes any hook or workflow that would auto-commit.
+
+  All other rule 7 content (Commit-messages-stay-short / Pre-flight / Constraints / Mechanics reference) relocates to `/wind-down`'s Step 4 with no other change in substance. *Downstream:* rule 7 drops from ~82 lines to ~6 lines; `/wind-down`'s Step 4 grows to absorb the mechanics. Pairs with N3-A1's "skills own rituals" principle and N4-A1's routing protocol.
+
+- **Option B — Rule 7 disappears entirely; absorbed into N3-A1's principle.** No rule 7 at all; the imperative folds into the project-level "skills own rituals" rule. *Downstream:* cleaner but conflates rule-7-the-imperative with the meta-principle. Future readers expecting a rule about commits won't find one numbered as such.
+
+- **Option C — Trim rule 7 internally (no relocation).** Closest to R1's original Option A; consolidate the three sections without moving anything to `/wind-down`. *Downstream:* preserves single-source-of-truth in rule 7 but doesn't make `/wind-down` the canonical owner. Conflicts with N4-A1 — pick this and routing-to-`/wind-down` has no spec home.
+
+> AUDIT NOTE — JAH:
+> _Accepted._
+
+##### R3-A1. Rule 8 paragraph 2 tweak — preserve automated-test discipline [re-opened from R3]
+
+**Sources.** [`cc-template/rules/coding-session-rules.md` rule 8 lines 150-162](../../cc-template/rules/coding-session-rules.md#L150-L162). [`cc-template/.claude/commands/exit-test-plan.md`](../../cc-template/.claude/commands/exit-test-plan.md) (the command spec). Round 1 R3 marking ("automated tests and `/exit-test-plan` are separate").
+
+**Problem.** Round 1 REJECTED R3's collapse-to-pointer recommendation as having misread rule 8. The core discipline ("Claude shouldn't run automated tests for humans — it wastes context, tokens, and makes humans less aware of the testing procedures") is load-bearing and stays. Paragraph 2 (lines 156-162, the manual phase-exit walkthroughs paragraph) needs a tweak to disambiguate automated tests from manual phase-exit walkthroughs — both share the "Jamie runs them" constraint but at different cadences and for different reasons.
+
+**Recommendation.** Pick one at markup. Option A recommended.
+
+- **Option A (Recommended) — Tweak paragraph 2 to explicitly disambiguate.** Replace lines 156-162 with:
+
+  > Rule 8 also covers **manual phase-exit walkthroughs**, which are distinct from the automated test runs above. Manual walkthroughs happen at phase transitions where interactive UI / behavior needs human verification; the canonical flow is `/exit-test-plan` — Stage 1 authors the plan from the phase's exit criteria, Jamie runs it and marks the run log inline, Stage 2 reads the log and lands dispositions. The plan is the artifact; Claude never runs the steps. This is a separate cadence from automated-test discipline — both invoke "Jamie runs them," but for different reasons (automated: avoid wasting Claude context and to keep Jamie aware of testing procedures; manual: human-only verification of interactive product behavior).
+
+  *Downstream:* rule 8 stays roughly the same length but is structurally clearer. The disambiguation is the load-bearing fix.
+
+- **Option B — Split rule 8 into 8a (automated) and 8b (manual).** Heavyweight; introduces sub-rule numbering. *Downstream:* over-engineered for the size of the clarification needed.
+
+- **Option C — Add a single prefix sentence to paragraph 2.** Less invasive: just prepend "Distinct from the automated runs above:" to paragraph 2's existing content. *Downstream:* minimal change; the rest of the paragraph carries the conflation risk.
+
+> AUDIT NOTE — JAH:
+> _Approved._
+
+##### R4-A1. Version-freshness rule relocation + per-skill guardrails [re-opened from R4]
+
+**Sources.** [`cc-template/rules/environment-rules.md` Version freshness section lines 128-175](../../cc-template/rules/environment-rules.md#L128-L175). [`cc-template/rules/coding-session-rules.md`](../../cc-template/rules/coding-session-rules.md) (target file for relocation). Per-skill guardrail targets: [`onboard.md` Step 3](../../cc-template/.claude/commands/onboard.md), [`bootstrap.md` Steps 3 + 5](../../cc-template/.claude/commands/bootstrap.md), [`deployment-plan.md` Steps 3 + 5](../../cc-template/.claude/commands/deployment-plan.md), [`design-review.md` Step S1.5 checkpoint authoring](../../cc-template/.claude/commands/design-review.md). Round 1 R4 marking.
+
+**Problem.** Round 1 REJECTED R4's intra-file consolidation as the wrong scope. Jamie's reframe has two parts: (1) move the rule itself to `coding-session-rules.md` as a short standing rule — the failure mode (assuming training-time versions are current) is general behavioral discipline, not environment-specific; and (2) add explicit per-skill guardrails so design-document-writing and design-review skills surface latest LTS even when the spec already pinned a version. The first-level decision is which skills get explicit guardrails (the rule shape is implied).
+
+**Recommendation.** Pick one at markup. Option A recommended.
+
+- **Option A (Recommended) — `coding-session-rules.md` gains a short rule; all version-pinning skills get explicit guardrails.** New rule added to `cc-template/rules/coding-session-rules.md` (placement: after the last surviving rule, since rule 9 may be eliminated per R2):
+
+  > **Rule N: Never assume training-time versions are current.** Before pinning any version (language, framework, package, runtime) into a project artifact, surface what was found at training time, look up current stable/LTS if possible, and ask Jamie before pinning. Skills that write design documents or do design reviews carry this discipline explicitly — they must NOT trust spec-pinned versions without surfacing the freshness question.
+
+  Per-skill guardrails added: `/onboard` Step 3, `/bootstrap` Steps 3+5, `/deployment-plan` Steps 3+5, and `/design-review` Step S1.5 (when authoring checkpoints that touch version-pinning subjects) gain explicit instructions to surface latest LTS even when the input doc pinned a version, ask whether the pin was intentional or training-time-residual, and confirm before perpetuating.
+
+  `environment-rules.md` version-freshness section reduces to a one-line cross-reference back to the new rule.
+
+- **Option B — Rule stays in `environment-rules.md` (per Round 1 R4); only add per-skill guardrails.** Weaker — the rule's general applicability isn't reflected in its location.
+
+- **Option C — Rule in `design-philosophy-rules.md` as a judgment frame.** Doesn't fit — version-freshness is behavioral discipline, not judgment frame.
+
+> AUDIT NOTE — JAH:
+> _Approved._
+
+##### R6-A1. Recurring-command cadence prose — remove or HTML-comment [re-opened from R6]
+
+**Sources.** [`cc-template/CLAUDE.md` banner lines 32-45](../../cc-template/CLAUDE.md#L32-L45). N5 in this addendum (HTML-comment-stripping). Round 1 R6 marking.
+
+**Problem.** Round 1 REJECTED R6's "replace with one-line pointer" as too conservative. Jamie's reframe: is there any benefit to Claude reading the cadence prose if the skills already know their own cadence? Per N5, an HTML comment is zero-cost to Claude's context. The first-level decision is between *remove entirely* and *move to HTML comment for human readability*.
+
+**Recommendation.** Pick one at markup. Option A recommended; conditional on N5 acceptance.
+
+- **Option A (Recommended) — Move to HTML comment.** Wrap the cadence prose in `<!-- ... -->`. Preserves the prose for humans browsing the file; zero Claude-context cost per N5. *Downstream:* the prose can be more verbose than it currently is without context cost; it becomes maintainer-facing documentation.
+
+- **Option B — Remove entirely.** Cleanest if there's no human-readership value. *Downstream:* lighter file; no maintainer-facing reference to cadence beyond the command files themselves.
+
+- **Option C — One-line pointer (R6's original Option A).** Closer to status quo. *Downstream:* still costs Claude-context tokens; the prose value question is unanswered.
+
+> AUDIT NOTE — JAH:
+> _Option B with Caveat: Onboard needs revision to ensure it writes a very lightweight note in CLAUDE.md such as "check of test plans or review checkpoints in progress before proceeding". Implementation left to a coding session decision._
+
+##### R11. Add REJECTED to `/design-review`'s AUDIT-NOTE legend as a first-class shape [new]
+
+**Sources.** Both [`.claude/commands/design-review.md`](../../.claude/commands/design-review.md) and [`cc-template/.claude/commands/design-review.md`](../../cc-template/.claude/commands/design-review.md) (Step 0 placeholder check, Step S1.5 checkpoint-template legend, Step S2.1 classification, Step S2.4 read-state, Step S2.5 land-or-addendum recommendation, Step S1.A authoring). The Round 1 markings of B2, R1, R3, R4, R6 (five REJECTED uses). [`docs/open-questions.md` "Add REJECTED to /design-review's AUDIT-NOTE legend"](../open-questions.md) user story.
+
+**Problem.** Round 1 produced five REJECTED markings — a fifth shape not in the current four-shape legend. The behavior is well-defined ("none of the listed recommendations are satisfactory; opens addendum; rejection prose is the reframing input") but the spec only knows four shapes. Future-Claude in a fresh project will surface REJECTED at S2.1 as "malformed — surface and ask," which blocks the round. The spec needs to catch up to the behavior.
+
+**Recommendation.** Pick one at markup. Option A recommended.
+
+- **Option A (Recommended) — Formalize REJECTED in both copies of `/design-review`.** Concrete updates:
+  1. Step S1.5's "How to mark up this review" legend gains a fifth bullet: `REJECTED: <your reframing prose>` with the definition.
+  2. Step S2.1's classification list gains REJECTED as a fifth classification.
+  3. Step S2.4's read-state explicitly foregrounds REJECTED-marking count.
+  4. Step S2.5's recommendation logic: any REJECTED in the latest round is an automatic recommend-open-another-round trigger (overriding the otherwise-clean-disposition default).
+  5. Step 0's placeholder check is unchanged — REJECTED is a non-placeholder marking like the other four.
+  6. Disposition log records `REJECTED` verbatim as the disposition column value.
+  7. Stage 1 addendum (S1.A) convention: rejection prose is the authoritative reframe input — do not generate alternatives from scratch.
+
+- **Option B — Add REJECTED only to the legend; leave Step S2.5 default logic unchanged.** Lighter. *Downstream:* the auto-open-another-round behavior happens implicitly via investigation directives but isn't documented. Risk: a REJECTED without further-investigation language could be misread as land-eligible.
+
+- **Option C — Don't formalize; treat as user-introduced shorthand.** *Downstream:* future-Claude misinterprets in fresh projects.
+
+> AUDIT NOTE — JAH:
+> _Accepted._
+
+#### Notes (re-opened + new)
+
+##### N3-A1. Skills-own-rituals as a guiding principle of the project [re-opened from N3]
+
+**Sources.** Round 1 N3 marking. R1-A1, R2 Round 1 caveat, N4-A1 in this addendum (concrete first instances). [`cc-template/rules/project-rules.md`](../../cc-template/rules/project-rules.md) (candidate home for the principle). [`cc-template/rules/coding-session-rules.md`](../../cc-template/rules/coding-session-rules.md) (candidate home for an operational rule).
+
+**Problem.** Round 1 decided: "where applicable a skill specific rule should live in the skill" + "the skill owns the ritual if it is the unique owner of that ritual, a rule reminds Claude not to offer that separately." The first-level decision is where this principle gets documented and at what level of formal codification.
+
+**Recommendation.** Pick one at markup. Option A recommended.
+
+- **Option A (Recommended) — Principle in `project-rules.md`; operational rule in `coding-session-rules.md`.** Two-surface codification:
+  1. `project-rules.md` gains a section "Skills own rituals" — the principle in 1-2 paragraphs, with examples (commits → `/wind-down`; design-review checkpoint authoring → `/design-review` itself).
+  2. `coding-session-rules.md` gains an operational rule (placement: as a new numbered rule): "When Claude would offer a behavior that a skill canonically owns (e.g., offering commit commands → `/wind-down`), invoke the skill instead of doing the behavior inline. The skill's ownership is the source of truth for the ritual's exact shape."
+
+  *Downstream:* principle and rule are mutually reinforcing; the rule is the operational gate, the principle is the explanation for *why* the gate exists.
+
+- **Option B — Operational rule only; skip the principle doc.** Saves a rules-file edit. *Downstream:* the *why* is missing; future-Claude might apply the rule too narrowly or too broadly.
+
+- **Option C — Principle only; no operational rule.** *Downstream:* enforcement is weaker; the principle is read once at session start, the rule would have been read every session.
+
+> AUDIT NOTE — JAH:
+> _Approved._
+
+##### N4-A1. Skill-to-`/wind-down` routing protocol [re-opened from N4]
+
+**Sources.** Round 1 N4 marking. R1-A1, R2 Round 1 caveat. [`cc-template/.claude/commands/wind-down.md`](../../cc-template/.claude/commands/wind-down.md) (Steps 3/4 — current scope). [`cc-template/.claude/commands/design-review.md`](../../cc-template/.claude/commands/design-review.md) Step S1.8 + S2.7 (current rule-7 handoff surfaces). [`cc-template/.claude/commands/exit-test-plan.md`](../../cc-template/.claude/commands/exit-test-plan.md) Step S1.7 + S2.7 (same).
+
+**Problem.** Round 1 decided "skills call `/wind-down` as they wrap up; `/wind-down` is the owner of git commands; `/wind-down` keeps documents the calling skill doesn't own up to date." The first-level decision is the routing mechanism — how does a skill route to `/wind-down` at its wrap-up point?
+
+**Recommendation.** Pick one at markup. Option A recommended.
+
+- **Option A (Recommended) — Explicit in-spec invocation.** Each artifact-boundary command spec (Stage 1 initial + Stage 2 landing for both `/design-review` and `/exit-test-plan`) replaces its inline rule-7 handoff Step (S1.8 / S2.7) with: "Step N: invoke `/wind-down` for session wrap-up. `/wind-down` surfaces the commit handoff (per its Step 4, which absorbs the former rule 7 mechanics per R1-A1) and refreshes TODO.txt plus doc-coherence for any docs the calling skill doesn't own." `/wind-down`'s own Step 3 grows to absorb the per-doc enumeration from R2's caveat (rule 9's per-doc list, since rule 9 itself goes away).
+
+  *Downstream:* explicit and traceable; specs name the redirect. Pairs with N3-A1's operational rule (Claude reading the rule pattern-matches against the routing). Mid-iteration paths (Stage 1 addendum, Stage 2 open-another-round) remain commit-free as today; only the artifact-boundary handoffs reroute through `/wind-down`.
+
+- **Option B — Rule-driven only.** No spec change to skills; only the N3-A1 operational rule fires the routing via Claude's pattern-matching. *Downstream:* relies on rule-application discipline; specs continue surfacing inline handoffs that the rule then redirects. Fragile.
+
+- **Option C — Hybrid: rule-driven + spec change.** Both. *Downstream:* belt-and-suspenders. Same as Option A in effect; the rule from N3-A1 catches anything specs miss.
+
+> AUDIT NOTE — JAH:
+> _Approved with caveat: Each skill than names wind-down should do so at the point that all work for the round or session is complete. Eg, it's the last thing todo since it triggers commits and session close. If there is still work to do in this session, other than wind-down, then it's not time to offer. If an iterative process like design-review should run a second pass in the same session, it's not time to wind down yet._
+
+##### N5. HTML-comment-stripped content as architectural enabler [new]
+
+**Sources.** Round 1 B2 marking ("single line inline HTML comments are ignored / stripped by Claude's CLAUDE.md pre-processor"). Jamie's confirmation via Claude web review of CLAUDE.md preprocessor syntax. Phase 2.1's CC-TEMPLATE-BLOCK marker design (markers ARE HTML comments; refresh tool reads file contents directly, not via Claude-as-context — so the marker behavior is compatible with comment stripping at context-load time).
+
+**Problem.** The HTML-comment-stripping insight has architectural implications beyond B2 alone. If single-line `<!-- -->` content is preprocessor-stripped from Claude's context-load:
+- Compression budgets in CLAUDE.md and rules files count only Claude-visible (non-comment) content.
+- Human-only prose (rationale, audit trails, maintainer guidance, "why this rule exists" commentary) can move to HTML comments at zero context cost.
+- Content that Claude must read for behavior must NOT be in a comment.
+
+The first-level decision is whether to document this as a project-level design principle (informs future work) or leave it as informal session knowledge (cited by individual findings as they arise).
+
+**Recommendation.** Pick one at markup. Option A recommended.
+
+- **Option A (Recommended) — Document as a project-level design principle.** Add a section to `cc-template/rules/design-philosophy-rules.md` (or a new short rule in `environment-rules.md` if design-philosophy stays purely judgment-frame):
+
+  > **HTML comment content is free.** Single-line inline HTML comments (`<!-- ... -->`) are stripped from CLAUDE.md / rules-file preprocessing before Claude reads them as context. Use HTML comments freely for human-only prose: maintainer rationale, audit notes, why-this-exists explanations. Anything Claude must read for behavior CANNOT live in a comment. Compression budgets count only Claude-visible content.
+
+  Near-term applications: R6-A1's cadence-prose-to-comment becomes viable; B1's "confirm you read" directive (which Claude must act on) cannot. Future compressions get a new tool.
+
+- **Option B — Don't document formally.** Cite the insight informally per finding. *Downstream:* the insight risks being forgotten; future-Claude in fresh projects re-discovers it ad-hoc.
+
+> AUDIT NOTE — JAH:
+> _Approved with caveat: Make this a very short rule, this prose is too long. Write it for claude, remove parentheses content if not necessary._
+
+##### N6. Skills processing pre-written human input — batching pattern [new]
+
+**Sources.** [`docs/open-questions.md` "Skills that process human input shouldn't paraphrase-and-confirm each element back"](../open-questions.md) user story (added during this session). Memory entry `feedback_design_review_walk_no_restate.md`. Friction observed in this session's Stage 2 walk (16 round-trips for 16 markings, all unambiguous).
+
+**Problem.** `/design-review` Stage 2's S2.2 walk currently restates each marking back to Jamie before recording, even when the marking is unambiguous. Jamie's inline markings are settled positions; the walk's confirmation cycle is busywork. Same risk in `/exit-test-plan` Stage 2's TC walk (potentially many TCs). The first-level decision is where the spec change lands.
+
+**Recommendation.** Pick one at markup. Option A recommended.
+
+- **Option A (Recommended) — Spec change in both affected skills + a one-line design principle.** Updates:
+  1. `cc-template/.claude/commands/design-review.md` S2.2 and `.claude/commands/design-review.md` S2.2: replace the per-finding confirm-then-record pattern with triage-then-batch — scan all latest-round markings first; classify into *unambiguous* (record silently in one batch write) vs *genuinely ambiguous* (surface that specific question inline). Define "genuinely ambiguous" with explicit triggers: malformed marking, internally contradictory caveats, scope conflict between findings.
+  2. `cc-template/.claude/commands/exit-test-plan.md` S2.2 and `.claude/commands/exit-test-plan.md` S2.2: same triage-then-batch update applied to the TC walk.
+  3. `cc-template/rules/design-philosophy-rules.md` gains a one-line principle: "Skills processing pre-written human input read it as authoritative; the human's act of writing it IS the confirmation. Don't paraphrase-and-confirm."
+
+  *Downstream:* both skills get the fix; the principle generalizes to future skills.
+
+- **Option B — Spec changes only; skip the principle.** Saves rule weight. *Downstream:* future skills risk re-introducing the same pattern.
+
+- **Option C — Principle only; let skills self-correct.** *Downstream:* weaker; specs still encourage the friction.
+
+> AUDIT NOTE — JAH:
+> _Option B._
