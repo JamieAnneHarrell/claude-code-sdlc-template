@@ -70,8 +70,8 @@ addendum rounds before it lands. The pattern mirrors
     / Accepted with caveats / DECISION) as doc revisions to
     REQUIREMENTS / ARCHITECTURE / PROJECT_PLAN / CLAUDE_CODE_PROMPTS,
     fills the Sign-off Summary table and Follow-up actions section,
-    flips the frontmatter to `LANDED <date>`, and surfaces a commit
-    handoff.
+    flips the frontmatter to `LANDED <date>`, and invokes
+    `/wind-down` to wrap up the session.
   - **Open another round**: leaves the frontmatter at
     `AWAITING-DECISIONS`, surfaces a TODO describing what the
     addendum needs (research, follow-up clarification, off-the-
@@ -183,8 +183,9 @@ Stage 1 has two branches:
 The branches share the input-reading discipline (S1.1) and the
 finding-composition rules (S1.4). The addendum branch skips S1.2
 reconnaissance, S1.5 doc-template authoring (only appends), the
-S1.6 REVIEWS.md update, and the S1.8 commit handoff (mid-iteration
-— wind-down handles staging).
+S1.6 REVIEWS.md update, and the S1.8 wind-down (mid-iteration — no
+session wrap-up; wind-down stages pending changes only when Jamie
+wraps the session).
 
 ## Step S1.1: Read project context
 
@@ -995,49 +996,21 @@ preserved below.
 
 State the rewritten `TODO.txt` back to Jamie before saving.
 
-## Step S2.7: Surface git commands (rule 7) — only on the "land" path
+## Step S2.7: Wind down (only on the "land" path)
 
 This step runs only when S2.5 picked "land the document." Skip it
-on the "open Addendum N+1" path.
+on the "open Addendum N+1" path — that path is mid-iteration and
+does not wind down.
 
-**Re-read rule 7's "Commit handoff format" section in
-`rules/coding-session-rules.md` end-to-end before drafting the
-message.** The brevity bar needs to be active in working memory
-before you write a single word.
-
-Stage 2 (landing) typically modifies the checkpoint file plus one
-or more of REQUIREMENTS / ARCHITECTURE / PROJECT_PLAN /
-CLAUDE_CODE_PROMPTS, plus REVIEWS.md. Jamie's choice: one bundled
-commit, or one commit per logical doc change. Offer both shapes:
-
-**Bundled (default — simpler handoff):**
-
-```
-git status
-```
-
-```
-git add docs/design/design-review-checkpoint-NNN.md docs/design/REVIEWS.md <other modified docs>
-```
-
-```
-git status
-```
-
-```
-git commit -m "Land design review checkpoint NNN
-
-<one-line summary of what landed across docs and rounds>."
-```
-
-**Split (one commit per logical change):** surface a sequence —
-one commit per doc, each with a focused subject ("Add NFR-7 from
-checkpoint NNN", "Revise Prompt 1 step 4 from checkpoint NNN", and
-finally a "Land checkpoint NNN — frontmatter and follow-ups"). Use
-when the doc edits cover unrelated concerns and Jamie wants the
-git log to reflect that.
-
-`TODO.txt` is gitignored and never staged.
+Landing is a true artifact close and the session's work is
+complete, so invoke `/wind-down` to wrap up. `/wind-down` owns the
+commit handoff (its Step 4, including the bundled-vs-split choice)
+and the doc-coherence sweep for any docs this command doesn't own.
+Stage 2 landing typically modified the checkpoint file plus one or
+more of REQUIREMENTS / ARCHITECTURE / PROJECT_PLAN /
+CLAUDE_CODE_PROMPTS, plus REVIEWS.md — `/wind-down` surfaces the
+commit handoff covering them. Step S2.6.6 already set `TODO.txt`'s
+first entry; `/wind-down`'s safety net confirms it.
 
 ## Step S2.8: Final report
 
@@ -1136,11 +1109,12 @@ End with one of:
 - Does not auto-land a document. Stage 2's S2.5 asks Jamie
   explicitly whether to land or open another addendum — there is
   no implicit transition to `LANDED`.
-- Does not surface a commit handoff on mid-iteration paths
-  (Stage 1 addendum branch, or Stage 2 when opening another
-  round). Wind-down handles staging when Jamie wraps the session.
-  Commit handoffs only fire on Stage 1 *initial* (new artifact
-  created) and Stage 2 *landing* (artifact closes).
+- Does not surface a commit handoff inline. Artifact-boundary
+  paths — Stage 1 *initial* (new artifact created) and Stage 2
+  *landing* (artifact closes) — invoke `/wind-down`, which owns the
+  commit handoff. Mid-iteration paths (Stage 1 addendum branch,
+  Stage 2 opening another round) do not wind down at all;
+  wind-down stages pending changes when Jamie wraps the session.
 - Does not bundle multiple independent recommendations under one
   AUDIT NOTE block. Composition rule (S1.4): one finding = one
   decision.

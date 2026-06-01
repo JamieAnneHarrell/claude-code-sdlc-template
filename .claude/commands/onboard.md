@@ -26,10 +26,10 @@ relative to it.
 
 **Required reading before Step 0:** read `rules/coding-session-rules.md`
 and `rules/design-philosophy-rules.md` in full. These are the universal
-rules that govern this session — including the rule-7 commit handoff
-format that the final step of onboarding depends on. Skipping them
-leads to drift (e.g. surfacing a bash heredoc commit block in a
-PowerShell session).
+rules that govern this session. The final step surfaces a commit
+handoff, whose format is owned by `/wind-down`'s Step 4 (rule 7 routes
+commit handoffs through `/wind-down`). Skipping these leads to drift
+(e.g. surfacing a bash heredoc commit block in a PowerShell session).
 
 ---
 
@@ -394,7 +394,7 @@ The template ships a starter `TODO.txt` whose first entry is "Run
   the dev environment before starting Phase 0."
 - Third entry: "After `/bootstrap`, paste Prompt 0 from
   `docs/CLAUDE_CODE_PROMPTS.md` to run Phase 0."
-- Leave Carryover and Deferred decisions empty (rule 9 wind-down
+- Leave Carryover and Deferred decisions empty (`/wind-down`
   populates them as work accumulates).
 
 ### `.gitignore`
@@ -439,7 +439,7 @@ unchanged.
 ## Step 6: Surface git commands (rule 7)
 
 Do not run any git commands. Surface a copy/paste-ready block per
-rule 7's commit-handoff format:
+the commit-handoff format in `/wind-down`'s Step 4:
 
 ```
 git init

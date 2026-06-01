@@ -32,7 +32,8 @@ relative to it.
 **Required reading before Step 0:** read
 `rules/coding-session-rules.md`, `rules/design-philosophy-rules.md`,
 and `rules/environment-rules.md` in full. The first two are the
-universal rules (including the rule-7 commit handoff format). The
+universal rules; the commit-handoff format lives in `/wind-down`'s
+Step 4 (rule 7 routes commit handoffs through `/wind-down`). The
 third is what `/bootstrap` populated with shell, venv, and tooling
 decisions — your deployment plan must be consistent with those.
 

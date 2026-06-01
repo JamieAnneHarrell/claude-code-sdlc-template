@@ -31,10 +31,10 @@ relative to it.
 **Required reading before Step 0:** read
 `rules/coding-session-rules.md`, `rules/design-philosophy-rules.md`,
 and `rules/environment-rules.md` in full. The first two are the
-universal rules (including the rule-7 commit handoff format that
-Step 7 of this command depends on). The third is what this command
-appends into — you need to know the existing structure to add to it
-cleanly.
+universal rules; the commit-handoff format Step 7 depends on lives
+in `/wind-down`'s Step 4 (rule 7 routes commit handoffs through
+`/wind-down`). The third is what this command appends into — you
+need to know the existing structure to add to it cleanly.
 
 ---
 
@@ -344,7 +344,7 @@ once status flips to `COMPLETE`.
 ## Step 7: Surface git commands (rule 7)
 
 Do not run any git commands. Surface a copy/paste-ready block per
-rule 7's commit-handoff format.
+the commit-handoff format in `/wind-down`'s Step 4.
 
 ```
 git status

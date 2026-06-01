@@ -1,11 +1,15 @@
 ---
-description: Run the rule-9 session wind-down ritual — rewrite TODO.txt, update tracking docs, surface a commit handoff if needed.
+description: Run the session wind-down ritual — rewrite TODO.txt, update tracking docs, and surface the commit handoff. /wind-down owns the commit-handoff ritual.
 ---
 
 # /wind-down
 
-Run the session wind-down ritual per coding-session rule 9. This is
-the right thing to do at the end of a session, before Jamie steps away.
+Run the session wind-down ritual at the end of a session, before
+Jamie steps away. `/wind-down` is the canonical owner of the
+session-close ritual: the `TODO.txt` rewrite, the doc-coherence
+sweep, and the commit handoff. Coding-session rule 9 routes here;
+the commit-handoff mechanics that used to live in rule 7 now live in
+Step 4.
 
 Jamie can invoke this explicitly (`/wind-down`), but Claude should
 also surface the suggestion to run it whenever wind-down cues appear
@@ -13,6 +17,12 @@ in conversation: "calling it", "off to bed", "that's enough for
 today", "done for tonight", "we're done", etc. **Don't run it
 autonomously** — surface the suggestion and wait for Jamie's
 go-ahead.
+
+When another skill invokes `/wind-down` at an artifact boundary
+(e.g. `/design-review` or `/exit-test-plan` at a landing),
+`/wind-down` owns the commit handoff and the doc-coherence sweep for
+any docs the calling skill doesn't own — run the full ritual below,
+scoped to what the session actually changed.
 
 ---
 
@@ -33,7 +43,7 @@ correct.
 `TODO.txt` is the handoff between sessions, **not** a running history.
 At wind-down, **rewrite** it — do not append.
 
-Required shape after rewrite (full spec in rule 9):
+Required shape after rewrite (this is the canonical spec):
 
 - **Completed items removed.** No strikethroughs, no "(done)"
   annotations. The git log is the record of what was done; TODO.txt
@@ -158,8 +168,13 @@ is the per-edit review surface and pre-pasting duplicates it.
 
 ## Step 3: Update tracking docs (only those that apply)
 
-Not every doc changes every session. Only surface the ones with real
-diffs to apply:
+Wind-down keeps the rest of the repo's docs coherent — but not every
+doc changes every session. Surface only the ones with real diffs to
+apply. For each: state the intent in one short sentence, then edit
+directly via the Edit tool — don't paste the full proposed text in
+chat (the edit-approval mode is the per-edit review surface, and
+pre-pasting duplicates it). Multi-doc structural changes warrant a
+brief plan first.
 
 ### `docs/CLAUDE_CODE_PROMPTS.md`
 - If a planned prompt landed this session, mark it landed in the
@@ -202,6 +217,10 @@ diffs to apply:
 - If scope changed (phase split, phase reordered, new phase inserted),
   state the intent and edit directly.
 
+### `docs/[command].md` or `docs/commands/*.md`
+- If a command's CLI parameters or functionality changed this
+  session, update its command doc to match.
+
 ### `docs/design/design-review-checkpoint-*.md` and `docs/design/REVIEWS.md`
 - If a checkpoint changed status this session
   (`AWAITING-DECISIONS` → `LANDED`, or a new `AWAITING-DECISIONS`
@@ -228,29 +247,101 @@ diffs to apply:
   outstanding polish or fix-now work. Wind-down only reports
   state.
 
-## Step 4: Surface a commit handoff if needed
+The goal: at session end, the repo's docs reflect reality. If they
+don't, surface the gap before closing — even if the fix is a
+follow-up next session.
 
-If there are uncommitted changes (staged or unstaged) that should land
-before the session ends:
+## Step 4: Surface the commit handoff
 
-1. **Re-read rule 7's "Commit handoff format" section in
-   `rules/coding-session-rules.md` end-to-end before drafting the
-   message.** Habit-mode handoffs drift long. The brevity bar
-   (subject < 72 chars, body = a few sentences max, bullets cite
-   doc IDs over restating implementation) needs to be active in
-   working memory before you write a single word.
-2. **Trust Step 1's recap.** Don't re-run `git status`, and don't
-   re-verify state the rules already establish (e.g. TODO.txt is
-   gitignored).
-3. **Project tooling is in `rules/environment-rules.md`'s "Build /
-   run / test commands" subsection.** Don't probe the filesystem
-   for `.pre-commit-config.yaml` or other configs. If the
-   subsection says N/A, skip the formatter and pre-commit steps in
-   rule 7's dry-run.
-4. Per rule 7, surface the commit handoff using that tooling.
-5. **Do not run the commit yourself.** Jamie pastes the commands.
+`/wind-down` owns the commit-handoff ritual (coding-session rule 7
+routes here). If there are uncommitted changes (staged or unstaged)
+that should land before the session ends, surface the handoff per
+the spec below. If there are none, skip this step.
 
-If no uncommitted changes, skip this step.
+**Trust Step 1's recap.** Don't re-run `git status` to rediscover
+what changed, and don't re-verify state the rules already establish
+(e.g. `TODO.txt` is gitignored). Project tooling — formatter,
+pre-commit, test commands — lives in `rules/environment-rules.md`'s
+"Build / run / test commands" subsection. Don't probe the
+filesystem for `.pre-commit-config.yaml` or other configs. If that
+subsection says N/A, skip the formatter and pre-commit steps below.
+
+**Do not run the commit yourself.** Jamie reviews diff, message, and
+scope, then pastes the commands.
+
+### Commit messages stay short
+
+Default shape: **subject + zero or one body sentence.** Subject ≤72
+chars, imperative mood, one logical change per commit.
+
+Body bullets (when used) cite doc IDs — `FR-N`, `NFR-N`,
+`ARCHITECTURE §N`, `Prompt N`, finding IDs like `R4b` — instead of
+restating context the diff or referenced doc already covers. If a
+body bullet wants to be a paragraph, it's the wrong shape: make it a
+doc reference, not a re-explanation. Multi-paragraph bodies are
+rare, not normal.
+
+### Constraints — every handoff satisfies all of these
+
+1. **Pre-commit dry-run sequence**, in order:
+   1. `<formatter> --check <source paths>` — detect formatting
+      drift before staging. (Python: `ruff format --check`.)
+   2. `<formatter> <source paths>` — only if step 1 reported drift.
+   3. `git add <paths>` — stage the intended files (may include
+      `.md`).
+   4. `git status` — confirm no `MM` rows remain.
+   5. `pre-commit run` — dry-run hooks against the staged snapshot.
+      If any hook reports "files were modified by this hook",
+      re-run `git add` and repeat.
+   6. `git commit -m "<subject>"` — only after step 5 is green.
+
+2. **One command per copyable line.** Each shell command on its own
+   line in its own fenced code block (or, in a multi-command block,
+   alone on its line with no trailing comment). Never join commands
+   with `;`, `&&`, or `||` — chained commands force Jamie to edit
+   before pasting.
+
+3. **Filter formatter inputs to relevant file types.** Ruff doesn't
+   process Markdown; eslint doesn't process Python. Filter
+   `<source paths>` to the formatter's target file types. `git add`
+   and `pre-commit run` still cover the full set including `.md`.
+
+4. **The commit command is one copy/paste-ready block.** Jamie
+   copies and runs the `git commit` line verbatim — she does not
+   assemble subject and body from prose.
+
+### Bundled vs split
+
+Default to one bundled commit. If the changes cover unrelated
+concerns and Jamie wants the git log to reflect that, offer a split
+sequence — one commit per logical change, each with a focused
+subject. Let Jamie pick.
+
+### Mechanics reference — PowerShell quoting
+
+- Single `-m "..."` flag holds the entire message (subject, blank
+  line, body, bullets) inside one double-quoted string with literal
+  newlines. Both git-bash and the VSCode PowerShell terminal accept
+  this form when pasted as one block.
+- **Never** use multiple `-m` flags to stack subject and body.
+- **Never** present the message as separate `Subject:` / `Body:`
+  prose sections for Jamie to reassemble.
+- **Never** use here-docs (`<<EOF`) — not portable between git-bash
+  and PowerShell.
+- PowerShell single-quoted here-strings (`@'...'@`) work; messages
+  inside cannot contain double quotes, and avoid single quotes to
+  be safe.
+- If the message has no body, single-line `git commit -m "Subject"`
+  is fine.
+
+Correct shape (one fenced block, one command):
+```
+git commit -m "Subject under 72 chars
+
+One short body sentence referencing FR-2.
+- R4a: trimmed env-rules version-freshness repetition
+- R4b: rule 7 brevity foregrounded"
+```
 
 ## Step 5: Final report
 

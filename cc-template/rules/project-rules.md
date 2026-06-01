@@ -46,10 +46,29 @@ so it also handles X?"), confirm scope before implementing X.
   split if multiple changes are in flight.
 - Subject ≤72 chars, imperative mood ("Add motion detector", not
   "Added"/"Adds").
-- Per rule 7: Claude proposes commit commands; Jamie runs them.
+- Per rule 7: Claude routes commit handoffs through `/wind-down`;
+  Jamie runs the commands.
 - Don't push or tag without explicit instruction.
 - Branch naming: `phase-N-<short-description>` for phase work,
   `fix/<short-description>` for post-MVP fixes.
+
+### Skills own rituals
+
+When a skill is the unique owner of a behavior, that ritual lives
+in the skill — not duplicated into a rule, a command, or inline
+prose. A rule reminds Claude to invoke the skill rather than
+perform the behavior separately (coding-session rule 9 is that
+gate). The skill is the single source of truth for its ritual's
+exact shape; anything that needs the ritual routes through the
+skill.
+
+- **`/wind-down` owns commits and session close** — the commit
+  handoff, the `TODO.txt` rewrite, and the doc-coherence sweep.
+  When you'd offer commit commands, invoke `/wind-down` instead.
+- **`/design-review` owns checkpoint authoring and dispositions** —
+  findings and sign-offs are never hand-written outside it.
+- **`/exit-test-plan` owns phase-exit test plans** — the plan and
+  its dispositions live in the skill's artifacts.
 
 ---
 

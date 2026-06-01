@@ -523,37 +523,19 @@ so the first entry under "What's next" is the test-plan follow-up:
 Carryover entries stay below in priority order. Do not invent
 carryovers; preserve whatever was already there.
 
-## Step S1.7: Surface git commands (rule 7)
+## Step S1.7: Wind down
 
-**Re-read rule 7's "Commit handoff format" section in
-`rules/coding-session-rules.md` end-to-end before drafting the
-message.** The brevity bar needs to be active in working memory
-before you write a single word.
+Stage 1 initial created a new test plan and the session's work is
+complete — the plan now awaits Jamie's run, which is her
+next-session task. This is a true artifact boundary, so invoke
+`/wind-down` to wrap up the session. `/wind-down` owns the commit
+handoff (its Step 4) and the doc-coherence sweep for any docs this
+command doesn't own; the only file `/exit-test-plan` owns is the
+test plan itself. Step S1.6 already set `TODO.txt`'s first entry —
+confirm `/wind-down`'s safety net preserves it.
 
-Stage only the new test plan file:
-
-```
-git status
-```
-
-```
-git add docs/test-plans/phase-NNN-exit.md
-```
-
-```
-git status
-```
-
-```
-git commit -m "Phase N exit test plan — awaiting run
-
-<TC count> test cases covering Phase N exit criteria.
-Plan: docs/test-plans/phase-NNN-exit.md.
-Next: Jamie runs the plan; re-run /exit-test-plan to land dispositions."
-```
-
-Do not stage `TODO.txt` (it's gitignored). Do not run any
-commands.
+(The Stage 1 addendum branch runs S1.A instead and does NOT wind
+down — appending a §6.N addendum is mid-iteration.)
 
 ## Step S1.8: Final report
 
@@ -1111,8 +1093,8 @@ status: LANDED YYYY-MM-DD  # today's date
 Preserve the `date:` field. Update only `status:`.
 
 Now apply S2.5's TODO.txt rewrite (the "land" shape) and proceed
-to S2.7 (commit handoff — landing is a meaningful artifact close,
-so the commit handoff is appropriate here).
+to S2.7 (wind down — landing is a meaningful artifact close, so
+the session wrap-up is appropriate here).
 
 ### If "open another polish round"
 
@@ -1126,45 +1108,21 @@ TODO entry. When polish lands, Jamie re-invokes
 `/exit-test-plan` and Step 0 routes to Stage 1's addendum branch
 (S1.A).
 
-## Step S2.7: Surface git commands (rule 7) — only when landing
+## Step S2.7: Wind down (only when landing)
 
-This step runs only when S2.6 picked "land the document." Skip
-it on the polish-round path.
+This step runs only when S2.6 picked "land the document." Skip it
+on the polish-round path — that path is mid-iteration and does not
+wind down.
 
-**Re-read rule 7's "Commit handoff format" section in
-`rules/coding-session-rules.md` end-to-end before drafting the
-message.** The brevity bar needs to be active in working memory
-before you write a single word.
-
-Stage 2 (landing) typically modifies the test plan file plus
-`docs/design-decisions.md` and `docs/open-questions.md`.
-`TODO.txt` is gitignored and never staged.
-
-Default bundled commit:
-
-```
-git status
-```
-
-```
-git add docs/test-plans/phase-NNN-exit.md docs/design-decisions.md docs/open-questions.md
-```
-
-```
-git status
-```
-
-```
-git commit -m "Land Phase N exit review
-
-<one-line summary of dispositions across all rounds: count by type>.
-Mirrors: design-decisions.md (<count> entries), open-questions.md (<count> additions, <count> removals).
-Rounds: original + <count> addendum(s)."
-```
-
-If §5's edits cover unrelated concerns and Jamie wants the git log
-to reflect that, offer a split shape: one commit for the test
-plan + §5, one commit per mirrored doc. Default to bundled.
+Landing is a true artifact close and the session's work is
+complete, so invoke `/wind-down` to wrap up. `/wind-down` owns the
+commit handoff (its Step 4, including the bundled-vs-split choice)
+and the doc-coherence sweep for any docs this command doesn't own.
+Stage 2 landing typically modified the test plan file plus
+`docs/design-decisions.md` and `docs/open-questions.md` —
+`/wind-down` surfaces the commit handoff covering them. S2.5's
+`TODO.txt` rewrite already set the first entry; `/wind-down`'s
+safety net confirms it.
 
 ## Step S2.8: Final report
 
@@ -1284,11 +1242,12 @@ End with one of:
 - Does not auto-land a document. Stage 2's last step asks Jamie
   explicitly whether to land or open another polish round —
   there is no implicit transition to `LANDED`.
-- Does not surface a commit handoff on mid-iteration stages
-  (Stage 1 addendum branch, or Stage 2 when opening another
-  round). Wind-down handles staging when Jamie wraps the
-  session. Commit handoffs only fire on Stage 1 initial (new
-  artifact created) and Stage 2 landing (artifact closing).
+- Does not surface a commit handoff inline. Artifact-boundary
+  stages — Stage 1 initial (new artifact created) and Stage 2
+  landing (artifact closing) — invoke `/wind-down`, which owns the
+  commit handoff. Mid-iteration stages (Stage 1 addendum branch,
+  Stage 2 opening another round) do not wind down at all;
+  wind-down stages pending changes when Jamie wraps the session.
 - Does not generate a third "mid-run troubleshooting" stage.
   Mid-run failures route to normal coding sessions, with the
   TC's Fail signals as starting points. The plan is a live,
