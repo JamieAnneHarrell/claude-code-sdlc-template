@@ -169,6 +169,47 @@ post-onboard (rewritten state). The new `docs/design/`
 Reading-order entry is present in `cc-template/CLAUDE.md`.
 ---
 
+## Phase 1.3 — root↔cc-template bring-forward
+
+**Goal.** Align this project's own root copies (`rules/*.md`,
+`CLAUDE.md`, `.claude/commands/*.md`) with the cleaned-up
+`cc-template/` versions. The pre-Phase-2.1 cleanup bundle (checkpoint
+003 landings — architectural spine, version-freshness rule,
+skills-own-rituals, REJECTED legend, triage-then-batch, etc.) landed
+only in `cc-template/`; the root copies drifted behind. Aligning root
+*before* Phase 2.1 means the `CC-TEMPLATE-BLOCK` markers Phase 2.1
+wraps are applied to already-clean content, and this project's own
+sessions run under the cleaned-up rules.
+
+**Deliverables.**
+- Root `rules/*.md`: universal (template-owned) content brought
+  forward from `cc-template/rules/`; each file's `ONBOARD-FILL` block
+  content preserved.
+- Root `CLAUDE.md`: template-owned sections (Collaboration rules,
+  Reading order — per the checkpoint 002 R3 partition recorded in
+  `docs/design-decisions.md` "consumer-boundary partition") brought
+  forward from `cc-template/CLAUDE.md`; project-specific sections
+  (banner, Project-specific context, Load-bearing invariants)
+  preserved. Surgical, not a copy — root `CLAUDE.md` is not a verbatim
+  copy of the dist placeholder.
+- Root `.claude/commands/*.md`: hard-copied from `cc-template/` so all
+  six are byte-identical, after a pre-diff confirms root carries no
+  content that never landed in `cc-template/`.
+
+**Exit criteria.** The three fully-universal rules files
+(`coding-session-rules.md`, `design-philosophy-rules.md`,
+`testing-rules.md`) are identical root↔`cc-template/`. The three with
+`ONBOARD-FILL` blocks (`project-rules.md`, `environment-rules.md`,
+`multi-agent-rules.md`) match `cc-template/` on universal content with
+root's filled blocks intact. All six `.claude/commands/*.md` are
+byte-identical root↔`cc-template/` (verified by diff). Root
+`CLAUDE.md` Collaboration-rules + Reading-order reflect the
+`cc-template/` improvements (rule summaries stripped, rules-read
+directive foregrounded) with banner / invariants / context preserved.
+No `CC-TEMPLATE-BLOCK` markers introduced — that is Phase 2.1's job.
+
+---
+
 ## Phase 2 — Planned project enhancements (roadmap)
 
 Roadmap phases that extend the template's behavior beyond

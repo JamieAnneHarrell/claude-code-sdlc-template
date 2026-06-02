@@ -347,6 +347,83 @@ Reading-order entry for `docs/design/`). Must land before Phase
 
 ---
 
+## Prompt 1.3: root↔cc-template bring-forward
+
+**Read first.**
+- [`docs/PROJECT_PLAN.md`](PROJECT_PLAN.md) Phase 1.3
+- [`docs/design/design-review-checkpoint-003.md`](design/design-review-checkpoint-003.md)
+  "Out-of-scope follow-ups / Cleanup bundle" list — the canonical
+  record of what landed in `cc-template/` and where (architectural
+  spine, R4-A1, R5, R6-A1, R7, N1, N3-A1, N4-A1, N5, N6, R11)
+- [`docs/design-decisions.md`](design-decisions.md): "`/refresh-from-repository`
+  consumer-boundary partition" (the CLAUDE.md template-owned vs
+  consumer-owned map — which sections to bring forward), plus the
+  recent "Rules-read reliability" and "`/wind-down` owns ...
+  reconciliation" entries
+- [`docs/REQUIREMENTS.md`](REQUIREMENTS.md) NFR-9 (source/dist
+  duplication is deliberate; universal content stays identical)
+- Both copies of each rules file, both `CLAUDE.md` files, and all six
+  `.claude/commands/*.md` files in both command directories
+
+**Scope.**
+1. **Rules files (surgical).** For each `rules/*.md`, diff root vs
+   `cc-template/rules/`. Bring forward `cc-template/`'s universal
+   (template-owned) improvements to root; preserve root's
+   `ONBOARD-FILL` block content (`project-rules.md` § project-scope,
+   `environment-rules.md` § environment, `multi-agent-rules.md`'s
+   explore-plus-plan content). The three fully-universal files
+   (`coding-session-rules.md`, `design-philosophy-rules.md`,
+   `testing-rules.md`) should end up identical root↔`cc-template/`.
+2. **CLAUDE.md (surgical).** Diff root `CLAUDE.md` vs
+   `cc-template/CLAUDE.md`. Bring forward improvements only to the
+   template-owned sections — Collaboration rules and Reading order,
+   per the checkpoint 002 R3 partition in `docs/design-decisions.md`
+   "consumer-boundary partition" (rule summaries stripped per B1;
+   rules-read directive foregrounded per B2-A1). Preserve root's
+   project-specific sections verbatim: the banner, Project-specific
+   context, Load-bearing invariants. Root `CLAUDE.md` is NOT a
+   verbatim copy of the dist — the banner and invariants differ by
+   design.
+3. **Command files (hard-copy).** Pre-diff each of the six
+   `.claude/commands/*.md`, root vs `cc-template/`. Flag any root
+   content that never landed in `cc-template/` (root-ahead surprise)
+   before overwriting. Then hard-copy
+   `cc-template/.claude/commands/*.md` → root `.claude/commands/*.md`
+   so all six are byte-identical. (`wind-down.md` was synced during
+   the Phase-1.3-authoring session — expect a no-op there.)
+
+**Constraints (what NOT to do).**
+- Do NOT overwrite root's `ONBOARD-FILL` block content — those are
+  this project's filled-in specifics, not template content.
+- Do NOT overwrite root `CLAUDE.md`'s banner, Load-bearing
+  invariants, or Project-specific context — only the template-owned
+  Collaboration-rules + Reading-order sections get `cc-template/`
+  improvements.
+- Do NOT hard-copy the rules files — they carry `ONBOARD-FILL`
+  divergence; rules are surgical, commands are hard-copy.
+- Do NOT introduce `CC-TEMPLATE-BLOCK` markers — that is Phase 2.1's
+  job. This phase aligns content only.
+- Do NOT blindly overwrite a command file if the pre-diff shows
+  root-ahead content — surface it and decide before copying.
+
+**Exit criteria.**
+- `coding-session-rules.md`, `design-philosophy-rules.md`,
+  `testing-rules.md` identical root↔`cc-template/`.
+- `project-rules.md`, `environment-rules.md`, `multi-agent-rules.md`
+  match `cc-template/` on universal content; root `ONBOARD-FILL`
+  blocks intact.
+- All six `.claude/commands/*.md` byte-identical root↔`cc-template/`
+  (verified by diff).
+- Root `CLAUDE.md` Collaboration-rules + Reading-order reflect the
+  `cc-template/` improvements; banner / invariants / context
+  preserved.
+- A re-read confirms this project's next session would load the
+  cleaned-up rules from root.
+
+**Revisions since this prompt ran:** none tracked.
+
+---
+
 ## Prompt 2.1: `/refresh-from-repository`
 
 **Read first.**
