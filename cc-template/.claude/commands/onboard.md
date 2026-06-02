@@ -425,6 +425,9 @@ Rewrite `CLAUDE.md`:
    > `/exit-test-plan` authors the manual walkthrough; Stage 2
    > lands dispositions once Jamie has run it.
    >
+   > Before proceeding in any later session, check `docs/test-plans/`
+   > and `docs/design/` for an in-flight test plan or review checkpoint.
+   >
    > **Project:** \<name\> — \<one-paragraph description\>
    > **Language / framework:** \<from Step 3\>
    > **Multi-agent mode:** \<from Step 3\>

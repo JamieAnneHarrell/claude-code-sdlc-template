@@ -1,5 +1,10 @@
 # CLAUDE.md
 
+> **Before you respond to the first user message of any session:** read
+> `rules/coding-session-rules.md` and `rules/design-philosophy-rules.md`
+> end-to-end — they are not loaded into context by default. Confirm you
+> have read and understood them before proceeding.
+
 <!-- ONBOARD-STATUS: UNCONFIGURED -->
 <!-- BOOTSTRAP-STATUS: UNCONFIGURED -->
 <!-- DEPLOYMENT-PLAN-STATUS: UNCONFIGURED -->
@@ -28,21 +33,6 @@
 > depend on. She may have a reason to skip; surface it once and respect
 > her decision. `/deployment-plan` can always be deferred without
 > blocking work.
->
-> After configuration, two recurring commands run on Jamie's cadence —
-> neither is part of the configuration ritual and neither owns a
-> status comment in this file:
->
-> - `/design-review` produces sign-off-ready checkpoints at high-risk
->   transitions (post-onboarding sanity check; between phases that
->   touch schema, multi-tenancy, auth, or anything expensive-to-
->   retrofit).
-> - `/exit-test-plan` authors and closes out the manual walkthrough
->   that closes each phase: Stage 1 writes the plan from the phase's
->   exit criteria (or appends a §6.N polish addendum after polish
->   lands); Stage 2 reads the newest filled run log + trailing notes,
->   lands dispositions across the project's docs, and asks Jamie
->   whether to land the document or open another polish round.
 
 ## Reading order at session start
 
@@ -65,28 +55,18 @@
 
 ## Collaboration rules
 
-**MUST DO before responding to the first user message of any session.**
-Read these two files end-to-end. Their contents are *not* loaded into
-context by default — only this CLAUDE.md is. Skipping this step is the
-#1 cause of rule drift (KISS violations, commit-message bloat, no
-simpler-alternative on additions).
+The two universal rule files are named in the directive at the top of
+this file; read them end-to-end before responding.
 
-- `rules/coding-session-rules.md` — the 9 standing rules (root-cause,
-  trust diagnosis, rejections permanent, no unsolicited design, decouple
-  data from display, reference rule numbers, Jamie runs commits, Jamie
-  runs tests, session wind-down rewrites TODO.txt). Includes the rule-7
-  commit handoff format and the rule-4 simpler-alternative self-check.
-- `rules/design-philosophy-rules.md` — KISS, progressive disclosure,
-  simple defaults. *iPhone, not Android. Macintosh, not PC.*
+- `rules/coding-session-rules.md` — the 9 standing rules.
+- `rules/design-philosophy-rules.md` — design judgment framework.
 
 **Read these when relevant to the current task:**
 
-- `rules/project-rules.md` — project-specific scope discipline (what is
-  MVP, what is roadmap, dependency justification).
-- `rules/testing-rules.md` — test discipline, language-neutral.
-- `rules/environment-rules.md` — cross-platform conventions, shells,
-  venv handling, where Claude scratch files go.
-- `rules/multi-agent-rules.md` — how this project uses subagents.
+- `rules/project-rules.md` — project scope discipline.
+- `rules/testing-rules.md` — test discipline.
+- `rules/environment-rules.md` — cross-platform conventions.
+- `rules/multi-agent-rules.md` — subagent use.
 
 If Jamie says "rule 4" or "this is a rule 1 issue" mid-session, that's a
 drift signal pointing at `rules/coding-session-rules.md`. Acknowledge,
