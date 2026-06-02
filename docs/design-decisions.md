@@ -815,3 +815,104 @@ adds spec wording without changing behavior.
 
 **Scope note.** N6 landed spec-only (checkpoint 003 Option B); no
 `design-philosophy-rules.md` principle was added.
+
+---
+
+## Rules-read reliability — foregrounding + skills-own-rituals, not hook enforcement
+
+**Decision.** Reliable session-start rules-read is addressed by three
+complementary, already-landed changes in the distributable rather than
+by runtime enforcement:
+
+1. The rules-read directive is the **first block of
+   `cc-template/CLAUDE.md`**, above the configuration banner — "before
+   you respond to the first message, read both rules files end-to-end;
+   confirm you have read and understood them" (checkpoint 003 B2-A1).
+2. The Collaboration-rules section **no longer summarizes the rules by
+   topic**, so Claude cannot pattern-match the summary as already
+   absorbed and skip the read (B1).
+3. **Skills own the rituals they exercise** — the "Skills own rituals"
+   principle in `project-rules.md` plus the operational gate in
+   `coding-session-rules.md` (rule 9: invoke the owning skill instead
+   of inlining its ritual) route skill-owned behavior to the owning
+   skill, so the relevant rule context arrives just-in-time rather
+   than competing for attention at session start (checkpoint 003
+   N3-A1 + N4-A1; e.g. commit handoffs → `/wind-down`).
+
+These map to the four "directions" explored in the now-retired
+open-questions story: Directions 1, 2, and 4 landed; Direction 3
+(hooks) is rejected; Direction 4b (session-entry skill prompt) is
+deferred.
+
+**Why.** The skip-prone behavior had several compounding causes (a
+buried instruction, a summary that read as sufficient priors, and
+enforcement that relied on judgment biased toward "respond now");
+addressing any one alone was judged unlikely to fix it. The three
+landed changes are nearly free, portable across every Claude surface,
+and reinforce each other.
+
+**Why not Direction 3 (a `UserPromptSubmit` hook that unconditionally
+reads both rules files on the first message).** Hooks are
+CLI-feature-specific; portability across the IDE-extension / desktop /
+web surfaces named in `environment-rules.md` is unvalidated, and
+"first message of session" detection is non-trivial. The template's
+"reliable out of the box" stance is better served by the nearly-free
+foregrounding + skills-own-rituals approach first.
+
+**Why not Direction 4b (ask the user's intent at session start and
+load the matching skill's rules).** A friction step on every session
+start; risks feeling bureaucratic and is redundant when the user's
+first message already states intent.
+
+**Scope note.** Re-open Direction 3 or 4b only if, after these landed
+measures have been exercised in practice, Claude still reliably skips
+the end-to-end rules re-read at session start. Direction 4's
+skills-own-rituals form covers only rules with a canonical skill home
+(commit handoff and wind-down rituals → `/wind-down`; manual
+phase-exit walkthrough → `/exit-test-plan`); session-pervasive rules
+(KISS, rules 1–6, the rule-4 simpler-alternative self-check) keep
+living in the always-loaded rules files. Landed in the distributable
+(`cc-template/`): B1 + B2-A1 (Session B), N3-A1 + N4-A1 (Session A).
+Full disposition: [design-review-checkpoint-003.md](design/design-review-checkpoint-003.md).
+
+---
+
+## `/wind-down` owns the open-questions ↔ design-decisions reconciliation
+
+**Decision.** `/wind-down` Step 3 is the session-close maintainer of
+the `open-questions.md` ↔ `design-decisions.md` relationship. It
+scans — non-skippably — for questions resolved this session, moves
+them *out* of `open-questions.md` and records them in
+`design-decisions.md`, and reads each file's own format section
+(`design-decisions.md` § Format / § When to record; `open-questions.md`
+§ Categories) before editing rather than reproducing the shape from
+memory. `/wind-down` is the session-close *maintainer*, not the only
+*writer* of `design-decisions.md` — `/onboard` (seeds it) and
+`/design-review` Stage 2 (routes its own dispositions) legitimately
+write it at their own boundaries.
+
+**Why.** Session E surfaced two live gaps: `/wind-down` left resolved
+stories sitting in `open-questions.md` (only the inbound add was
+encoded, never the outbound move), and Claude had to rediscover both
+files' formats at runtime. The skill that owns the doc-coherence sweep
+didn't carry the structural knowledge of the two docs it most often
+edits. Encoding the move and the read-format-first discipline in the
+spec makes the reconciliation non-skippable rather than
+judgment-dependent. Connects to the "Skills own rituals" principle —
+the skill that owns the ritual carries the knowledge the ritual needs.
+
+**Why not a `/design-review` checkpoint first.** The outbound move
+encodes a protocol `open-questions.md`'s own header already documents;
+the change is a root-cause spec fix honoring an existing contract, not
+a fresh design decision. A checkpoint would be heavier machinery for a
+settled design, and a detour before Phase 2.1.
+
+**Why not inline the file formats into `wind-down.md`.** Duplicates the
+format definitions and drifts — the prior inlined hint ("Decision →
+Why → Why not") had already drifted, omitting the Scope note. Pointing
+at each file's own format section keeps one source of truth.
+
+**Scope note.** Spec edit landed in both `.claude/commands/wind-down.md`
+copies (root + cc-template, NFR-9). The read-format-first discipline is
+scoped to the two decision/question docs, not every Step 3 tracking
+doc. Originated as an `open-questions.md` story surfaced in Session E.

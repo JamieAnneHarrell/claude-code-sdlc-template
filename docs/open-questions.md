@@ -135,114 +135,6 @@ Whether Thread 2's "scan PROJECT_PLAN for high-risk transitions"
 heuristic needs concrete criteria, or whether it's best handled
 as a session-judgment call surfaced for Jamie to disposition.
 
-#### Make the rules-read reliably happen — placement, content, enforcement, just-in-time loading
-
-*Context.* Root `CLAUDE.md` Collaboration-rules section says:
-
-> **MUST DO before responding to the first user message of any
-> session.** Read these two files end-to-end...
-
-In practice Claude regularly skips the re-read and goes straight to
-the user's task. The failure has multiple compounding causes —
-addressing any single one in isolation is unlikely to fix it:
-
-- **CLAUDE.md summarizes the rules** (lists all 9 by topic, names
-  KISS and progressive disclosure), so Claude treats the summary as
-  sufficient priors. Story "Trim CLAUDE.md" addresses this surface
-  directly.
-- **The instruction is buried** — it's the third section of
-  CLAUDE.md, after a status banner and a Reading-order list. By the
-  time Claude reaches it, attention is already on the user's
-  request.
-- **Enforcement relies on Claude's judgment**, which is biased
-  toward "respond now." The instruction names the failure mode but
-  depends on the reader to overcome it.
-
-For this template, the cost compounds: every downstream project
-seeded from `cc-template/` inherits the same skip-prone behavior.
-Reliable rules-read is foundational — without it the rest of the
-collaboration-rules infrastructure is decorative.
-
-*Proposed approach — four complementary directions (not mutually exclusive).*
-
-**Direction 1 — Move the rules-read instruction to the top of
-CLAUDE.md.** "STOP. Read `rules/coding-session-rules.md` and
-`rules/design-philosophy-rules.md` end-to-end before responding."
-First line, no preamble. Optionally extend with session-type clues —
-if the user's message hints at commits, wind-down, or testing,
-suggest additional rule files (lines up with Direction 4). *Pro:*
-free; minimal mechanical change. *Con:* still relies on Claude's
-judgment.
-
-**Direction 2 — Strip rule summaries from CLAUDE.md, move
-drift-phrases into the rule files themselves.** Don't tell Claude
-what the rules *are* — tell Claude to read them. CLAUDE.md's
-current hints ("the rule-7 commit handoff format," "the rule-4
-simpler-alternative self-check") let Claude pattern-match as if
-it had absorbed them. Move key phrases *into* the rule files so
-reading the actual rule is the only path to those priors. Pairs
-with Story "Trim CLAUDE.md." *Pro:* removes the "I already know
-the rules" pattern-match. *Con:* unverified that this alone
-changes behavior; Claude may still skip and rely on training.
-
-**Direction 3 — Hooks-based enforcement.** A `UserPromptSubmit`
-hook on the first message of a session reads both rules files into
-context unconditionally, removing the judgment call. Hook detects
-"first message of session" via session state (e.g. absence of
-prior assistant turns, or a sentinel file written on first
-invocation and cleared at session close). Ships as part of
-`cc-template/`'s default `.claude/settings.json`. *Pro:* zero
-reliance on Claude compliance. *Con:* hooks are CLI-feature-specific
-— portability across IDE extension / desktop app / web app needs
-validation per the env list in `rules/environment-rules.md`;
-sentinel detection is non-trivial.
-
-**Direction 4 — Rules co-located with skills; skills load rule
-context just-in-time.** Move specific rules into the skill that
-exercises them — e.g., rule 7 (commit handoff format and brevity)
-lives with `/wind-down`, since `/wind-down` should be the only
-command that ever surfaces a commit handoff (cross-refs Story
-"Artifact-boundary command landings → `/wind-down`"). Skills load
-on invocation, so the relevant rule context arrives fresh,
-just-in-time, and doesn't compete for attention with other rules
-at session start. Companion change: configure other commands/skills
-NOT to surface commit handoffs — they defer to `/wind-down`. *Pro:*
-rule context is loaded when relevant and not before; rules stay
-short because they don't have to live in CLAUDE.md's permanent
-budget. *Con:* not every rule has a canonical skill home (KISS,
-rule 4 simpler-alternative are session-pervasive); requires a
-per-rule audit.
-
-**Direction 4b — Session entry-point via skill.** Extends
-Direction 4: if a session begins without an obvious skill
-invocation, Claude asks the user's intent and suggests the
-appropriate skill ("Are we onboarding? Running a phase prompt?
-Doing a design review? Winding down?"). The selected skill loads
-its rule context. *Pro:* makes "the right rules for this work"
-the default. *Con:* a friction step on every session start; risks
-feeling bureaucratic; needs careful ergonomics (skip when intent
-is obvious from the user's first message).
-
-*Open sub-questions.* Per-rule audit for Direction 4: which rules
-have a canonical skill home (rule 7 → `/wind-down`, rule 9 →
-`/wind-down`, rule 8 manual walkthrough → `/exit-test-plan`) and
-which stay session-pervasive (KISS, rules 1–6). Whether Direction
-4 changes how `/design-review` and `/exit-test-plan` surface their
-commit handoffs today (lines up with the artifact-boundary-commands
-story — landing that one first is a prerequisite). Whether
-Directions 1 + 2 should land first as a nearly-free baseline
-before investing in 3 or 4. Whether Direction 3's hook should be
-opt-in or default-on for downstream consumers (default-on matches
-the template's "reliable behavior out of the box" stance). Whether
-Direction 4b is annoying when the user's first message *is* the
-intent ("read TODO and run Prompt 2.1") — needs an
-intent-obvious bypass. Whether hook enforcement should extend to
-`/wind-down` rule 9 doc-coherence sweep (the rule the 2026-05-26
-checkpoint-002 landing missed — same class of "instruction
-present, judgment skipped" failure). Whether
-`environment-rules.md` needs a section on hook authoring
-conventions if Direction 3 lands.
-
 #### In-flight artifact status callout at top of CLAUDE.md
 
 *Context.* ds-niche-stream's CLAUDE.md opens with a 🟡 callout
@@ -271,6 +163,12 @@ like `STATUS.md` that CLAUDE.md links to. Whether to introduce a
 fourth status comment family (something like
 `<!-- INFLIGHT-STATUS: ... -->`) for machine-parseable state.
 
+*Deferred 2026-05-29 per checkpoint 003 R8* — re-open if downstream
+consumers report difficulty discovering mid-flight artifacts despite
+`/wind-down` safety nets; consider skill-owned banners as a possible
+mechanism (skills surface mid-iteration state independently of
+TODO.txt).
+
 #### "Project quick orientation" section in onboarded CLAUDE.md
 
 *Context.* ds-niche-stream (the most mature downstream consumer)
@@ -298,6 +196,12 @@ section every project has to maintain).
 owns it — `/onboard` (most project context is already collected
 there) or `/bootstrap` (knows the stack + commands)? How much
 overlaps with the banner before the duplication starts hurting?
+
+*Re-open trigger added 2026-05-29 per checkpoint 003 N2* — when a
+third downstream consumer (beyond ds-niche-stream and ds-auto-dailies)
+evolves a Project quick orientation section independently, OR when
+Jamie's session-start experience surfaces the banner alone is
+consistently too thin.
 
 #### Regression-test automation for the distributable
 
@@ -343,7 +247,8 @@ session start. Three drift modes have accumulated:
    format," "the rule-4 simpler-alternative self-check"). Claude
    (by its own admission, observed repeatedly) treats the summary
    as sufficient priors and skips the end-to-end re-read. Pairs
-   with Story "Rules-read reliability."
+   with the resolved "Rules-read reliability" decision in
+   `design-decisions.md`.
 
 *Proposed approach.* Treat CLAUDE.md as a thin index — not a state
 report, not a rules summary.
@@ -369,8 +274,8 @@ probably earns its place because it's the entry-point on a fresh
 project, but worth a second look. Whether the "Reading order at
 session start" section is itself bloat: it tells Claude to read
 TODO.txt, PROJECT_PLAN, CLAUDE_CODE_PROMPTS — habits that might
-belong in a hook or a skill (see Direction 3 / 4 in Story
-"Rules-read reliability"), not in CLAUDE.md prose.
+belong in a hook or a skill (see the "Rules-read reliability"
+decision in `design-decisions.md`), not in CLAUDE.md prose.
 
 #### Seed `cc-template/TODO.txt` as the active onboarding checklist; teach the TODO-driven habit from day one
 
@@ -432,57 +337,4 @@ Whether `/onboard` should check that TODO.txt has been walked
 paternalistic. Whether the seeded TODO.txt should be a sample
 users can rewrite freely vs. a structured artifact whose shape
 `/wind-down` preserves.
-
-#### `/wind-down` should own the open-questions ↔ design-decisions lifecycle, including the formats
-
-*Context.* Session E surfaced two `/wind-down` gaps, both observed
-live. (1) When N6 and R11 were resolved this session, `/wind-down`
-initially left their source stories sitting in `open-questions.md`
-as open — it took a correction to move them. `open-questions.md`'s
-own header states the protocol ("once a question gets answered with
-a real decision, it moves to `design-decisions.md`"), but
-`wind-down.md` Step 3 doesn't encode that outbound move — its
-open-questions guidance only covers *adding* newly-surfaced
-questions, never *retiring* resolved ones. (2) Claude had to
-rediscover both files' formats at runtime (the `## Format` /
-`## When to record` block in `design-decisions.md`, the
-`## Categories` block in `open-questions.md`) because `wind-down.md`
-points at neither. The skill that owns the doc-coherence sweep
-didn't know the structure of the two docs it most often edits, and
-nearly skipped the very move it exists to perform.
-
-*Proposed approach.* Give `wind-down.md` Step 3 explicit ownership
-of the `open-questions.md` ↔ `design-decisions.md` relationship:
-
-1. Add the outbound-move instruction: for every question/story
-   resolved with a real decision this session, remove it from
-   `open-questions.md` and record it in `design-decisions.md` using
-   that file's format — paired with the existing inbound
-   instruction (newly-surfaced questions move *into*
-   `open-questions.md`).
-2. Tell the sweep to read each target file's own format/structure
-   section before editing it, rather than relying on Claude already
-   knowing the shape (`design-decisions.md` § Format + When-to-
-   record; `open-questions.md` § Categories). Lighter than inlining
-   the formats into `wind-down.md`, which would duplicate and drift.
-3. Make the resolved-story scan a non-skippable Step 3 checklist
-   item so coherence isn't left to in-the-moment judgment.
-
-Connects to N3-A1's "skills own rituals" principle: `/wind-down`
-owns the doc-coherence ritual, so it should carry the structural
-knowledge of the docs that ritual touches. Mirror any spec change
-to both `cc-template/` and project-root copies (NFR-9).
-
-*Open sub-questions.* Whether "ownership" means `/wind-down` is the
-*only* writer of `design-decisions.md` (today `/onboard` seeds it
-and `/design-review` Stage 2 routes its own decisions) or just the
-session-close maintainer — probably the latter, since other skills
-legitimately write decisions at their own boundaries. Whether the
-point-at-the-format discipline should extend to every Step 3
-tracking doc (`CLAUDE_CODE_PROMPTS.md` footer shape,
-`PROJECT_PLAN.md` phase-status convention) or only the two
-decision/question docs. Whether this is a direct `wind-down.md`
-spec edit next session or warrants a `/design-review` finding first
-— it touches a command spec and the skills-own-rituals principle,
-so a checkpoint may be the cleaner home.
 

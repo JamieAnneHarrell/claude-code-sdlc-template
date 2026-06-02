@@ -57,6 +57,10 @@ cc-template/
 ├── .claude/
 │   ├── commands/
 │   │   ├── onboard.md             ← /onboard slash command
+│   │   ├── bootstrap.md           ← /bootstrap slash command
+│   │   ├── deployment-plan.md     ← /deployment-plan slash command
+│   │   ├── design-review.md       ← /design-review slash command
+│   │   ├── exit-test-plan.md      ← /exit-test-plan slash command
 │   │   └── wind-down.md           ← /wind-down slash command
 │   ├── settings.local.json.example
 │   └── settings.local.json.example.README.md

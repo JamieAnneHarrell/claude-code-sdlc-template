@@ -192,18 +192,30 @@ brief plan first.
   historical record.
 
 ### `docs/design-decisions.md`
-- Record any significant design decision made this session.
-- Format: **Decision** → **Why** → **Why not (alternatives)**.
-- Only record decisions that future-Claude would benefit from
-  knowing. Trivial implementation choices don't belong here.
+- **Always scan for resolved questions first — don't skip this.** For
+  every `open-questions.md` story or question this session resolved
+  with a real decision, remove it from `open-questions.md` and record
+  the decision here. This outbound move is the counterpart to
+  open-questions.md's inbound move; resolved items leave that file,
+  they don't sit there marked done.
+- Also record any significant design decision made this session that
+  didn't start as an open question.
+- **Read this file's own `## Format` and `## When to record a
+  decision here` sections before writing an entry**, and match that
+  shape — don't reproduce the format from memory.
+- Only record decisions future-Claude would benefit from knowing;
+  trivial implementation choices don't belong here.
 
 ### `docs/open-questions.md`
-- Move unresolved questions from this session to this file.
+- Move unresolved questions from this session *into* this file.
+  Questions resolved this session move *out* to `design-decisions.md`
+  — see the resolved-question scan above.
 - **Exception:** if a question must be resolved at the start of the
   next session to make progress, it belongs in TODO.txt instead of
   open-questions.md.
-- Categorize: Deferred User Stories / Known Limitations / Abandoned
-  Approaches / Open Questions.
+- **Read this file's own `## Categories` section before adding an
+  entry**, and file it under the right header: Deferred User Stories /
+  Known Limitations / Abandoned Approaches / Open Questions.
 
 ### `docs/REQUIREMENTS.md` and `docs/ARCHITECTURE.md`
 - If the session changed requirements or architecture, state the
