@@ -175,6 +175,17 @@ Changing one of these requires auditing the whole chain.
   only checks the latest round. Changing this text breaks stage
   detection — audit `.claude/commands/design-review.md` Steps 0,
   S1.5, S1.A together.
+- **Five-shape disposition legend.** A marked AUDIT NOTE is one of
+  five shapes: `Accepted`, `Accepted with caveats`, `Defer
+  Approved`, `DECISION: <choice>`, or `REJECTED: <reframing
+  prose>`. REJECTED means no listed recommendation was
+  satisfactory; Stage 2 records it verbatim in the Disposition log
+  and treats it as an automatic open-another-round trigger, with
+  the rejection prose as the next addendum's reframe input.
+  Changing the legend means auditing `design-review.md` Steps
+  S1.5, S2.1, S2.4, S2.5, S1.A together (both the root and
+  `cc-template/` copies). Step 0 is unaffected — REJECTED is a
+  non-placeholder marking like the other four.
 - **`/design-review` commit handoffs only on artifact boundaries.**
   Stage 1 *initial* (new checkpoint) and Stage 2 *landing*
   (`LANDED`) surface a rule-7 handoff. Stage 1 *addendum* and

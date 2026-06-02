@@ -62,10 +62,10 @@ addendum rounds before it lands. The pattern mirrors
 - **Stage 2 — Walk dispositions; land or open another round.** Runs
   when the newest checkpoint is `AWAITING-DECISIONS`, every AUDIT
   NOTE block in the latest round is marked, and the Disposition
-  log does NOT yet have rows for that round. Walks each marked
-  finding one at a time with Jamie, appends rows to the
-  Disposition log, then asks Jamie explicitly: **land the document
-  or open Addendum N+1?**
+  log does NOT yet have rows for that round. Triages the marked
+  findings as a batch — surfacing only genuinely ambiguous
+  markings — appends rows to the Disposition log, then asks Jamie
+  explicitly: **land the document or open Addendum N+1?**
   - **Land**: applies every accumulated final disposition (Accepted
     / Accepted with caveats / DECISION) as doc revisions to
     REQUIREMENTS / ARCHITECTURE / PROJECT_PLAN / CLAUDE_CODE_PROMPTS,
@@ -389,6 +389,10 @@ For each finding below, replace the placeholder line under
 - `Accepted with caveats: <your caveats>`
 - `Defer Approved`
 - `DECISION: <explicit choice>`
+- `REJECTED: <your reframing prose>` — none of the listed
+  recommendations is satisfactory. This opens another addendum
+  round; your rejection prose is the authoritative input the next
+  addendum reframes the finding from.
 
 Each finding has its own AUDIT NOTE block — mark each
 independently. Inline detail, caveats, and rationale are welcome
@@ -571,7 +575,7 @@ Tell Jamie:
 - Path to the new checkpoint file.
 - Counts per tier (`<B count> blockers, <R count> recommendations,
   <N count> notes`).
-- The marking-up legend (echo the four options).
+- The marking-up legend (echo the five options).
 - That re-running `/design-review` after markup will enter Stage 2,
   which walks each disposition and asks whether to land or open
   another addendum.
@@ -596,11 +600,15 @@ handoff.
 
 2. **Identify what this addendum re-opens and what it adds.** Walk
    the Disposition log and the latest round together:
-   - Every disposition whose Reason cites "further review",
-     "investigate X", "DECISION: <choice that asks for more
-     analysis>", or any marking that didn't close the thread
-     should be re-opened in the addendum with concrete research /
-     clarification, under a new ID suffixed `-AN`.
+   - Every REJECTED marking, plus every disposition whose Reason
+     cites "further review", "investigate X", "DECISION: <choice
+     that asks for more analysis>", or any other marking that
+     didn't close the thread, should be re-opened in the addendum
+     with concrete research / clarification, under a new ID
+     suffixed `-AN`. For a REJECTED finding, the rejection prose
+     IS the authoritative reframe input — re-author the finding
+     from Jamie's stated objection; do not generate fresh
+     alternatives from scratch as if the finding were new.
    - Any new findings the intervening session surfaced (off-the-
      shelf research, a related concern that came up while
      investigating, a follow-up question Jamie raised) get added
@@ -734,50 +742,69 @@ one of:
   consideration recorded only in the audit trail.
 - **DECISION: <choice>** — apply the explicit choice when the doc
   lands. May differ from the original Recommendation.
+- **REJECTED: <reframing prose>** — none of the listed
+  recommendations was satisfactory. Record `REJECTED` verbatim as
+  the disposition; the rejection prose is the authoritative input
+  the next addendum reframes the finding from. REJECTED applies no
+  doc revision and is an automatic open-another-round trigger
+  (see S2.5).
 
-If any AUDIT NOTE line is malformed (not one of the four shapes),
+If any AUDIT NOTE line is malformed (not one of the five shapes),
 surface it and ask Jamie to clarify. Do not guess.
 
-If a marking includes a directive for further investigation
-(examples: "Further review required before closing", "Investigate
-off-the-shelf X first", "REJECTED — investigate Y instead"), note
-it for the land-or-addendum decision in S2.5. The marking IS a
-disposition for the Disposition log this round; the directive is
-the trigger for opening Addendum N+1.
+A REJECTED marking always triggers Addendum N+1 (S2.5). A marking
+in any of the other four shapes can also carry a further-
+investigation directive (examples: "Accepted, but verify X
+first", "Defer — revisit after Y resolves") — note any such
+directive for the land-or-addendum decision in S2.5. In every
+case the marking IS a disposition for the Disposition log this
+round; REJECTED or the directive is what opens the next addendum.
 
 Re-state to Jamie: round name (Original / Addendum N), per-tier
 counts, and a brief summary of which markings closed cleanly vs
 which asked for further investigation. Confirm before walking.
 
-## Step S2.2: Walk each disposition one at a time
+## Step S2.2: Triage the latest round's markings
 
-Walk the latest round's findings in B/R/N order:
+Jamie's inline markings are settled decisions — her act of writing
+each one IS the confirmation. Do NOT paraphrase-and-confirm each
+marking back; that round-trip is busywork this step exists to
+avoid. Scan the whole round, then surface only what is genuinely
+unresolved.
 
-1. State the finding's title and Jamie's marking back in one
-   sentence.
-2. Echo the disposition you'll record (Accepted / Accepted with
-   caveats / Defer Approved / DECISION: <choice>) and the Reason
-   (one short sentence — the rationale Jamie gave inline, or
-   "investigation directive: <text>" when the marking asks for
-   more research).
-3. For "Accepted with caveats" and "DECISION: <choice>", restate
-   the caveats / the chosen path explicitly so Stage 2's landing
-   application has unambiguous instructions later.
-4. Wait for Jamie's confirmation before recording. Don't move on
-   until she's settled.
+1. **Scan every marking in the latest round** (B/R/N order) and
+   classify each per S2.1: Accepted / Accepted with caveats /
+   Defer Approved / DECISION / REJECTED. For "Accepted with
+   caveats" and "DECISION", capture the caveats / chosen path so
+   the landing application later has unambiguous instructions.
+2. **Sort into unambiguous vs genuinely ambiguous.** A marking is
+   *genuinely ambiguous* only when one of these holds:
+   - **Malformed** — not one of the five legend shapes.
+   - **Internally contradictory caveats** — the caveat text
+     conflicts with itself or with the disposition keyword, or a
+     caveat expands the finding's scope in a way the
+     recommendation didn't anticipate.
+   - **Scope conflict between findings** — two markings, applied
+     as written, would collide (e.g. one edits a section another
+     deletes).
+   Everything else is unambiguous — including a plain REJECTED
+   (record it; it drives the S2.5 open-another-round
+   recommendation).
+3. **Surface only the genuinely ambiguous markings**, one focused
+   question each, and resolve them with Jamie before recording. Do
+   not re-walk the unambiguous ones.
 
-If a caveat is unclear or expands the scope of the finding's
-recommendation, ask Jamie to clarify before recording. Don't
-guess.
+The classified dispositions feed S2.3, which writes all rows in a
+single batch.
 
 ## Step S2.3: Append rows to the Disposition log
 
-After the walk, append one row per walked finding to the
-`## Disposition log` table. Format:
+After the triage in S2.2, append one row per finding to the
+`## Disposition log` table in a single batch. Format:
 
 | Round | Finding | Disposition | Reason |
 |-------|---------|-------------|--------|
-| <Original or Addendum N> | <ID> | <Accepted / Accepted with Caveats / Deferred / Decision> | <one-sentence reason or "investigation directive: <text>"> |
+| <Original or Addendum N> | <ID> | <Accepted / Accepted with Caveats / Deferred / Decision / REJECTED> | <one-sentence reason or "investigation directive: <text>"> |
 
 Rows append only — never modify earlier rows. The latest-round
 disposition on a re-opened finding (e.g. `B1-A2` Decision)
@@ -785,8 +812,10 @@ supersedes earlier rows on related IDs (`B1`, `B1-A1`) for the
 purposes of Step S2.6's landing application; the earlier rows
 remain in the log as historical record.
 
-State the new rows back to Jamie before writing them. Wait for
-confirmation, then apply with `Edit`.
+State the full set of new rows back to Jamie as one table, then
+write them with `Edit` in a single batch. Genuinely ambiguous
+markings were already resolved in S2.2, so no per-row confirmation
+is needed here.
 
 ## Step S2.4: Mid-round read of the doc state
 
@@ -800,13 +829,17 @@ After the rows land, Stage 2 takes stock. State to Jamie:
   - List finding IDs that closed cleanly (Accepted / Defer
     Approved / Accepted with Caveats with no further-investigation
     directive / DECISION with no further-investigation directive).
+  - **Count and list the REJECTED finding IDs in the latest
+    round.** Each one forces an open-another-round recommendation
+    in S2.5 — foreground them so the land-or-addendum call is
+    obvious.
   - List finding IDs whose latest disposition includes a
     further-investigation directive.
 
 - **What an Addendum N+1 would re-open.** If any latest-round
-  marking includes a further-investigation directive, name the
-  IDs. If none, say so explicitly ("All findings closed cleanly
-  this round. Recommend landing.").
+  marking is REJECTED or includes a further-investigation
+  directive, name the IDs. If none, say so explicitly ("All
+  findings closed cleanly this round. Recommend landing.").
 
 - **Outstanding earlier-round findings not yet in the log.** This
   shouldn't happen under normal flow (Step 0 routes to Stage 2
@@ -824,14 +857,15 @@ Ask Jamie one question explicitly:
 
 Default recommendation:
 
-- **Recommend "open Addendum N+1"** if any latest-round marking
-  includes a further-investigation directive (text like "further
-  review required", "investigate X", "REJECTED — investigate Y
-  first", or any marking that explicitly asks for more research /
-  clarification before the disposition is final).
+- **Recommend "open Addendum N+1"** if any latest-round marking is
+  `REJECTED` (always an automatic trigger — the finding has no
+  satisfactory disposition yet) **or** includes a further-
+  investigation directive (text like "further review required",
+  "investigate X", or any marking that explicitly asks for more
+  research / clarification before the disposition is final).
 - **Recommend "land"** otherwise: every latest-round disposition
-  closed cleanly and no further-investigation directives are
-  outstanding.
+  closed cleanly, with no REJECTED markings and no further-
+  investigation directives outstanding.
 
 State the recommendation and the reasoning. Wait for Jamie's
 decision; she can override either way.
@@ -1049,7 +1083,7 @@ End with one of:
 - **`AWAITING-DECISIONS` checkpoint, latest round all marked, but
   a caveat is unclear.** Surface the specific caveat in S2.2 and
   ask before recording. Don't guess.
-- **AUDIT NOTE line malformed (not one of the four shapes).**
+- **AUDIT NOTE line malformed (not one of the five shapes).**
   Surface and ask. Don't try to interpret novel wording.
 - **Stage 1 addendum branch fires but no marking actually asks for
   further investigation.** S1.A Step 2 asks Jamie which findings

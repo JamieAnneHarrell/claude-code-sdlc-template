@@ -709,19 +709,28 @@ Confirm with Jamie that this is the right read before walking
 findings. If she points out something you missed in the notes,
 incorporate it before continuing.
 
-## Step S2.2: Walk each TC note one at a time
+## Step S2.2: Triage the per-TC notes and BLOCKED rows
 
-For each per-TC note in the newest run log (in TC order):
+Read the whole notes block first and draft a disposition for every
+item, then surface only what genuinely needs discussion. Do NOT
+propose-and-confirm each note one at a time — that round-trip is
+the friction this step exists to avoid.
 
-1. State the observation back in one sentence, in your own
-   words. Jamie corrects if you misread.
-2. Propose a disposition with the reason:
+Unlike `/design-review` (where Jamie pre-writes each decision),
+Claude *proposes* the dispositions here. So the batch table is the
+confirmation surface: present all proposed dispositions at once and
+let Jamie confirm or adjust them in a single pass. Don't record
+before she signs off on the table.
+
+### Per-TC notes
+
+1. **Draft a disposition for every per-TC note** in the newest run
+   log (TC order), using the five values:
    - **Fix-now** — small, in-scope of the phase's exit contract.
      Bundles into the phase polish batch as the next session's
      first item.
-   - **Defer to Deferred User Stories** — feature work that
-     isn't part of the phase's contract, recorded for later
-     pickup.
+   - **Defer to Deferred User Stories** — feature work that isn't
+     part of the phase's contract, recorded for later pickup.
    - **Defer to Known Limitations** — accepted-as-is constraint
      of the current stack / approach.
    - **Spec gap** — the observation surfaces a question
@@ -729,10 +738,16 @@ For each per-TC note in the newest run log (in TC order):
      next `/design-review` session as an agenda item.
    - **Note-only** — no action; documenting the observation is
      enough.
-3. Wait for Jamie to confirm, override, or refine the
-   disposition. Don't move on until she's settled.
+2. **Present all drafted dispositions as one table** — TC /
+   abbreviated observation / proposed disposition / reason — for
+   Jamie to confirm or adjust in a single pass.
+3. **Pull out individually only the notes that genuinely need it:**
+   a note whose surface hypothesis warrants real investigation, or
+   an observation too unclear to disposition from the run log
+   alone. Do that work, discuss, then fold the result back into
+   the batch.
 
-Where the note's surface hypothesis warrants real investigation —
+Where a note's surface hypothesis warrants real investigation —
 the tester wrote down what they observed but the cause might be
 elsewhere — perform root-cause analysis: read the relevant source
 files, trace branches, separate symptom from real defect. The
@@ -758,16 +773,19 @@ Notes that describe **new** observations (something the tester
 saw during the addendum run that wasn't in any prior §5.1 row)
 DO get walked as above and get a new §5.1 row with disposition.
 
-**BLOCKED rows.** For each `[BLOCKED]` row in the newest run log
-(walk in TC order, alongside the per-TC notes above):
+### BLOCKED rows
 
-1. Read the tester's blocker description from the run log's notes
-   block. Restate in one sentence — what couldn't run, and what
-   stopped it. If no blocker description was recorded for a
-   `[BLOCKED]` row, refuse to disposition that row until Jamie
-   supplies one.
-2. Propose one of the same five disposition values, interpreted
-   as the path to unblock:
+A `[BLOCKED]` row is definitive: the test couldn't run, so work is
+needed to unblock it and a new addendum will re-run it regardless
+of anything decided here. Don't discuss BLOCKED rows one at a
+time — record them in the batch and move on.
+
+1. For each `[BLOCKED]` row in the newest run log, read the
+   tester's blocker description and restate it in one sentence —
+   what couldn't run, and what stopped it. If no blocker
+   description was recorded, refuse to disposition that row until
+   Jamie supplies one.
+2. Draft the path to unblock as one of the same five values:
    - **Fix-now** when the blocker is a small in-scope cleanup
      coding pass (the typical case).
    - **Spec gap** when the blocker surfaces a question
@@ -783,20 +801,19 @@ DO get walked as above and get a new §5.1 row with disposition.
      addendum.
    - **Note-only** is rare for blockers — typically a blocker
      warrants at least one of the four above.
-3. Append a row to §5.1 with the disposition, the Reason column
-   prefixed `Blocker:` followed by an abbreviated blocker
-   description plus the path to unblock.
-4. Wait for Jamie to confirm before moving on.
+3. **Add the BLOCKED rows to the same batch table** from the
+   per-TC walk, each with its path to unblock (the §5.1 row's
+   Reason column gets prefixed `Blocker:` at composition in S2.4).
+   They're recorded, not debated — the blocked state itself
+   mandates the next addendum. Surface a BLOCKED row individually
+   only when its path to unblock genuinely needs root-cause
+   analysis to determine; do that analysis as above and preserve
+   it in §5.2.
 
-Where the blocker warrants real investigation (the surface
-hypothesis might not be the true cause), perform root-cause
-analysis as above and preserve the investigation in §5.2.
-
-Regardless of disposition, every `[BLOCKED]` row in the newest
-run log will result in a TC re-run in the next addendum
-(S1.A Step 2 handles that automatically) — the disposition
-governs what unblocking work happens between addendums, not
-whether the test re-runs.
+Every `[BLOCKED]` row in the newest run log results in a TC re-run
+in the next addendum (S1.A Step 2 handles that automatically) —
+the disposition governs what unblocking work happens between
+addendums, not whether the test re-runs.
 
 ## Step S2.3: Walk each out-of-scope observation
 

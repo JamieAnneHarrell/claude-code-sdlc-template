@@ -745,3 +745,73 @@ inserting standalone marker blocks. No spec edits required to
 `/design-review` Stage 1 still reads checkpoint inputs and
 writes `docs/design/design-review-checkpoint-NNN.md` the same
 way regardless of how its trigger was scheduled.
+
+---
+
+## `REJECTED` is a first-class `/design-review` disposition shape
+
+**Decision.** The `/design-review` AUDIT-NOTE legend has five shapes,
+not four: Accepted / Accepted with caveats / Defer Approved /
+DECISION / `REJECTED: <reframing prose>`. REJECTED means no listed
+recommendation was satisfactory; Stage 2 records it verbatim in the
+Disposition log and treats it as an automatic open-another-round
+trigger, with the rejection prose as the next addendum's reframe
+input (Stage 1 re-authors the finding from the objection rather than
+inventing fresh alternatives). Landed in both command copies plus
+`CLAUDE.md` § Load-bearing invariants (checkpoint 003 Addendum 1 R11).
+
+**Why.** Jamie used REJECTED five times in checkpoint 003 Round 1
+before it existed in the spec. The behavior was well-defined but
+unencoded — a fresh downstream Claude would hit REJECTED at S2.1,
+classify it "malformed," and block the round. Formalizing makes the
+organic shorthand portable to fresh projects.
+
+**Why not leave it as session shorthand.** Future-Claude in a fresh
+project has no memory of the convention; the spec is the only
+teacher. Unencoded, it breaks stage detection on first contact.
+
+**Why not add it to the legend only (skip the S2.5 auto-trigger).**
+A REJECTED carrying no explicit "investigate X" directive would read
+as land-eligible, contradicting its meaning. The auto-trigger is what
+makes REJECTED self-completing.
+
+**Scope note.** Step 0's placeholder check is unchanged — REJECTED is
+a non-placeholder marking. Whether `/exit-test-plan` gains an
+analogous REJECTED shape is left open (its walk disposes run-log
+entries, not finding recommendations, so the analog is less direct).
+
+---
+
+## Disposition walks triage-then-batch, not confirm-each
+
+**Decision.** `/design-review` S2.2 and `/exit-test-plan` S2.2 scan a
+whole round's markings first, then surface only the genuinely
+ambiguous ones (malformed / internally contradictory caveats / scope
+conflict between findings) instead of restating and confirming each
+marking one at a time. The two skills differ by input shape:
+`/design-review` records unambiguous markings silently in one batch
+(Jamie pre-writes each decision, so her writing IS the confirmation);
+`/exit-test-plan` *proposes* dispositions, so it presents the whole
+batch as one table for a single confirmation. BLOCKED rows in
+`/exit-test-plan` are definitive — recorded without discussion, since
+a blocked test mandates a follow-up addendum regardless of its
+path-to-unblock. Landed checkpoint 003 Addendum 1 N6.
+
+**Why.** Checkpoint 003's own Stage 2 walk produced 16 restate-and-
+confirm round-trips for 16 already-settled markings — pure busywork.
+A human's written input is authoritative; re-eliciting it wastes the
+session.
+
+**Why not record everything silently in both skills.** In
+`/exit-test-plan` Claude proposes the dispositions rather than reading
+Jamie's pre-written ones, so a confirmation surface is still needed —
+but one batched confirmation, not N.
+
+**Why not extend triage-then-batch to `/exit-test-plan`'s S2.3
+out-of-scope observations.** Those are larger, distinct threads that
+usually warrant individual discussion; the triage step would route
+them to "surface individually" almost every time, so batching there
+adds spec wording without changing behavior.
+
+**Scope note.** N6 landed spec-only (checkpoint 003 Option B); no
+`design-philosophy-rules.md` principle was added.
