@@ -1,11 +1,14 @@
 # cc-template
 
 Template seed for new `ds-*` projects. Provides a working
-collaboration agreement (the 9 rules), design-philosophy guidance,
+collaboration agreement (the 10 rules), design-philosophy guidance,
 slash commands for onboarding and wind-down, and the directory
 structure each new project starts from.
 
 ## How to use
+
+These steps are also seeded into `TODO.txt` in the new project as a
+walkable checklist and session handoff — follow them in order:
 
 1. **Copy the template** to a new project directory:
    ```
@@ -18,7 +21,16 @@ structure each new project starts from.
    generated PROJECT_PLAN; a one-paragraph design produces a thin
    one. See `docs/design/README.md` for what good looks like.
 
-3. **Open the new directory in Claude Code** and run:
+3. **Review the rules.** Read each `rules/*.md` file and make sure it
+   matches your own collaboration philosophy — edit anything you
+   disagree with. The rules are a starting agreement, not law; the
+   template is meant to be customized per project. (Once
+   `/refresh-from-repository` ships in Phase 2.1, the universal rule
+   content will sit inside `CC-TEMPLATE-BLOCK` markers; you'll be able
+   to lift the parts you've customized out of those markers so refresh
+   leaves your edits alone.)
+
+4. **Open the new directory in Claude Code** and run:
    ```
    /onboard
    ```
@@ -26,7 +38,11 @@ structure each new project starts from.
    questions (project name, language, multi-agent mode, scope
    statements), and generates the rest of the project documents.
 
-4. **Run Phase 0** in the next session by pasting Prompt 0 from
+5. **Run `/bootstrap`** in the next session to plan the developer
+   environment (shell, tooling, dev secrets) and write the README
+   Developer setup section. It's a hard prerequisite to Phase 0.
+
+6. **Run Phase 0** by pasting Prompt 0 from
    `docs/CLAUDE_CODE_PROMPTS.md`. This sets up the language tooling,
    CI workflow, and project skeleton.
 
@@ -45,7 +61,7 @@ cc-template/
 │   ├── settings.local.json.example
 │   └── settings.local.json.example.README.md
 ├── rules/                         ← collaboration rules, loaded on demand
-│   ├── coding-session-rules.md    (the 9 rules)
+│   ├── coding-session-rules.md    (the 10 rules)
 │   ├── design-philosophy-rules.md (progressive disclosure)
 │   ├── project-rules.md           (scope discipline; rewritten at onboarding)
 │   ├── testing-rules.md           (test discipline)
@@ -65,7 +81,7 @@ the rules files have project-specific sections appended.
 ## What's pre-decided vs. what onboarding asks
 
 **Pre-decided** (apply to every project, baked into the rules files):
-- The 9 collaboration rules, including rule-7 commit handoff format.
+- The 10 collaboration rules (commit handoffs are owned by `/wind-down`).
 - Progressive-disclosure design philosophy.
 - Cross-platform discipline (Windows primary, Linux/macOS supported).
 - Logging over print. Structured logging in non-trivial code.

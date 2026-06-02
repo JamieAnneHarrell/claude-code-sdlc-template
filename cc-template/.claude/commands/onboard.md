@@ -420,12 +420,9 @@ Rewrite `CLAUDE.md`:
 2. Replace the unconfigured 4-bullet banner block with a
    post-onboard banner:
 
-   > ✅ **Onboarded.** Planning docs are written. Next step is
-   > `/design-review` for a post-onboarding sanity check, then
-   > `/bootstrap` to plan the dev environment, then Prompt 0.
-   > `/deployment-plan` is deferrable. At every phase close,
-   > `/exit-test-plan` authors the manual walkthrough; Stage 2
-   > lands dispositions once Jamie has run it.
+   > ✅ **Onboarded.** Planning docs are written. See `TODO.txt`
+   > for the current next step — it is the authoritative handoff,
+   > rewritten at each session close.
    >
    > Before proceeding in any later session, check `docs/test-plans/`
    > and `docs/design/` for an in-flight test plan or review checkpoint.

@@ -1,0 +1,24 @@
+TODO
+
+What's next (consumer onboarding checklist — walk these in order)
+-----------------------------------------------------------------
+1. Read README.md to understand the template shape.
+2. Drop a design doc into docs/design/.
+3. Read each rules/*.md file. Edit anything you disagree with.
+   (Once /refresh-from-repository ships in Phase 2.1, you'll be
+   able to lift content out of CC-TEMPLATE-BLOCK markers so
+   refresh leaves your edits alone.)
+4. Run /onboard.
+5. (Next session) Run /bootstrap.
+6. (When you're ready) Run /deployment-plan.
+
+Use this file as your handoff between sessions. Rewrite it
+(don't append) at each session close — /wind-down owns that rewrite.
+
+Carryover
+---------
+- (nothing yet)
+
+Deferred decisions
+------------------
+- (nothing yet)

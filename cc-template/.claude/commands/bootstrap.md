@@ -425,10 +425,8 @@ stdout/stderr for each.
    - Replace the stage-1 warning banner with the validated
      banner:
 
-     > ✅ **Onboarded and bootstrapped.** Ready for Phase 0. Run
-     > Prompt 0 from `docs/CLAUDE_CODE_PROMPTS.md` when ready.
-     > `/deployment-plan` is deferrable — run it when test/prod
-     > planning is needed.
+     > ✅ **Onboarded and bootstrapped.** The dev environment is
+     > validated. See `TODO.txt` for the current next step.
      >
      > **Project:** \<name\> — \<one-paragraph description\>
      > **Language / framework:** \<from onboarding\>

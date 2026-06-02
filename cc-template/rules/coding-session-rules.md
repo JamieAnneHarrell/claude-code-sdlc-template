@@ -4,7 +4,7 @@ Jamie's standing rules for every coding session, every project. They
 apply without exception unless `rules/project-rules.md` explicitly
 modifies one. **Read together with
 [`rules/design-philosophy-rules.md`](design-philosophy-rules.md)** —
-the 9 rules are behavioral guardrails; design-philosophy is the
+the 10 rules are behavioral guardrails; design-philosophy is the
 judgment framework (KISS, progressive disclosure) for *how* to apply
 them. Rule 4 is the gate that protects KISS from drift.
 

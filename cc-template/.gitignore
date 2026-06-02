@@ -1,7 +1,7 @@
 # cc-template seed .gitignore
 # Onboarding may extend this with language-specific patterns.
 
-# Session handoff (per rule 9, this is personal scratch — never commit)
+# Session handoff — personal scratch, never commit
 TODO.txt
 
 # Local Claude config (per-machine, not per-project)
