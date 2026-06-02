@@ -139,14 +139,15 @@ don't ask questions whose answer the design doc already gives, and
 don't ask irrelevant questions.
 
 **Version recency.** Before suggesting a version in any answer
-back to Jamie or in any artifact, follow the **Version freshness**
-section in `rules/environment-rules.md` — surface the staleness
-caveat to Jamie, offer to look up the current stable/LTS release,
-wait for go-ahead before running `WebSearch`/`WebFetch`. This
-applies even if `/onboard`, the design doc, or
-`docs/REQUIREMENTS.md` already named a version. Step 5 below
-re-checks at write time; this Step 3 check is the first gate, not
-the only one.
+back to Jamie or in any artifact, follow **Rule 10** (never assume
+training-time versions are current) in
+`rules/coding-session-rules.md` — surface the staleness caveat,
+offer to look up current stable/LTS, wait for go-ahead before
+`WebSearch`/`WebFetch`. This applies even if `/onboard`, the design
+doc, or `docs/REQUIREMENTS.md` already named a version: ask whether
+the pin was intentional or a training-time residual before
+perpetuating it. Step 5 below re-checks at write time; this Step 3
+check is the first gate, not the only one.
 
 Examples (Claude picks what's relevant; this is not a checklist to
 ask in full):
@@ -231,12 +232,11 @@ placeholder) with the real content below, in place. The section
 sits after the one-paragraph description and before "Deployment".
 
 **Version freshness checkpoint (write time).** Before any version
-number lands in this section, re-confirm per
-`rules/environment-rules.md` § Version freshness. Even if Step 3
-captured a version with Jamie's go-ahead, ask once more before it
-goes into a file Jamie will commit. The Prerequisites and Verify
-your setup subsections below both contain version pins — both are
-in scope.
+number lands in this section, re-confirm per **Rule 10**
+(`rules/coding-session-rules.md`). Even if Step 3 captured a version
+with Jamie's go-ahead, ask once more before it goes into a file
+Jamie will commit. The Prerequisites and Verify your setup
+subsections below both contain version pins — both are in scope.
 
 Required subsections under "Developer setup":
 
@@ -271,11 +271,11 @@ alone.)
 ### `rules/environment-rules.md` (append)
 
 **Version freshness checkpoint (write time).** Same gate as the
-README write step above — re-confirm every version per
-`rules/environment-rules.md` § Version freshness before it goes
-into the `<!-- ONBOARD-FILL: environment -->` block. The
-"Language and runtime" and "Tooling beyond language" bullets below
-both pin versions; both are in scope.
+README write step above — re-confirm every version per **Rule 10**
+(`rules/coding-session-rules.md`) before it goes into the
+`<!-- ONBOARD-FILL: environment -->` block. The "Language and
+runtime" and "Tooling beyond language" bullets below both pin
+versions; both are in scope.
 
 Inside the existing `<!-- ONBOARD-FILL: environment -->` block,
 replace the placeholder bullets with concrete content:

@@ -101,16 +101,17 @@ don't ask about Kubernetes for a static site, don't ask about CDNs
 for a CLI tool.
 
 **Version recency.** Before suggesting a version in any answer
-back to Jamie or in any artifact, follow the **Version freshness**
-section in `rules/environment-rules.md` — surface the staleness
-caveat to Jamie, offer to look up the current stable/LTS release,
-wait for go-ahead before running `WebSearch`/`WebFetch`. This
-applies to base image tags (`python:3.12-slim`, `node:20-alpine`),
-database engine versions (`postgres:16`, `mysql:8.4`), cloud SDK
-versions, and any runtime version repeated from
-`rules/environment-rules.md`. It applies even if a version is
-already pinned in the dev environment — the production target may
-move on a different cadence than dev.
+back to Jamie or in any artifact, follow **Rule 10** (never assume
+training-time versions are current) in
+`rules/coding-session-rules.md` — surface the staleness caveat,
+offer to look up current stable/LTS, wait for go-ahead before
+`WebSearch`/`WebFetch`. This applies to base image tags
+(`python:3.12-slim`, `node:20-alpine`), database engine versions
+(`postgres:16`, `mysql:8.4`), cloud SDK versions, and any runtime
+version repeated from the dev environment. It applies even if a
+version is already pinned: ask whether the pin was intentional or a
+training-time residual, and note the production target may move on a
+different cadence than dev.
 
 ### Mandatory decision categories
 
@@ -187,11 +188,10 @@ the conflict now — don't write it into `DEPLOYMENT.md`.
 **Version freshness checkpoint (write time).** Before any version
 number lands in `docs/DEPLOYMENT.md` — base image tag, database
 engine major, runtime version in deploy scripts, cloud SDK pin —
-re-confirm per `rules/environment-rules.md` § Version freshness.
-Even if Step 3 captured a version with Jamie's go-ahead, ask once
-more before it goes into a file Jamie will commit. The
-Environments and Deploy mechanism subsections are the
-version-heavy ones.
+re-confirm per **Rule 10** (`rules/coding-session-rules.md`). Even
+if Step 3 captured a version with Jamie's go-ahead, ask once more
+before it goes into a file Jamie will commit. The Environments and
+Deploy mechanism subsections are the version-heavy ones.
 
 **If everything was answered:** write a full doc with these
 sections, in this order:

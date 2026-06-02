@@ -1,4 +1,4 @@
-# Coding Session Rules — the 9 standing rules
+# Coding Session Rules — the 10 standing rules
 
 Jamie's standing rules for every coding session, every project. They
 apply without exception unless `rules/project-rules.md` explicitly
@@ -48,7 +48,7 @@ before implementation.
 abstraction, dependency, or configuration that wasn't asked for,
 name the simpler alternative **in the same message** and let Jamie
 pick: "I could add X for reasons R; the simpler alternative is to do
-nothing / do Y." Visible enforcement of KISS (see
+Y." Visible enforcement of KISS (see
 [`design-philosophy-rules.md`](design-philosophy-rules.md)). Silently
 picking the richer option is the failure mode.
 
@@ -80,13 +80,10 @@ Ask Jamie to run tests; give the commands, what to run, and expected
 outcomes ("expect 2 skipped, 5 successful"). She pastes errors back
 or confirms.
 
-This rule also covers **manual phase-exit walkthroughs**. The
-canonical flow is `/exit-test-plan` — Stage 1 authors the plan from
-the phase's exit criteria, Jamie runs it and marks §4's run log
-inline, Stage 2 reads the run log + trailing notes and lands
-dispositions. The plan is the artifact; Claude never runs it.
-Mid-run failures are normal coding work driven by Fail signals in
-each TC.
+Rule 8 also covers **manual phase-exit walkthroughs** via
+`/exit-test-plan` — distinct from the automated runs above: human-only
+verification of interactive behavior at phase transitions, where
+Claude authors the plan but never runs the steps.
 
 ## Rule 9: Invoke the owning skill instead of inlining its ritual
 
@@ -103,3 +100,12 @@ rituals" for the principle behind this gate.
   signals — → suggest `/wind-down` and wait for Jamie's go-ahead.
   `/wind-down` owns the `TODO.txt` rewrite and the doc-coherence
   sweep. Don't run it autonomously.
+
+## Rule 10: Never assume training-time versions are current
+
+Version recall is stale-prone. Before pinning any version into an
+artifact, flag it as possibly-stale, offer to look up current
+stable/LTS, and let Jamie pick. A version already in a design doc,
+REQUIREMENTS, or prior session does **not** bypass this — ask whether
+the pin was intentional or a training-time residual. Skills that write
+or review design docs carry this explicitly.

@@ -79,13 +79,15 @@ each. Each question must be material — if the design already answers
 it, don't re-ask. Cover at minimum:
 
 **Version recency.** Before suggesting a version in any answer
-back to Jamie or in any artifact, follow the **Version freshness**
-section in `rules/environment-rules.md` — surface the staleness
-caveat to Jamie, offer to look up the current stable/LTS release,
-wait for go-ahead before running `WebSearch`/`WebFetch`. This
-applies even if the design doc names a version. The illustrative
-versions below (e.g. "Python 3.12", "Node 20") are placeholders
-only — never copy them as pins.
+back to Jamie or in any artifact, follow **Rule 10** (never assume
+training-time versions are current) in
+`rules/coding-session-rules.md` — surface the staleness caveat,
+offer to look up the current stable/LTS, wait for go-ahead before
+`WebSearch`/`WebFetch`. This applies even if the design doc names a
+version: ask whether the pin was intentional or a training-time
+residual before perpetuating it. The illustrative versions below
+(e.g. "Python 3.12", "Node 20") are placeholders only — never copy
+them as pins.
 
 ### Project identity
 - **Project name** and short slug (e.g. "Nichestream Platform" /

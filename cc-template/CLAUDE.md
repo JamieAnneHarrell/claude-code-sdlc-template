@@ -58,7 +58,7 @@
 The two universal rule files are named in the directive at the top of
 this file; read them end-to-end before responding.
 
-- `rules/coding-session-rules.md` — the 9 standing rules.
+- `rules/coding-session-rules.md` — the 10 standing rules.
 - `rules/design-philosophy-rules.md` — design judgment framework.
 
 **Read these when relevant to the current task:**
