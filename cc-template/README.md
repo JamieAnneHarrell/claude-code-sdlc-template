@@ -24,11 +24,11 @@ walkable checklist and session handoff — follow them in order:
 3. **Review the rules.** Read each `rules/*.md` file and make sure it
    matches your own collaboration philosophy — edit anything you
    disagree with. The rules are a starting agreement, not law; the
-   template is meant to be customized per project. (Once
-   `/refresh-from-repository` ships in Phase 2.1, the universal rule
-   content will sit inside `CC-TEMPLATE-BLOCK` markers; you'll be able
-   to lift the parts you've customized out of those markers so refresh
-   leaves your edits alone.)
+   template is meant to be customized per project. The universal rule
+   content sits inside `<!-- CC-TEMPLATE-BLOCK: <id> -->` markers; if
+   you want to keep a customization, lift that section out of its
+   markers (or delete the block) so `/refresh-from-repository` leaves
+   your edit alone. See "Keeping a project up to date" below.
 
 4. **Open the new directory in Claude Code** and run:
    ```
@@ -46,6 +46,77 @@ walkable checklist and session handoff — follow them in order:
    `docs/CLAUDE_CODE_PROMPTS.md`. This sets up the language tooling,
    CI workflow, and project skeleton.
 
+## Keeping a project up to date
+
+Once a project is seeded, it keeps its own copy of the commands and
+rules — it does **not** track the upstream template. To pull later
+improvements, run, in the project:
+
+```
+/refresh-from-repository
+```
+
+This **replaces** the shipped slash commands with the latest upstream
+versions and **block-merges** the universal rules and the
+template-owned sections of `CLAUDE.md` against what you have now. Your
+customizations are safe by design:
+
+- Content inside `<!-- ONBOARD-FILL: ... -->` blocks (your
+  project-specific scope, environment, tooling) is never touched.
+- Content **outside** the `<!-- CC-TEMPLATE-BLOCK: ... -->` markers is
+  yours forever — refresh ignores it.
+- If you edited a rule *inside* a template block, refresh detects it
+  and asks, one block at a time, whether to take the upstream version,
+  keep yours, or hand-merge. It never silently overwrites an edit.
+- If you deleted a template block, refresh respects the absence and
+  doesn't re-add it.
+
+A project onboarded before the marker system existed gets a one-time
+migration on its first run: refresh inserts the markers for you,
+aligning to upstream, and flags any section where your content has
+diverged.
+
+Two optional flags:
+
+- `/refresh-from-repository --refresh-skills-only` — update only the
+  slash commands, merge nothing. Useful to inspect the new refresh
+  logic before letting it touch your rules.
+- `/refresh-from-repository --no-claudemd` — refresh commands and
+  rules but leave `CLAUDE.md` alone. For heavily-customized
+  `CLAUDE.md` files.
+
+**Pinning to a specific version (vendored lock-in).** If you need to
+pin to an exact upstream version — for audit or reproducibility — copy
+the `cc-template/` directory from the upstream commit you want into
+your own repo as a subdirectory. With a `cc-template/` subdir present,
+`/refresh-from-repository` runs in **source mode**: it treats that
+local subdir as the upstream and syncs it to your project root, with
+the same conflict-surfacing behavior. Upgrading the pin is a
+deliberate action you take (re-vendor a newer `cc-template/`); the
+routine sync from subdir to root stays stable and auditable.
+
+### Installing the command into a project that doesn't have it yet
+
+A self-updating command can't install itself — a project seeded before
+`/refresh-from-repository` existed has no command to run. Bootstrap it
+once by hand (this is exactly a `--refresh-skills-only` pass done
+manually):
+
+1. **Get the upstream command files.** Clone or download
+   `github.com/JamieAnneHarrell/claude-code-sdlc-template` (or, for a
+   vendored/source-mode setup, use your local `cc-template/`
+   subdirectory).
+2. **Copy the command file(s)** from the upstream
+   `cc-template/.claude/commands/` into your project's
+   `.claude/commands/`. At minimum copy `refresh-from-repository.md`;
+   copying all of them is the same as a skills-only refresh and gets
+   you the latest version of every command at once.
+3. **Run `/refresh-from-repository`** in your project. With the command
+   now present, it performs the one-time pre-marker migration (inserts
+   `CC-TEMPLATE-BLOCK` markers, seeds the refresh state file) and
+   block-merges the rest. From then on, refresh keeps itself current
+   like any other command.
+
 ## What the template ships with
 
 ```
@@ -61,7 +132,8 @@ cc-template/
 │   │   ├── deployment-plan.md     ← /deployment-plan slash command
 │   │   ├── design-review.md       ← /design-review slash command
 │   │   ├── exit-test-plan.md      ← /exit-test-plan slash command
-│   │   └── wind-down.md           ← /wind-down slash command
+│   │   ├── wind-down.md           ← /wind-down slash command
+│   │   └── refresh-from-repository.md ← /refresh-from-repository slash command
 │   ├── settings.local.json.example
 │   └── settings.local.json.example.README.md
 ├── rules/                         ← collaboration rules, loaded on demand

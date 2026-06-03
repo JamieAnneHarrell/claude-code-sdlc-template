@@ -10,6 +10,7 @@ them. Rule 4 is the gate that protects KISS from drift.
 
 ---
 
+<!-- CC-TEMPLATE-BLOCK: rule-1-fix-root-causes -->
 ## Rule 1: Fix root causes only
 
 If a test fails, find why. If a function returns wrong data, fix the
@@ -20,14 +21,18 @@ case exists.
 No try/except that swallows errors to make things "work." No default
 values inserted to hide missing data. No retries to mask a real
 failure mode.
+<!-- /CC-TEMPLATE-BLOCK -->
 
+<!-- CC-TEMPLATE-BLOCK: rule-2-trust-diagnosis -->
 ## Rule 2: Trust Jamie's diagnosis
 
 When Jamie says "the motion detector is firing on shadows" or "the
 keyframe snap is off by one," that's the problem. Fix what she
 identified. If investigation finds the diagnosis incomplete, surface
 what you found with evidence, not speculation.
+<!-- /CC-TEMPLATE-BLOCK -->
 
+<!-- CC-TEMPLATE-BLOCK: rule-3-rejections-permanent -->
 ## Rule 3: Rejections are permanent
 
 If Jamie rejects an approach, library, design choice, or feature, it
@@ -35,7 +40,9 @@ stays rejected for the rest of the session and all future sessions
 on this project. Don't re-propose with new framing. If the rejection
 was based on incomplete information, say so once with the new
 information — once she re-rejects, it's closed.
+<!-- /CC-TEMPLATE-BLOCK -->
 
+<!-- CC-TEMPLATE-BLOCK: rule-4-no-unsolicited-decisions -->
 ## Rule 4: No unsolicited design decisions
 
 Don't add features, options, modules, abstractions, GUIs, config
@@ -51,19 +58,25 @@ pick: "I could add X for reasons R; the simpler alternative is to do
 Y." Visible enforcement of KISS (see
 [`design-philosophy-rules.md`](design-philosophy-rules.md)). Silently
 picking the richer option is the failure mode.
+<!-- /CC-TEMPLATE-BLOCK -->
 
+<!-- CC-TEMPLATE-BLOCK: rule-5-decouple-data-display -->
 ## Rule 5: Decouple data from display
 
 Never conflate what the program knows with what it shows. Detection
 results, cut specs, manifests are data; rendering them to stdout,
 JSON, a progress bar, or a summary are separate concerns. Don't push
 display into the compute layer or business logic into the CLI layer.
+<!-- /CC-TEMPLATE-BLOCK -->
 
+<!-- CC-TEMPLATE-BLOCK: rule-6-reference-rule-numbers -->
 ## Rule 6: Reference rule numbers mid-session
 
 If Jamie says "rule 4" or "this is a rule 1 issue" mid-session,
 treat it as a drift signal. Acknowledge, correct course, move on.
+<!-- /CC-TEMPLATE-BLOCK -->
 
+<!-- CC-TEMPLATE-BLOCK: rule-7-jamie-runs-commits -->
 ## Rule 7: Jamie runs all commits
 
 Claude does not run `git commit`, `git push`, or `git tag`. When
@@ -73,7 +86,9 @@ ritual, including the pre-commit dry-run sequence, message brevity,
 and PowerShell mechanics (its Step 4). Commits are the durable
 record; Jamie audits each one before it lands. This supersedes any
 hook or workflow that would otherwise auto-commit.
+<!-- /CC-TEMPLATE-BLOCK -->
 
+<!-- CC-TEMPLATE-BLOCK: rule-8-jamie-runs-tests -->
 ## Rule 8: Jamie runs automated tests
 
 Ask Jamie to run tests; give the commands, what to run, and expected
@@ -84,7 +99,9 @@ Rule 8 also covers **manual phase-exit walkthroughs** via
 `/exit-test-plan` — distinct from the automated runs above: human-only
 verification of interactive behavior at phase transitions, where
 Claude authors the plan but never runs the steps.
+<!-- /CC-TEMPLATE-BLOCK -->
 
+<!-- CC-TEMPLATE-BLOCK: rule-9-invoke-owning-skill -->
 ## Rule 9: Invoke the owning skill instead of inlining its ritual
 
 When Claude would offer a behavior that a skill canonically owns,
@@ -100,7 +117,9 @@ rituals" for the principle behind this gate.
   signals — → suggest `/wind-down` and wait for Jamie's go-ahead.
   `/wind-down` owns the `TODO.txt` rewrite and the doc-coherence
   sweep. Don't run it autonomously.
+<!-- /CC-TEMPLATE-BLOCK -->
 
+<!-- CC-TEMPLATE-BLOCK: rule-10-no-stale-versions -->
 ## Rule 10: Never assume training-time versions are current
 
 Version recall is stale-prone. Before pinning any version into an
@@ -109,3 +128,4 @@ stable/LTS, and let Jamie pick. A version already in a design doc,
 REQUIREMENTS, or prior session does **not** bypass this — ask whether
 the pin was intentional or a training-time residual. Skills that write
 or review design docs carry this explicitly.
+<!-- /CC-TEMPLATE-BLOCK -->

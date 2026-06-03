@@ -14,6 +14,7 @@ Until onboarding runs, the conservative default applies:
   sequential and Jamie-driven.
 - Do **not** use git worktrees.
 
+<!-- CC-TEMPLATE-BLOCK: briefing-rule -->
 When briefing any subagent, treat it like "a smart colleague who just
 walked into the room" — it has not seen this conversation, doesn't
 know what's been tried, and doesn't understand why this task matters.
@@ -25,3 +26,4 @@ Brief it accordingly:
 
 Never delegate understanding. Don't write "based on your findings, fix
 the bug" — synthesis is the main thread's job.
+<!-- /CC-TEMPLATE-BLOCK -->

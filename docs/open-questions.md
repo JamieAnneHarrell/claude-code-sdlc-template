@@ -304,3 +304,31 @@ paternalistic. Whether the seeded TODO.txt should be a sample
 users can rewrite freely vs. a structured artifact whose shape
 `/wind-down` preserves.
 
+### Known Limitations
+
+#### `/onboard` does not preserve CC-TEMPLATE-BLOCK markers when it rewrites mode-specific rules files
+
+*Context.* `/onboard` rewrites `multi-agent-rules.md` wholesale based
+on the chosen multi-agent mode. The dist placeholder wraps only the
+universal `briefing-rule` block in a CC-TEMPLATE-BLOCK; the
+mode-specific content is intentionally left unmarked (consumer/mode
+owned). If `/onboard`'s rewrite drops or relocates the `briefing-rule`
+markers, a freshly-onboarded project's `multi-agent-rules.md` may have
+no markers at all.
+
+*Why it's not currently broken.* `/refresh-from-repository`'s
+pre-marker migration (Step 6) self-heals this: the first refresh in a
+project with marker-less rules files re-inserts markers by aligning
+against upstream. So the worst case is "markers absent until first
+refresh," not "refresh misbehaves." The same reasoning covers the
+onboard-appended tooling tails of `testing-rules.md` /
+`environment-rules.md` — those are free regions by design.
+
+*Open question.* Whether `/onboard`'s spec should be updated to
+preserve the `briefing-rule` marker when it rewrites
+`multi-agent-rules.md` (tighter, but couples `/onboard` to the marker
+convention), or whether relying on pre-marker migration to re-establish
+markers is sufficient (looser, already works). Surfaced during the
+Phase 2.1 build; out of scope for that phase since it touches
+`/onboard`, not `/refresh-from-repository`.
+

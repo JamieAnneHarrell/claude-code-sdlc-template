@@ -9,6 +9,7 @@ section below the divider is populated by `/onboard`.
 
 ## General project rules (every project)
 
+<!-- CC-TEMPLATE-BLOCK: scope-discipline -->
 ### Scope discipline
 
 - **MVP is decided during onboarding.** Nothing outside MVP scope
@@ -18,7 +19,9 @@ section below the divider is populated by `/onboard`.
 - **Ambiguity goes to the docs first, then to Jamie.** Check
   `docs/REQUIREMENTS.md` and `docs/PROJECT_PLAN.md` first; ask Jamie
   if the docs don't answer.
+<!-- /CC-TEMPLATE-BLOCK -->
 
+<!-- CC-TEMPLATE-BLOCK: dependency-justification -->
 ### Dependency justification
 
 When adding a runtime dependency, the commit message must say **why**
@@ -33,13 +36,17 @@ in concrete terms.
 Dev dependencies (test runner, formatter, linter) follow the same
 rule with a lower bar — those choices are usually settled during
 onboarding.
+<!-- /CC-TEMPLATE-BLOCK -->
 
+<!-- CC-TEMPLATE-BLOCK: no-unsolicited-features -->
 ### No unsolicited features
 
 Rule 4 in project context: don't add capability that wasn't asked
 for. If a session request implies a feature ("can you wire that up
 so it also handles X?"), confirm scope before implementing X.
+<!-- /CC-TEMPLATE-BLOCK -->
 
+<!-- CC-TEMPLATE-BLOCK: commit-branch-discipline -->
 ### Commit and branch discipline
 
 - One logical change per commit; ask Jamie whether to bundle or
@@ -51,7 +58,9 @@ so it also handles X?"), confirm scope before implementing X.
 - Don't push or tag without explicit instruction.
 - Branch naming: `phase-N-<short-description>` for phase work,
   `fix/<short-description>` for post-MVP fixes.
+<!-- /CC-TEMPLATE-BLOCK -->
 
+<!-- CC-TEMPLATE-BLOCK: skills-own-rituals -->
 ### Skills own rituals
 
 When a skill is the unique owner of a behavior, that ritual lives
@@ -69,6 +78,7 @@ skill.
   findings and sign-offs are never hand-written outside it.
 - **`/exit-test-plan` owns phase-exit test plans** — the plan and
   its dispositions live in the skill's artifacts.
+<!-- /CC-TEMPLATE-BLOCK -->
 
 ---
 

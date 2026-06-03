@@ -34,6 +34,7 @@
 > her decision. `/deployment-plan` can always be deferred without
 > blocking work.
 
+<!-- CC-TEMPLATE-BLOCK: reading-order -->
 ## Reading order at session start
 
 1. **This file** — quick orientation and reading list.
@@ -52,7 +53,9 @@
    loop (original run, dispositions, polish coding session, optional
    §6.N addendums); `LANDED` means every run log is PASS / SKIP,
    every Fix-now is verified, and the phase exit is closed.
+<!-- /CC-TEMPLATE-BLOCK -->
 
+<!-- CC-TEMPLATE-BLOCK: collaboration-rules -->
 ## Collaboration rules
 
 The two universal rule files are named in the directive at the top of
@@ -71,3 +74,4 @@ this file; read them end-to-end before responding.
 If Jamie says "rule 4" or "this is a rule 1 issue" mid-session, that's a
 drift signal pointing at `rules/coding-session-rules.md`. Acknowledge,
 correct course, move on.
+<!-- /CC-TEMPLATE-BLOCK -->

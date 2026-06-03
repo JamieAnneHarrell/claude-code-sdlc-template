@@ -948,3 +948,107 @@ Collaboration-rules per-rule summaries — drift mode 3) and the
 consumer-boundary partition (banner stays consumer-owned). All three
 drift modes of the "Trim CLAUDE.md" story are resolved; its remaining
 open sub-questions stay in `open-questions.md`.
+
+---
+
+## `/refresh-from-repository` content hashing uses `git hash-object`
+
+**Decision.** The per-block content hash (Option D's inline-edit
+signal) is computed by taking the block's content between its markers,
+normalizing all line endings to LF, and piping it to
+`git hash-object --stdin`. The emitted object id is the stored hash.
+Same recipe everywhere a hash is written or compared.
+
+**Why.** The template has no language runtime, but the command runs
+inside Claude Code, which has shell access and assumes a git repo
+already (the baseline is a git commit). `git hash-object` is git's own
+content-addressing — deterministic, present wherever git is, and
+needs no new dependency. LF normalization before piping removes the
+only platform-dependent byte difference (CRLF on Windows vs LF
+elsewhere), so the same block hashes identically on Windows, Linux,
+and macOS. This satisfies NFR-1 cross-platform without a hashing
+library.
+
+**Why not a platform hash utility** (`Get-FileHash` / `sha256sum` /
+`shasum`). Forces OS-branching in the spec, a temp file per block, and
+manual newline normalization — more surface and more failure modes
+(line-ending drift was the top rework risk the pre-flight flagged).
+
+**Why not store the normalized baseline text instead of a hash.**
+Simpler for the session (plain text compare, no hashing) but it
+deviates from checkpoint 002's landed "Block hashes" schema; changing
+that would need a `/design-review` addendum, not a build-time choice.
+
+**Scope note.** The recipe is load-bearing per NFR-4 — it gets pinned
+into root `CLAUDE.md` Load-bearing invariants alongside the marker
+syntax and state-file path (Prompt 2.1 scope item 13). Changing it
+requires bumping the command's Refresh-logic-version stamp.
+
+---
+
+## Phase 2.1 builds in `cc-template/` only; the refresh state file is dogfood-generated and committed
+
+**Decision.** The Phase 2.1 build session edits `cc-template/` only —
+markers, the command file, and docs. Root does **not** get hand-edited
+markers, a hand-mirrored command, or a hand-written state file.
+Instead, root receives all of that by **running
+`/refresh-from-repository` in source mode against this repo** (the
+dogfood): the command pulls itself to root, pre-marker-migrates root's
+rules + CLAUDE.md, and seeds
+`.claude/claude-code-sdlc-template-refresh-state.md`. That generated
+state file is committed in this repo.
+
+**Why.** This repo is a consumer of its own distribution, so the
+honest way to get markers and the command onto root is the same path
+every downstream consumer uses — which also makes the first run the
+real end-to-end test of source-mode + pre-marker migration on a live
+project, not a contrived sandbox. Committing the generated state file
+(rather than gitignoring it) preserves checkpoint 002 B1-A1's "source
+mode keeps three-way semantics": the baseline must survive a clean
+clone, or source-mode degrades to copy-if-changed.
+
+**Why not hand-author the state file and hand-insert root markers.**
+Faster to a committed result, but skips the dogfood validation and
+risks the hand-written artifacts diverging from what the command
+actually produces.
+
+**Why not gitignore the state file.** A clean clone would then have no
+baseline; the next source-mode run would re-seed and silently lose the
+ability to detect root edits made in another working copy.
+
+**Scope note.** Downstream consumers generate their own state file on
+first refresh; it never ships inside `cc-template/`. Whether a consumer
+commits or ignores theirs is their call. The dogfood run and the root
+CLAUDE.md invariant pin were deferred past the build session at Jamie's
+request (review the command first).
+
+---
+
+## The self-updater is bootstrapped by a manual skills-only copy
+
+**Decision.** A project that predates `/refresh-from-repository` (or is
+brand-new and lacks it) installs the command by hand once: copy the
+command file(s) from the upstream `cc-template/.claude/commands/` into
+the project's `.claude/commands/`, then run `/refresh-from-repository`
+normally. This is documented in `cc-template/README.md` under "Keeping
+a project up to date."
+
+**Why.** A self-updating command can't install itself — there is a
+genuine chicken-and-egg gap at the start. The manual copy is exactly a
+`--refresh-skills-only` pass done by hand, so it reuses a concept the
+consumer already has rather than inventing a separate installer. It
+also serves the source-of-truth repo's own root: copy the command from
+local `cc-template/` to root, then run the source-mode dogfood.
+
+**Why not an installer script.** Would add a language runtime / script
+to a markdown-only template (NFR-6) to solve a one-time, two-step
+manual copy.
+
+**Why not ship the command pre-placed at root in seeded projects.**
+`/onboard` already copies the command set into a seeded project, so new
+projects get it; the manual path exists for projects seeded before the
+command existed. Naming the manual path costs a README section and
+closes the gap for everyone.
+
+**Scope note.** Surfaced during the Phase 2.1 build when working out
+how root and other repos first obtain the command.

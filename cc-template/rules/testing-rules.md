@@ -5,6 +5,7 @@ tooling (test runner, marker syntax, command lines) at the bottom.
 
 ---
 
+<!-- CC-TEMPLATE-BLOCK: categories -->
 ## Categories
 
 ### Unit tests
@@ -33,9 +34,11 @@ stable in name and content (changing a fixture invalidates
 downstream tests); documented in `tests/fixtures/README.md` if
 non-obvious. Larger integration assets live in a separate,
 gitignored test-media folder.
+<!-- /CC-TEMPLATE-BLOCK -->
 
 ---
 
+<!-- CC-TEMPLATE-BLOCK: discipline -->
 ## Discipline
 
 ### No flaky tests
@@ -72,9 +75,11 @@ same query.
 
 Tests that don't need a database don't get one — that's how unit
 tests stay fast, not by swapping engines underneath them.
+<!-- /CC-TEMPLATE-BLOCK -->
 
 ---
 
+<!-- CC-TEMPLATE-BLOCK: workflow -->
 ## Workflow (rule 8)
 
 Per coding-session rule 8: **Jamie runs the tests, Claude proposes
@@ -88,9 +93,11 @@ the commands.** When Claude finishes a change that should be tested:
 
 Don't run tests as part of routine implementation; Jamie's run is
 the canonical pass/fail signal.
+<!-- /CC-TEMPLATE-BLOCK -->
 
 ---
 
+<!-- CC-TEMPLATE-BLOCK: manual-phase-exit-walkthroughs -->
 ## Manual phase-exit walkthroughs
 
 Phases in `docs/PROJECT_PLAN.md` typically end with exit criteria a
@@ -115,6 +122,7 @@ flow is `/exit-test-plan`:
 
 See `.claude/commands/exit-test-plan.md` for the full spec. The plan
 is the test artifact; Claude does not run the steps.
+<!-- /CC-TEMPLATE-BLOCK -->
 
 ---
 
