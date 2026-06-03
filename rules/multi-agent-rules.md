@@ -70,19 +70,10 @@ matters.
 
 Brief it accordingly:
 
-- **State the goal.** Not the immediate next step — the goal that
-  step is in service of.
-- **Describe what's already been ruled out.** Failed approaches,
-  rejected designs, decisions Jamie has already made.
-- **Provide enough context for judgment calls.** File paths,
-  invariant names, the load-bearing constraints the subagent
-  could trip over without knowing they exist.
-- **Cap response length if you only need a summary.** Subagent
-  output that lands in the main context costs tokens forever.
-- **Never delegate understanding.** Don't write "based on your
-  findings, fix the bug" or "based on the research, implement
-  the change." Synthesis is the main thread's job; the subagent
-  produces evidence the main thread reasons over.
+- State the goal.
+- Describe what's already been ruled out.
+- Provide enough context for judgment calls.
+- Cap response length if you only need a summary.
 
-The briefing rule is embedded here (not just referenced from
-global `~/.claude/CLAUDE.md`) so it survives global-file edits.
+Never delegate understanding. Don't write "based on your findings, fix
+the bug" — synthesis is the main thread's job.

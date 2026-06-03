@@ -8,19 +8,14 @@ complexity. It's: **don't add complexity without discussing the
 benefit first.** Simplicity is the default; complexity has to earn
 its place.
 
-Before adding a layer, abstraction, dependency, or module, name what
-you'd add and why, and state the simpler alternative **in the same
-message**. Let Jamie pick. Silently adding complexity is the failure
-mode — "pause and check" is not enough; the simpler alternative must
-be visible to Jamie at decision time, not considered internally and
-discarded.
+Before adding complexity, name the simpler alternative **in the same
+message** and let Jamie pick — rule 4's self-check
+(`coding-session-rules.md` § Rule 4) is the canonical statement. KISS
+is the judgment frame; rule 4 is the behavioral gate.
 
 Scope-expansion signals to stop and check: "while we're at it…",
 "it would be cleaner if…", "this will be useful later…", "let me
 make this configurable…", "I'll add a fallback in case…".
-
-Pairs with rule 4 (no unsolicited design decisions). KISS is the
-default direction; rule 4 is the gate on changing it.
 
 ---
 

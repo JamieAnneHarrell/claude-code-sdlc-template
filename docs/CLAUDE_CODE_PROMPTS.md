@@ -420,7 +420,22 @@ Reading-order entry for `docs/design/`). Must land before Phase
 - A re-read confirms this project's next session would load the
   cleaned-up rules from root.
 
-**Revisions since this prompt ran:** none tracked.
+**Revisions since this prompt ran:**
+
+- LANDED 2026-06-02. Deviations:
+  - `testing-rules.md` was grouped with the "fully-universal /
+    identical" files, but it carries `/onboard`-appended content;
+    treated like the fill-block files (universal portion 1–119 already
+    identical; appended "Project-specific tooling" section preserved).
+    No content lost.
+  - `wind-down.md` was not the expected no-op — root was behind
+    `cc-template/`'s `### CLAUDE.md` banner-drift block; the hard-copy
+    resolved it.
+  - Decision B (beyond strict bring-forward): `project-rules.md`
+    "rule 1–9" → "1–10" fixed in **both** copies, since
+    `coding-session-rules.md` now defines 10 rules.
+  - Decision A: `multi-agent-rules.md` briefing rule adopted
+    `cc-template/`'s terser form (in-scope choice).
 
 ---
 

@@ -169,7 +169,7 @@ post-onboard (rewritten state). The new `docs/design/`
 Reading-order entry is present in `cc-template/CLAUDE.md`.
 ---
 
-## Phase 1.3 — root↔cc-template bring-forward
+## Phase 1.3 — root↔cc-template bring-forward (COMPLETE)
 
 **Goal.** Align this project's own root copies (`rules/*.md`,
 `CLAUDE.md`, `.claude/commands/*.md`) with the cleaned-up

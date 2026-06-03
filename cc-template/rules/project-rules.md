@@ -1,7 +1,7 @@
 # Project-Specific Rules
 
 Project-specific scope, dependency allowlist, and defaults live here.
-Universal rules (rule 1–9) live in `rules/coding-session-rules.md`.
+Universal rules (rule 1–10) live in `rules/coding-session-rules.md`.
 The general rules above the divider apply to every project; the
 section below the divider is populated by `/onboard`.
 

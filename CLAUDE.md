@@ -1,14 +1,16 @@
 # CLAUDE.md
 
+> **Before you respond to the first user message of any session:** read
+> [`rules/coding-session-rules.md`](rules/coding-session-rules.md) and
+> [`rules/design-philosophy-rules.md`](rules/design-philosophy-rules.md)
+> end-to-end — they are not loaded into context by default. Confirm you
+> have read and understood them before proceeding.
+
 <!-- ONBOARD-STATUS: COMPLETE 2026-05-24 -->
 <!-- BOOTSTRAP-STATUS: COMPLETE 2026-05-24 -->
 <!-- DEPLOYMENT-PLAN-STATUS: UNCONFIGURED -->
 
-> ✅ **Onboarded and bootstrapped.** Ready for the next phase
-> prompt in `docs/CLAUDE_CODE_PROMPTS.md` (Phase 1.1 — add
-> `BLOCKED` disposition to `/exit-test-plan`). `/deployment-plan`
-> is deferrable — run it when distribution mechanism (git clone
-> vs zip vs other) needs to be pinned.
+> ✅ **Onboarded and bootstrapped.**
 >
 > **Project:** `claude-code-sdlc-template` — a self-modifying
 > project seed for new software projects driven by Claude Code.
@@ -50,36 +52,26 @@
 
 ## Collaboration rules
 
-**MUST DO before responding to the first user message of any
-session.** Read these two files end-to-end — their contents are
-*not* loaded into context by default. Skipping is the #1 cause of
-rule drift (KISS violations, commit-message bloat, no
-simpler-alternative on additions).
+The two universal rule files are named in the directive at the top of
+this file; read them end-to-end before responding.
 
-- [`rules/coding-session-rules.md`](rules/coding-session-rules.md)
-  — the 9 standing rules, including rule-7 commit handoff format
-  and rule-4 simpler-alternative self-check.
+- [`rules/coding-session-rules.md`](rules/coding-session-rules.md) —
+  the 10 standing rules.
 - [`rules/design-philosophy-rules.md`](rules/design-philosophy-rules.md)
-  — KISS, progressive disclosure.
-  *iPhone, not Android. Macintosh, not PC.*
+  — design judgment framework.
 
-**Read when relevant to the current task:**
+**Read these when relevant to the current task:**
 
-- [`rules/project-rules.md`](rules/project-rules.md) — MVP scope,
-  out-of-scope list, dependency justification.
-- [`rules/testing-rules.md`](rules/testing-rules.md) — test
-  discipline. This project has no traditional test suite; the
-  "testing" sections describe re-reading command files, mental
-  dry-run, and the live-test walkthrough.
+- [`rules/project-rules.md`](rules/project-rules.md) — project scope
+  discipline.
+- [`rules/testing-rules.md`](rules/testing-rules.md) — test discipline.
 - [`rules/environment-rules.md`](rules/environment-rules.md) —
-  cross-platform conventions, shells, scratch files. The
-  project-specific environment is inside the
-  `<!-- ONBOARD-FILL: environment -->` block.
-- [`rules/multi-agent-rules.md`](rules/multi-agent-rules.md) —
-  subagent usage (explore-plus-plan mode).
+  cross-platform conventions.
+- [`rules/multi-agent-rules.md`](rules/multi-agent-rules.md) — subagent
+  use.
 
-If Jamie says "rule 4" or "this is a rule 1 issue" mid-session,
-that's a drift signal pointing at
+If Jamie says "rule 4" or "this is a rule 1 issue" mid-session, that's a
+drift signal pointing at
 [`rules/coding-session-rules.md`](rules/coding-session-rules.md).
 Acknowledge, correct course, move on.
 

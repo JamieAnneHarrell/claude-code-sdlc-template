@@ -229,6 +229,14 @@ brief plan first.
 - If scope changed (phase split, phase reordered, new phase inserted),
   state the intent and edit directly.
 
+### `CLAUDE.md`
+- The post-configuration banner is static orientation — it should
+  not name a specific next prompt or phase (next-step lives in
+  `TODO.txt`). If the banner *does* name one, verify it matches
+  TODO.txt's first entry; if it has drifted, surface a warning and
+  propose either dropping the next-step prose or correcting it.
+  Don't silently rewrite the banner.
+
 ### `docs/[command].md` or `docs/commands/*.md`
 - If a command's CLI parameters or functionality changed this
   session, update its command doc to match.

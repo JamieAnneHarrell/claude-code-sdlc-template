@@ -254,9 +254,10 @@ Cover when relevant:
 - **Versions and dependency justifications.** When the trigger is
   post-onboarding or post-bootstrap, audit the version pins in
   `rules/environment-rules.md` and the dependency allowlist in
-  `rules/project-rules.md` against
-  `rules/environment-rules.md` § Version freshness. Ask Jamie
-  before recommending bumps.
+  `rules/project-rules.md` against **Rule 10**
+  (`rules/coding-session-rules.md`) — surface any pin that may be a
+  training-time residual rather than an intentional choice. Ask
+  Jamie before recommending bumps.
 - **Architecture coherence.** Ask whether any architectural
   decision has shifted since the design intake (and so
   REQUIREMENTS / ARCHITECTURE may now be stale).

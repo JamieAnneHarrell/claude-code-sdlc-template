@@ -125,54 +125,19 @@ summary output, CLI help text, progress bars (tqdm and equivalents).
 
 ---
 
+## HTML comments are free
+
+Single-line `<!-- ... -->` content is stripped before Claude reads
+CLAUDE.md and rules files — put human-only prose there, never content
+Claude must act on.
+
+---
+
 ## Version freshness
 
-Training-corpus version recall is unreliable — what Claude
-"remembers" as the current Python / Node / Postgres / Laravel /
-Docker base image is often months or years stale. Pinning a stale
-version into a project artifact (README prerequisites,
-`<!-- ONBOARD-FILL: environment -->` block, `docs/DEPLOYMENT.md`)
-bakes that drift in for the life of the project.
-
-### The rule
-
-Before pinning **any** software version into a project artifact:
-
-1. **Surface the assumption.** Say plainly that the version comes
-   from training-corpus recall (or a spec that may itself be stale)
-   and could be out of date.
-2. **Offer to look up the current stable / LTS release** via
-   `WebSearch` or `WebFetch`. Wait for explicit go-ahead. One offer
-   per version, not a batched blanket offer.
-3. **Show what was found** alongside any spec'd or recalled version
-   and let Jamie pick.
-
-Only the version Jamie confirms goes into the artifact. **A version
-already named in a design doc, REQUIREMENTS, ARCHITECTURE, rules
-file, or prior session does not bypass this check** — the source
-session may not have had this guardrail. **Never pick a version for
-convenience** (easy to recall, matches an example in a command
-file). Placeholder versions in `/onboard`, `/bootstrap`, and
-`/deployment-plan` examples (e.g. "Python 3.12", `python:3.12-slim`)
-are illustrative, not pins.
-
-### Surfaces in scope
-
-Language runtimes; framework majors / LTS lines; database engine
-majors; container base image tags; cloud SDKs and CLIs; package
-managers; any dependency that ships in a manifest (`requirements.txt`,
-`package.json`, `composer.json`, etc.) when the version is being
-*chosen* (not when reading what is already there).
-
-### Where this fires in the configuration ritual
-
-- `/onboard` Step 3 — collecting language and framework versions.
-- `/bootstrap` Step 3 (questions) **and** Step 5 (writing the README
-  "Prerequisites" subsection and the `<!-- ONBOARD-FILL: environment
-  -->` block). Step 5 is load-bearing — re-ask even if Step 3
-  captured a version.
-- `/deployment-plan` Step 3 (questions about base images, DB
-  engines) **and** Step 5 (writing `docs/DEPLOYMENT.md`).
+Never assume training-time versions are current — see
+`rules/coding-session-rules.md` § Rule 10. Applies before pinning any
+version into a project artifact.
 
 ---
 

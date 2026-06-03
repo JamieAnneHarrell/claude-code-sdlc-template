@@ -916,3 +916,35 @@ at each file's own format section keeps one source of truth.
 copies (root + cc-template, NFR-9). The read-format-first discipline is
 scoped to the two decision/question docs, not every Step 3 tracking
 doc. Originated as an `open-questions.md` story surfaced in Session E.
+
+---
+
+## CLAUDE.md banner carries no next-step or next-phase prose
+
+**Decision.** The post-configuration banner in `CLAUDE.md` is static
+orientation only — it never names a specific next prompt or phase.
+`TODO.txt` is the single source of truth for "what's next." Commands
+that write the banner (`/onboard`, `/bootstrap`) point readers at
+`TODO.txt` instead of naming a phase, and `/wind-down` Step 3 checks the
+banner for drift rather than re-deriving next-step prose. Resolves drift
+mode 1 of the now-closed "Trim CLAUDE.md" story.
+
+**Why.** The banner duplicated `TODO.txt` — which `CLAUDE.md` itself
+names as the next-step source — so the two disagreed whenever `TODO.txt`
+moved and the banner didn't (the banner named "Phase 1.1" for several
+phases after it landed). `CLAUDE.md` loads into every session's initial
+context, so stale next-step prose is permanent weight that actively
+misleads.
+
+**Why not keep a status banner a command updates each phase.**
+Self-edited next-phase banners are the drift source; any
+write-it-each-phase scheme re-introduces the disagreement. The
+status-comment configuration banner (`ONBOARD-STATUS` etc.) stays — it
+is status, not next-step, and earns its place as the entry point on a
+fresh project.
+
+**Scope note.** Companion to "Rules-read reliability" (which removed the
+Collaboration-rules per-rule summaries — drift mode 3) and the
+consumer-boundary partition (banner stays consumer-owned). All three
+drift modes of the "Trim CLAUDE.md" story are resolved; its remaining
+open sub-questions stay in `open-questions.md`.

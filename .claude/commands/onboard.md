@@ -79,13 +79,15 @@ each. Each question must be material — if the design already answers
 it, don't re-ask. Cover at minimum:
 
 **Version recency.** Before suggesting a version in any answer
-back to Jamie or in any artifact, follow the **Version freshness**
-section in `rules/environment-rules.md` — surface the staleness
-caveat to Jamie, offer to look up the current stable/LTS release,
-wait for go-ahead before running `WebSearch`/`WebFetch`. This
-applies even if the design doc names a version. The illustrative
-versions below (e.g. "Python 3.12", "Node 20") are placeholders
-only — never copy them as pins.
+back to Jamie or in any artifact, follow **Rule 10** (never assume
+training-time versions are current) in
+`rules/coding-session-rules.md` — surface the staleness caveat,
+offer to look up the current stable/LTS, wait for go-ahead before
+`WebSearch`/`WebFetch`. This applies even if the design doc names a
+version: ask whether the pin was intentional or a training-time
+residual before perpetuating it. The illustrative versions below
+(e.g. "Python 3.12", "Node 20") are placeholders only — never copy
+them as pins.
 
 ### Project identity
 - **Project name** and short slug (e.g. "Nichestream Platform" /
@@ -418,12 +420,12 @@ Rewrite `CLAUDE.md`:
 2. Replace the unconfigured 4-bullet banner block with a
    post-onboard banner:
 
-   > ✅ **Onboarded.** Planning docs are written. Next step is
-   > `/design-review` for a post-onboarding sanity check, then
-   > `/bootstrap` to plan the dev environment, then Prompt 0.
-   > `/deployment-plan` is deferrable. At every phase close,
-   > `/exit-test-plan` authors the manual walkthrough; Stage 2
-   > lands dispositions once Jamie has run it.
+   > ✅ **Onboarded.** Planning docs are written. See `TODO.txt`
+   > for the current next step — it is the authoritative handoff,
+   > rewritten at each session close.
+   >
+   > Before proceeding in any later session, check `docs/test-plans/`
+   > and `docs/design/` for an in-flight test plan or review checkpoint.
    >
    > **Project:** \<name\> — \<one-paragraph description\>
    > **Language / framework:** \<from Step 3\>

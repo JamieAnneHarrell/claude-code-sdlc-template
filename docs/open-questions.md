@@ -216,66 +216,32 @@ zero-pad width changes in checkpoint/test-plan filenames).
 *Proposed approach.* Phase 3 roadmap. Specifics deferred until we
 have a real regression to motivate the work.
 
-#### Trim CLAUDE.md — content that lives in TODO.txt or the rules files shouldn't be repeated here
+#### CLAUDE.md as a thin index — remaining sub-questions
 
-*Context.* CLAUDE.md is the only file loaded into every session's
-initial context, so every line in it is permanent weight on every
-session start. Three drift modes have accumulated:
+*Resolved core.* The three drift modes of the original "Trim
+CLAUDE.md" story are all resolved:
+1. **Self-edited "next phase" banner** — dropped from root CLAUDE.md
+   (Phase 1.3 wind-down, 2026-06-02), and the banner-writing commands
+   no longer emit next-phase prose. See `design-decisions.md`
+   "CLAUDE.md banner carries no next-step or next-phase prose."
+2. **Recurring-command cadence prose** — already removed from
+   `cc-template/CLAUDE.md`.
+3. **Collaboration-rules rule-by-rule summaries** — stripped. See
+   `design-decisions.md` "Rules-read reliability."
 
-1. **Self-edited "next phase" banners.** Root CLAUDE.md currently
-   opens with a status banner ("✅ Onboarded and bootstrapped.
-   Ready for the next phase prompt in `docs/CLAUDE_CODE_PROMPTS.md`
-   (Phase 1.1 — add `BLOCKED` disposition to `/exit-test-plan`)
-   ..."). The banner duplicates TODO.txt, which CLAUDE.md *itself*
-   names as the next-step source of truth. When TODO.txt updates
-   and the banner doesn't, they disagree. As of 2026-05-27 the
-   banner still names "Phase 1.1 — add BLOCKED" even though that
-   landed three commits ago.
-
-2. **Recurring-command cadence prose in `cc-template/CLAUDE.md`.**
-   The template's banner describes when `/design-review` and
-   `/exit-test-plan` run ("two recurring commands run on Jamie's
-   cadence... post-onboarding sanity check; between phases that
-   touch schema, multi-tenancy, auth..."). The cadence is the
-   skill's own job to know — the consumer doesn't need to be told
-   at session start. Context bloat that doesn't change session
-   behavior.
-
-3. **Rule summaries in the Collaboration-rules section.**
-   CLAUDE.md lists each of the 9 rules by topic and gestures at
-   KISS / progressive disclosure ("the rule-7 commit handoff
-   format," "the rule-4 simpler-alternative self-check"). Claude
-   (by its own admission, observed repeatedly) treats the summary
-   as sufficient priors and skips the end-to-end re-read. Pairs
-   with the resolved "Rules-read reliability" decision in
-   `design-decisions.md`.
-
-*Proposed approach.* Treat CLAUDE.md as a thin index — not a state
-report, not a rules summary.
-
-- Remove the self-edited "next phase" banner from root CLAUDE.md;
-  no command should write next-phase prose into CLAUDE.md. TODO.txt
-  is authoritative for "what's next."
-- Strip `cc-template/CLAUDE.md`'s recurring-command cadence prose.
-  Skills describe themselves; CLAUDE.md doesn't need to.
-- Replace the "9 rules summarized" section with a pointer only —
-  "9 rules; read `coding-session-rules.md` end-to-end before
-  responding." No topical list Claude can pattern-match as having
-  absorbed.
-
-*Open sub-questions.* This story is in tension with existing
-"In-flight artifact status callout at top of CLAUDE.md" — that
-story proposed automating a 🟡 status banner; this one argues
-banners drift and TODO.txt already serves the purpose. Resolve
-before either lands; probably retire the callout story in favor of
-this one. Whether the configuration-ritual banner (status-comment-
-driven, top of `cc-template/CLAUDE.md`) qualifies as bloat —
-probably earns its place because it's the entry-point on a fresh
-project, but worth a second look. Whether the "Reading order at
-session start" section is itself bloat: it tells Claude to read
-TODO.txt, PROJECT_PLAN, CLAUDE_CODE_PROMPTS — habits that might
-belong in a hook or a skill (see the "Rules-read reliability"
-decision in `design-decisions.md`), not in CLAUDE.md prose.
+*Still open.*
+- Tension with the "In-flight artifact status callout at top of
+  CLAUDE.md" story below — that one proposed an automated 🟡 status
+  banner; the trim stance argues banners drift and TODO.txt already
+  serves the purpose. Resolve before either lands; probably retire the
+  callout story in favor of the trim stance.
+- Whether the configuration-ritual banner (status-comment-driven, top
+  of `cc-template/CLAUDE.md`) qualifies as bloat — probably earns its
+  place as the entry point on a fresh project, but worth a second look.
+- Whether the "Reading order at session start" section is itself bloat:
+  it tells Claude to read TODO.txt, PROJECT_PLAN, CLAUDE_CODE_PROMPTS —
+  habits that might belong in a hook or a skill (see "Rules-read
+  reliability" in `design-decisions.md`), not in CLAUDE.md prose.
 
 #### Seed `cc-template/TODO.txt` as the active onboarding checklist; teach the TODO-driven habit from day one
 
