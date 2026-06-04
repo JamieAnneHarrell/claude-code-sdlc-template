@@ -38,7 +38,7 @@ those invariants.
 
 - Changes touching more than one command file or more than one
   load-bearing invariant. *Example: "Design how
-  `/refresh-from-repository --merge` interacts with `ONBOARD-FILL`
+  `/refresh-from-repository` interacts with `ONBOARD-FILL`
   markers across both rules files."*
 - Architectural decisions where trade-offs are non-obvious.
   *Example: "Should the new BLOCKED disposition be per-row or

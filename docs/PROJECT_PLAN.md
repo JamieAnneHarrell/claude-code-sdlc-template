@@ -225,6 +225,17 @@ lets consumers pull latest commands and merge latest rules /
 CLAUDE.md from the public upstream without re-running `/onboard`,
 using block-level reconciliation against template-owned markers.
 
+**Status (2026-06-04): built, then reframed — superseded by Phase
+2.1.A.** The command was built in `cc-template/` (2026-06-03) per
+the Option D deliverables below. Before close-out, a **second
+design review** ([checkpoint 004](design/design-review-checkpoint-004.md),
+LANDED 2026-06-04) reframed the reconciliation architecture from
+Option D (per-block hash + file-level baseline + state file) to
+**Option A** (stateless marker-state + ask-once; see FR-13). The
+Option-D deliverables below are retained as the **as-built record**
+— now a documented abandoned approach — and are **not** the current
+contract. The Option A rewrite is **Phase 2.1.A** below.
+
 **Deliverables.**
 - `cc-template/.claude/commands/refresh-from-repository.md`
   written per the design contract in
@@ -333,6 +344,56 @@ CC-TEMPLATE-BLOCK marker syntax,
 `.claude/claude-code-sdlc-template-refresh-state.md` state file,
 coarse-grained TEMPLATE-BLOCK wrapping (R6), CLAUDE.md merge
 partition (R3), and the inline-edit conflict UX (R2b).
+
+---
+
+## Phase 2.1.A — `/refresh-from-repository` Option A rewrite (active)
+
+**Goal.** Rewrite the built `/refresh-from-repository` from the
+Option D hash/baseline/state-file mechanism to the **stateless
+marker-state + ask-once** model adopted by checkpoint 004 (B1
+Option A), dissolving the seed/drift bug class so the command ships
+safely for fresh consumers.
+
+**Deliverables.**
+- Rewrite `cc-template/.claude/commands/refresh-from-repository.md`
+  to the marker-state model: markers carry `template-owned` /
+  `forked` / `removed` state; two-way compare + ask-once-and-record;
+  the executing session merges; **drop** the state file, per-block
+  hashes, `git hash-object` recipe, `last-synced` reference, and
+  baseline. Bump the `Refresh-logic-version` stamp.
+- Remove the `force-skills-only-from` read, the `## Upstream
+  directives` state-file section, and the Step 7.1 clear (checkpoint
+  004 R1) — the version stamp is the sole drift lever.
+- Settle the `forked` / `removed` marker-state encoding — NFR-4
+  pins the state vocabulary and removes the state file; this build
+  pins the exact syntax.
+- Supersede the affected `docs/design-decisions.md` entries
+  (reconciliation mechanism, content-hashing, consumer-boundary
+  partition, "state file is dogfood-generated").
+- Write the hash/baseline/state-file mechanism into
+  `docs/open-questions.md` § Abandoned Approaches.
+- Update `cc-template/README.md` "Keeping a project up to date" to
+  the Option A behavior.
+- Mirror the command to root `.claude/commands/` via the source-mode
+  dogfood (checkpoint 004 N2), after the briefing-rule fix is in.
+- `/onboard` `briefing-rule` preservation (checkpoint 004 N1) —
+  **landed at checkpoint 004 close, ahead of this phase.**
+- Authoritative build prompt: **Prompt 2.1.A** in
+  `docs/CLAUDE_CODE_PROMPTS.md`.
+
+**Exit criteria.** Source-mode dogfood at this repo's root runs the
+ask-once migration cleanly (markers inserted aligning to upstream;
+divergent blocks surface as guided yours/take/merge; no state file
+written); the surviving checkpoint 002 marker-syntax /
+coarse-wrapping / CLAUDE.md-partition decisions are intact; FR-13
+(Option A) is satisfied by the rewritten command. Then pin the
+marker-syntax invariants into root `CLAUDE.md` and close Phase 2.1
++ 2.1.A.
+
+**Design review checkpoint:**
+[checkpoint 004](design/design-review-checkpoint-004.md) (LANDED
+2026-06-04, Round 1) — reframed Option D → Option A.
 
 ---
 

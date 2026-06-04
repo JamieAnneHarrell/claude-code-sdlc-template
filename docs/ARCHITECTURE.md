@@ -60,7 +60,7 @@ claude-code-sdlc-template/                ← repo root (source-of-truth)
 
 **Universal content** — identical between root and `cc-template/`:
 
-- The 9 coding-session rules
+- The 10 coding-session rules
   ([`rules/coding-session-rules.md`](../rules/coding-session-rules.md))
 - Design philosophy rules
   ([`rules/design-philosophy-rules.md`](../rules/design-philosophy-rules.md))
@@ -128,9 +128,45 @@ test-plan files is the source of truth for those lifecycles.
 | `<!-- ONBOARD-FILL: environment -->` ... `<!-- /ONBOARD-FILL -->`  | `rules/environment-rules.md`      | `/bootstrap` |
 
 The markers demarcate downstream-owned content (everything inside)
-from template-owned content (everything outside) so the future
-`/refresh-from-repository --merge` (Phase 2) can preserve the
-inside while updating the outside.
+from template-owned content (everything outside) so
+`/refresh-from-repository` (Phase 2) preserves the inside while
+updating the outside. They are the inverse primitive to the
+`CC-TEMPLATE-BLOCK` markers below: `ONBOARD-FILL` wraps
+consumer-owned regions refresh never touches; `CC-TEMPLATE-BLOCK`
+wraps template-owned regions refresh keeps in sync.
+
+### CC-TEMPLATE-BLOCK marker state (refresh-managed content)
+
+`<!-- CC-TEMPLATE-BLOCK: <id> --> ... <!-- /CC-TEMPLATE-BLOCK -->`
+wraps the template-owned regions of `rules/*.md` and `CLAUDE.md`
+that `/refresh-from-repository` keeps in sync with upstream. Each
+block has a stable kebab-case `<id>` (file-scoped) used to match
+the same block across upstream and downstream.
+
+Under the Option A reconciliation model (FR-13, checkpoint 004),
+**the template files are their own memory** — each block also
+carries a state recorded in the marker itself. There is **no
+sidecar state file, no per-block content hash, and no baseline
+reference** (this is what distinguishes Option A from the abandoned
+Option D mechanism; see `design-decisions.md`). The state vocabulary:
+
+| State            | Meaning                                                        | Refresh behavior                              |
+|------------------|----------------------------------------------------------------|-----------------------------------------------|
+| `template-owned` | Default — the block tracks upstream.                           | Update it to match upstream.                  |
+| `forked`         | The consumer has taken ownership (set once, by asking).        | Leave it; may note when upstream diverges.    |
+| `removed`        | A **tombstone** — the block was deleted or moved out.          | Respect it; never re-add the block.           |
+
+Reconciliation is a **two-way compare** (downstream-current vs
+upstream-current) matched by `<id>`, with a one-time question
+recorded in-file when a block diverges or is absent with no
+tombstone (keep mine → `forked` / take upstream / hand-merge;
+never-had-it → add / removed-it → write tombstone). The executing
+Claude session performs the merge. The **state vocabulary** and the
+no-state-file rule are load-bearing per NFR-4; the exact syntax that
+encodes `forked` / `removed` in the marker is pinned by the Phase
+2.1.A build (Prompt 2.1.A). Logic drift between a downstream's loaded
+refresh and upstream's is handled separately by the command file's
+`Refresh-logic-version` stamp, not by these markers.
 
 ### Filename conventions for recurring artifacts
 
@@ -197,10 +233,18 @@ Same as above, with the source project itself producing planning
 docs from its own design intake at
 [`docs/design/cc-template-product-spec.md`](design/cc-template-product-spec.md).
 
-**Future flow** (Phase 2): downstream projects pull updated
-commands and rules from upstream via `/refresh-from-repository`.
-Two-stage, self-modifying: stage 1 replaces command files; stage 2
-runs the new logic to merge rules and CLAUDE.md.
+**Refresh flow** (Phase 2): downstream projects pull updated
+commands and rules from upstream via `/refresh-from-repository` —
+single-stage by default. It replaces the command files wholesale,
+then reconciles `rules/*.md` + `CLAUDE.md` against the downstream's
+current state using the CC-TEMPLATE-BLOCK marker-state model above
+(two-way compare + ask-once; the executing session merges,
+preserving `ONBOARD-FILL` regions). When a downstream's loaded
+refresh logic is behind upstream, it self-modifies: pulls the
+commands skills-only first, then asks the consumer to re-invoke so
+the new logic runs the merge. Built in Phase 2.1; the Option A
+rewrite that replaces the abandoned Option D mechanism is Phase
+2.1.A.
 
 ## Key technical decisions
 

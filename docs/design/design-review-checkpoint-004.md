@@ -2,7 +2,7 @@
 checkpoint: 004
 date: 2026-06-03
 reviewer: Claude (Opus 4.8) with Jamie
-status: AWAITING-DECISIONS
+status: LANDED 2026-06-04
 trigger: Refresh seed/drift contract — /refresh-from-repository not safe to first-run because consumers edit rules before /onboard or refresh, and current command may silently discard those edits; revisits checkpoint 002 seed/drift dispositions and whether /onboard should self-check/refresh first
 ---
 
@@ -264,7 +264,7 @@ Option B is chosen** — they are not specced as live findings here.
   the simpler alternative.
 
 > AUDIT NOTE — JAH:
-> _[UNMARKED — replace this line with your decision per the legend above]_
+> _[DECISION: (A)_
 
 ### Recommendations — resolve before or during the gate
 
@@ -297,7 +297,7 @@ sections to three. The lever-removal decision itself is firm
 regardless. Bump the command's Refresh-logic-version stamp.
 
 > AUDIT NOTE — JAH:
-> _[UNMARKED — replace this line with your decision per the legend above]_
+> _Accepted._
 
 ### Notes — acceptable now, revisit later
 
@@ -324,7 +324,7 @@ than relying on self-heal); under Option B this stays the existing
 Known Limitation with pre-marker-migration self-heal.
 
 > AUDIT NOTE — JAH:
-> _[UNMARKED — replace this line with your decision per the legend above]_
+> _DECISION: Fix this now in this iteration, no need for a later TODO._
 
 #### N2. Dogfood behavior under Option A
 
@@ -355,7 +355,7 @@ B it is gated on the baseline-source fix first. "Inspect the diff
 before committing" remains the review surface.
 
 > AUDIT NOTE — JAH:
-> _[UNMARKED — replace this line with your decision per the legend above]_
+> _Accepted with Caveat: We will fix the briefing-rule preservation before dogfood._
 
 #### N3. Landing scope + abandoned-approach capture
 
@@ -388,7 +388,7 @@ session does not re-derive it, (d) update `cc-template/README.md`
 the 002 marker-syntax / coarse-wrapping decisions that survive.
 
 > AUDIT NOTE — JAH:
-> _[UNMARKED — replace this line with your decision per the legend above]_
+> _Accepted._
 
 ## What the design got right (preserve)
 
@@ -431,7 +431,11 @@ the purposes of Stage 2's landing application.*
 
 | Round | Finding | Disposition | Reason |
 |-------|---------|-------------|--------|
-| <empty until Stage 2> | | | |
+| Original | B1 | Decision | Option A — stateless marker-state + ask-once reconciliation; replaces the hash/baseline/state-file mechanism. Provenance-by-recognition trade accepted. |
+| Original | R1 | Accepted | Version stamp is the sole drift lever; remove `force-skills-only` / Upstream directives; FR-13 edited at landing; bump the Refresh-logic-version stamp. |
+| Original | N1 | Decision | Fix `/onboard` `briefing-rule` preservation now in this iteration (not a deferred TODO); Jamie authorized an in-session `onboard.md` edit despite it being outside Stage 2's normal edit scope. |
+| Original | N2 | Accepted with Caveats | Dogfood is safe under Option A; caveat: fix the `briefing-rule` preservation before the dogfood. |
+| Original | N3 | Accepted | Landing produces in-scope FR-13 (+ PROJECT_PLAN Phase 2.1) edits plus the N3 TODO bundle, including the Abandoned Approaches record for the hash/baseline/state-file mechanism. |
 
 ## Sign-off Summary
 
@@ -440,9 +444,52 @@ section — sign-offs go inline above.*
 
 | ID | Final disposition |
 |----|-------------------|
-| <empty until landing> | |
+| B1 | Decision: Option A — stateless marker-state + ask-once reconciliation (replaces the hash/baseline/state-file mechanism). |
+| R1 | Accepted — version stamp is the sole drift lever; `force-skills-only` / Upstream directives removed; FR-13 edited at landing. |
+| N1 | Decision: `/onboard` `briefing-rule` preservation fixed this pass (in-session, authorized scope exception). |
+| N2 | Accepted with Caveats — dogfood safe under Option A; fix briefing-rule preservation before dogfood (done at landing). |
+| N3 | Accepted — landing produced the in-scope FR-13 / NFR-4 / PROJECT_PLAN edits plus the Phase 2.1.A TODO bundle incl. the Abandoned Approaches record. |
 
 ## Follow-up actions landed
 
 *Filled when Stage 2 lands the doc. Lists every doc edit and
 every TODO that landed during the landing pass.*
+
+**In-scope doc edits applied this landing:**
+
+- B1: rewrote `docs/REQUIREMENTS.md` FR-13 to the Option A stateless
+  marker-state + ask-once contract (no state file / hashes /
+  baseline).
+- B1 / NFR-4 drift: revised `docs/REQUIREMENTS.md` NFR-4 — marker
+  blocks now carry `template-owned` / `forked` / `removed` state;
+  supersedes the 002 "no inline metadata" pin; removes the refresh
+  state-file path + schema as load-bearing.
+- R1: lever removal folded into the FR-13 rewrite (version stamp is
+  the sole drift lever); command-file changes are Phase 2.1.A.
+- N3 / plan coherence: added a "built then reframed" status note to
+  `docs/PROJECT_PLAN.md` Phase 2.1 and a new **Phase 2.1.A**
+  (Option A rewrite); added a 2026-06-04 supersession note to
+  `docs/CLAUDE_CODE_PROMPTS.md` Prompt 2.1's footer (run body
+  untouched) and a new **Prompt 2.1.A**.
+- N1: edited `cc-template/.claude/commands/onboard.md` and its root
+  mirror to preserve the `briefing-rule` `CC-TEMPLATE-BLOCK` markers
+  when `/onboard` rewrites `multi-agent-rules.md` (authorized
+  in-session scope exception; the consumer-facing instruction is
+  self-contained, no checkpoint reference).
+
+**TODOs queued for Phase 2.1.A (out of Stage 2's edit scope):**
+
+- (a) Rewrite `cc-template/.claude/commands/refresh-from-repository.md`
+  to Option A + the full Prompt 2.1.A rewrite work; bump the
+  `Refresh-logic-version` stamp.
+- (b) Update/supersede the affected `docs/design-decisions.md`
+  entries (reconciliation mechanism, content-hashing,
+  consumer-boundary partition, "state file is dogfood-generated").
+- (c) Write the Abandoned Approaches entry in `docs/open-questions.md`
+  for the hash/baseline/state-file mechanism (what it was, why
+  abandoned, provenance-by-recognition accepted as the trade).
+- (d) Update `cc-template/README.md` "Keeping a project up to date"
+  to the Option A behavior.
+- (e) Run the source-mode dogfood (N2) — after the briefing-rule fix
+  (already landed); then pin the surviving marker-syntax invariants
+  into root `CLAUDE.md` and close Phase 2.1 + 2.1.A.

@@ -504,6 +504,80 @@ to apply whatever the vendored subdir currently holds.
 
 ---
 
+## `/refresh-from-repository` reconciliation: Option A (stateless marker-state + ask-once)
+
+**Decision.** Reconciliation moves from checkpoint 002's Option D
+(per-block content hash + file-level baseline in a sidecar state file
++ three-way merge) to **Option A**: template-managed blocks carry
+their own state in-file (`template-owned` / `forked` / `removed`);
+refresh is a two-way compare + ask-once-and-record, matched by block
+id, with the executing Claude session performing the surgical merge;
+the command file's version stamp is the sole drift lever. No state
+file, no per-block hashes, no baseline. Adopted at design review
+checkpoint 004 (B1), 2026-06-04.
+
+**Why.** Patching Option D's seed path surfaced that the whole bug
+class (wrong-side baseline in the re-seed branch and the pre-marker
+migration; "when is the baseline established") existed *because* the
+baseline + hashes were stored in a sidecar file. Moving the memory
+into the files themselves (a tombstone / `forked` flag set by asking
+once) and letting the LLM do the compare + merge it already owns
+dissolves the class outright and removes the state file, the hashes,
+the `git hash-object` recipe, the `last-synced` reference, and the
+baseline.
+
+**Why not keep Option D and fix the seed path.** It retains
+deterministic provenance — the one thing Option A trades away — but
+keeps the correctness-and-maintenance surface this review existed to
+chase: keeping seeded/shipped hashes correct, cross-platform
+LF/`hash-object` discipline, committing the state file so the
+baseline survives a clean clone, and the recurring drift risk across
+all of it. Per rule 4, Option A is the simpler alternative; the
+provenance trade (refresh asks the consumer once instead of inferring
+from a baseline, with "take upstream" the git-recoverable safe
+default) was accepted 2026-06-04.
+
+**Scope note.** Supersedes the Option-D-era entries below —
+"reconciliation mechanism", "content hashing uses `git hash-object`",
+the state-file half of "consumer-boundary partition", and "Phase 2.1
+builds in `cc-template/` only; the refresh state file is
+dogfood-generated and committed". Those are reconciled to Option A as
+part of **Phase 2.1.A** (the command rewrite); until then they
+describe the abandoned mechanism. The surviving checkpoint 002
+decisions (marker syntax, coarse-grained wrapping, CLAUDE.md merge
+partition, "template marks its own content") carry forward unchanged.
+
+---
+
+## `/onboard` preserves the `briefing-rule` marker when rewriting `multi-agent-rules.md`
+
+**Decision.** When `/onboard` rewrites `multi-agent-rules.md` for the
+chosen multi-agent mode, it preserves the `briefing-rule`
+`CC-TEMPLATE-BLOCK` marker pair verbatim rather than emitting an
+unmarked file. Adopted at design review checkpoint 004 (N1),
+2026-06-04.
+
+**Why.** Under the Option A reconciliation model, markers are
+memory-bearing (they carry a block's `template-owned` / `forked` /
+`removed` state), so a dropped marker loses provenance, not just
+formatting. `briefing-rule` is the one refresh-managed block in
+`multi-agent-rules.md` (mode content is consumer-owned and unmarked),
+so preserving it at onboarding keeps the block trackable from day one
+instead of relying on a later refresh to re-establish it.
+
+**Why not rely on pre-marker-migration self-heal.** The first
+`/refresh-from-repository` can re-insert a missing marker, but that
+leaves a window where a freshly-onboarded project has no marker at
+all and couples correctness to running refresh. Instructing
+`/onboard` to preserve the marker is the tighter guarantee; the
+self-heal path remains a backstop.
+
+**Scope note.** Closes the former Known Limitation "`/onboard` does
+not preserve CC-TEMPLATE-BLOCK markers." End-to-end behavior is
+confirmed when the Phase 2.1.A source-mode dogfood runs.
+
+---
+
 ## `/refresh-from-repository` reconciliation mechanism
 
 **Decision.** Option D hybrid: per-block content hashes detect inline

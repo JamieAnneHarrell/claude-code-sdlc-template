@@ -304,118 +304,62 @@ paternalistic. Whether the seeded TODO.txt should be a sample
 users can rewrite freely vs. a structured artifact whose shape
 `/wind-down` preserves.
 
-#### First-refresh seed must treat consumer rule-edits as an expected path; collapse the redundant force-skills-only lever
+#### `/design-review` Step S1.1 should read `docs/open-questions.md` (Abandoned Approaches especially)
 
-*Context.* Surfaced 2026-06-03 reviewing `/refresh-from-repository`
-before its first (dogfood) source-mode run. An inline fix was started
-and then pulled back when the divergences from checkpoint 002's
-signed-off contract multiplied past "small patch." Four coupled
-findings, all in the refresh seed/drift machinery:
+*Context.* Surfaced 2026-06-04 while authoring checkpoint 004's first
+Abandoned Approaches entry (N3 — the hash/baseline/state-file
+mechanism). `docs/open-questions.md`'s `### Abandoned Approaches`
+section exists so that "someone (Claude or human) tries the same thing
+again — the file reminds them why it didn't work." But the one command
+that re-proposes design options — `/design-review` — never reads that
+file. Step S1.1 "Read project context"
+(`.claude/commands/design-review.md`) loads REQUIREMENTS,
+ARCHITECTURE, PROJECT_PLAN, CLAUDE_CODE_PROMPTS, README, DEPLOYMENT,
+the `docs/design/` intake, and prior checkpoints — but not
+`docs/open-questions.md`. So a Stage 1 review can re-derive an
+already-abandoned approach as a fresh Option A/B/C and nobody is
+holding the record that says "tried, failed, here's why."
 
-1. **First-seed divergence is the expected case, not an edge case.**
-   The README tells consumers to review and edit rules they disagree
-   with *before* running `/onboard` (README "How to use" step 3
-   precedes step 4; reinforced by the "Seed `cc-template/TODO.txt` as
-   the active onboarding checklist" story above). So by the first
-   `/refresh-from-repository`, a fresh project's template blocks have
-   *commonly already diverged* from upstream. The seed path must be
-   designed for "divergence present at first seed" as the default.
-   Jamie's framing: this warrants a rule-review walk *before*
-   `/onboard` even runs, so keep-vs-lift-vs-edit decisions are made
-   deliberately and captured, not silently absorbed by the first
-   refresh.
+This is the durable cross-session enforcement of coding-session
+**rule 3** (rejections are permanent) at the design level. The risk is
+concrete and imminent: checkpoint 004's N3 writes the
+hash/baseline/state-file mechanism into Abandoned Approaches precisely
+so a future session does not re-derive it — and the next
+`/design-review` on the refresh machinery is exactly the session that
+would re-derive it if S1.1 still doesn't read that section.
 
-2. **The re-seed path seeds its baseline from the wrong side.** When
-   markers exist but there is no state file (every fresh consumer's
-   first refresh — the command's Step 2 re-seed branch), the baseline
-   is seeded from the *downstream's current content*. Because the
-   three-way merge treats the baseline as "upstream as of the sync," a
-   consumer edit made before that first refresh is frozen into the
-   baseline, and on the *next* run the block is misclassified as
-   "downstream untouched, upstream changed" and silently reverted —
-   even with no real upstream change. The baseline must instead
-   represent upstream's content at the sync point. (A minimal "seed
-   from upstream-current" patch was scoped and then pulled back on
-   2026-06-03 in favor of resolving the reframe in (1) first.)
+*Proposed approach.* Add `docs/open-questions.md` to the Step S1.1
+read list (after the design-intake / prior-checkpoint reads), with a
+line directing the review to treat `### Abandoned Approaches` as
+hard constraints — do not re-propose an abandoned approach as a live
+option without explicitly noting it was abandoned and why the
+calculus has changed (rule 3's "say so once with new information"
+path). Recommended scope: read the **whole file**, not just the
+Abandoned Approaches section — Deferred User Stories, Known
+Limitations, and Open Questions are all live context for a review (a
+review may surface a deferred story as now-live, or is the natural
+place an Open Question gets answered), and "read
+`docs/open-questions.md`" is a simpler instruction than "read one
+section of it." Narrower alternative: load only the Abandoned
+Approaches section (leaner, but cherry-picks and misses the other
+three categories). Decide at build time.
 
-3. **The pre-marker migration (Step 6) has the same latent defect.**
-   It seeds per-block hashes from the "now-marked" (downstream)
-   content. For a block where the consumer *keeps* a divergent edit
-   during migration, the baseline becomes that edit, so a later
-   upstream change to the block silently overwrites it. Same root
-   cause as (2): baseline sourced from downstream, not upstream. Does
-   not affect the source-repo root dogfood (root has no kept-divergent
-   template blocks), but bites real consumers.
+Read-only — this does **not** change `/design-review`'s edit scope.
+`docs/open-questions.md` stays owned by `/onboard` + `/wind-down`
+(and `/exit-test-plan` Stage 2); design-review adds it as an *input*
+only.
 
-4. **The `force-skills-only-from` / `Upstream directives` lever is
-   redundant and unwired.** Checkpoint 002 R3 / R4-A1 gave the state
-   file a fourth `Upstream directives` section letting upstream force
-   a skills-only pass. It duplicates the version-stamp drift signal R4
-   settled (same job; the stamp's integer comparison already stages
-   every downstream behind a bump); its one distinct capability —
-   forcing skills-only while the merge logic is byte-identical — has
-   no reachable use case; and as specified nothing ingests it from
-   upstream into the downstream-owned state file, so it can only ever
-   be empty. The design docs even disagree on where it lives
-   (checkpoint 002 R3 disposition row says "in that file" = the command
-   file; the sign-off summary and `design-decisions.md` say the state
-   file). Candidate resolution: drop it, make the version-stamp bump
-   the sole drift lever, state file drops to three sections.
+*Implementation surfaces to touch.*
 
-*Proposed approach.* Take to a `/design-review` checkpoint — the
-seed/drift contract is pinned by checkpoint 002 and the reframe
-revises signed-off decisions, so it is past inline-patch scope.
-Direction only (options and dispositions are the review's job, per the
-findings-only discipline): (a) make "consumer edits present at first
-seed" a first-class expected flow — possibly a rule-review /
-keep-vs-lift walk before or at `/onboard`; (b) baseline-source
-correctness in both the re-seed path and Step 6 (baseline =
-upstream-at-sync, never downstream-current); (c) whether the first
-seed should *surface* divergences interactively or silently
-preserve-and-defer (proactive visibility vs. a noisy conflict walk on
-intentional edits); (d) collapse `force-skills-only-from` into the
-version-stamp lever.
+- `.claude/commands/design-review.md` Step S1.1 — add
+  `docs/open-questions.md` to the numbered read list, plus the
+  Abandoned-Approaches-as-constraint note.
+- Mirror to `cc-template/.claude/commands/design-review.md` per NFR-9.
 
-*Related.* Pairs with "Seed `cc-template/TODO.txt` as the active
-onboarding checklist" above (the review-before-onboard habit — the
-rule-walk idea may subsume part of it) and the Known Limitation
-"`/onboard` does not preserve CC-TEMPLATE-BLOCK markers" below.
-
-*Open sub-questions.* Does the rule-review walk belong in `/onboard`,
-in a pre-onboard step, or stay a README-documented manual habit
-(safety vs. paternalism)? If divergences are surfaced at first seed,
-how to avoid a noisy multi-block conflict walk for edits made on
-purpose? Does collapsing to the version-stamp lever lose any
-flexibility checkpoint 002's R3 caveat meant to preserve ("let a
-future version solve merging differently")? Should the
-baseline-source correctness fix ship ahead of the larger reframe as a
-standalone patch, or land with it?
-
-### Known Limitations
-
-#### `/onboard` does not preserve CC-TEMPLATE-BLOCK markers when it rewrites mode-specific rules files
-
-*Context.* `/onboard` rewrites `multi-agent-rules.md` wholesale based
-on the chosen multi-agent mode. The dist placeholder wraps only the
-universal `briefing-rule` block in a CC-TEMPLATE-BLOCK; the
-mode-specific content is intentionally left unmarked (consumer/mode
-owned). If `/onboard`'s rewrite drops or relocates the `briefing-rule`
-markers, a freshly-onboarded project's `multi-agent-rules.md` may have
-no markers at all.
-
-*Why it's not currently broken.* `/refresh-from-repository`'s
-pre-marker migration (Step 6) self-heals this: the first refresh in a
-project with marker-less rules files re-inserts markers by aligning
-against upstream. So the worst case is "markers absent until first
-refresh," not "refresh misbehaves." The same reasoning covers the
-onboard-appended tooling tails of `testing-rules.md` /
-`environment-rules.md` — those are free regions by design.
-
-*Open question.* Whether `/onboard`'s spec should be updated to
-preserve the `briefing-rule` marker when it rewrites
-`multi-agent-rules.md` (tighter, but couples `/onboard` to the marker
-convention), or whether relying on pre-marker migration to re-establish
-markers is sufficient (looser, already works). Surfaced during the
-Phase 2.1 build; out of scope for that phase since it touches
-`/onboard`, not `/refresh-from-repository`.
+*Open sub-questions.* Whether the addendum branch (S1.1 item 9) needs
+the same read or whether the initial-branch read carries forward
+within the same checkpoint loop. Whether the
+Abandoned-Approaches-as-constraint note belongs in S1.1 (read time) or
+S1.4 (finding-composition rules) — probably S1.1 so the constraint is
+loaded before any option drafting begins.
 

@@ -340,7 +340,12 @@ Replace the placeholder with the variant Jamie chose:
   on each other).
 
 All variants reference the "smart colleague who just walked in" briefing
-rule from the global `~/.claude/CLAUDE.md`.
+rule from the global `~/.claude/CLAUDE.md`. **Preserve the
+`briefing-rule` `CC-TEMPLATE-BLOCK` markers verbatim** when you rewrite
+this file — it is the one refresh-managed block in
+`multi-agent-rules.md`, and `/refresh-from-repository` relies on those
+markers to track the block across updates. Wrap the chosen variant's
+content; do not drop or relocate the marker pair.
 
 ### `rules/project-rules.md` (append)
 Inside the `<!-- ONBOARD-FILL: project-scope -->` block, append:

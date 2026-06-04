@@ -586,6 +586,62 @@ Reading-order entry for `docs/design/`). Must land before Phase
   Phase 2.1 ships. Includes the N5 HTML-comment-stripping caveat
   that relaxes the fine-vs-coarse-grained block-boundary
   decision.
+- 2026-06-04 — **Superseded by checkpoint 004 (B1 Option A).** This
+  prompt's body describes the Option D (hash/baseline/state-file)
+  mechanism as built; checkpoint 004 reframed reconciliation to the
+  stateless marker-state + ask-once model. This run body is kept as
+  the historical record (it already ran); the rewrite is specified
+  by **Prompt 2.1.A** and tracked as Phase 2.1.A. Do not re-run this
+  prompt.
+
+---
+
+## Prompt 2.1.A: `/refresh-from-repository` Option A rewrite
+
+**Read first.**
+- [`docs/REQUIREMENTS.md`](REQUIREMENTS.md) FR-13 (Option A), NFR-4
+- [`docs/PROJECT_PLAN.md`](PROJECT_PLAN.md) Phase 2.1.A
+- [`docs/design/design-review-checkpoint-004.md`](design/design-review-checkpoint-004.md)
+  — B1 (Option A), R1, N1, N2, N3, and the investigation section
+- The as-built command
+  [`cc-template/.claude/commands/refresh-from-repository.md`](../cc-template/.claude/commands/refresh-from-repository.md)
+  (Option D — being rewritten)
+- [`docs/open-questions.md`](open-questions.md) § Abandoned
+  Approaches (once the Option-D entry is written)
+
+**Scope.**
+1. Rewrite the command to **stateless marker-state + ask-once**
+   reconciliation per FR-13 / checkpoint 004 B1 Option A. Markers
+   carry `template-owned` / `forked` / `removed` state; refresh is a
+   two-way compare matched by id, asking once and recording the
+   answer in-file; the executing session performs the surgical
+   merge.
+2. **Remove** the state file, per-block hashes, `git hash-object`
+   recipe, `last-synced` reference, and baseline. Settle the
+   `forked` / `removed` marker-state encoding (NFR-4 pins the state
+   vocabulary; this build pins the exact syntax).
+3. Make the `Refresh-logic-version` stamp the **sole** drift lever;
+   remove `force-skills-only-from`, the `## Upstream directives`
+   section, and the Step 7.1 clear (R1). Bump the stamp.
+4. Converge source-mode and public-mode (disk vs network read only;
+   no baseline fetch; public mode no longer needs git history).
+   First refresh is a one-time guided yours/take/merge walk, then
+   quiet.
+5. Supersede the affected `design-decisions.md` entries; write the
+   Abandoned Approaches entry for the Option D mechanism.
+6. Update `cc-template/README.md` "Keeping a project up to date".
+7. Mirror to root `.claude/commands/` via the source-mode dogfood
+   (N2), after `/onboard`'s briefing-rule preservation is confirmed
+   (N1 — landed at checkpoint 004 close).
+8. After markers exist on-disk at root, pin the marker syntax in
+   root `CLAUDE.md` Load-bearing invariants and close Phase 2.1.A.
+
+**Exit criteria.** As Phase 2.1.A: source-mode dogfood runs the
+ask-once migration cleanly with no state file; FR-13 (Option A)
+satisfied; surviving 002 decisions intact.
+
+**Revisions since this prompt ran:** none yet (authored 2026-06-04
+by checkpoint 004 landing; not yet run).
 
 ---
 

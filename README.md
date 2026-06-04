@@ -66,7 +66,7 @@ Edits to project-only files (this README, root `CLAUDE.md`,
 source-only docs, root rules) stay outside that subdirectory.
 The convention:
 
-- **Universal content** (the 9 rules, design philosophy, command
+- **Universal content** (the 10 rules, design philosophy, command
   files, etc.) is kept identical in both locations. Edit in
   [`cc-template/`](cc-template/) first; copy the change up to
   root if it's a command or rules file this project itself uses.

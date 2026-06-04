@@ -83,10 +83,10 @@ exactly one command. Base values: `UNCONFIGURED`,
 (filled by `/onboard`); `<!-- ONBOARD-FILL: environment -->` in
 `rules/environment-rules.md` (filled by `/bootstrap`). Markers
 demarcate downstream-owned content from template-owned content for
-`/refresh-from-repository --merge` (Phase 2).
+`/refresh-from-repository` (Phase 2).
 
 **FR-11: Universal content is identical between source and dist.**
-The 9 coding-session rules, design philosophy rules, the six
+The 10 coding-session rules, design philosophy rules, the six
 command files, and the placeholder rules files
 (`multi-agent-rules.md`, `project-rules.md`,
 `environment-rules.md`, `testing-rules.md`) ship identical at root
@@ -104,35 +104,50 @@ project's README, and root `CLAUDE.md` never copy into the dist.
 single-stage command shipped in the dist that pulls latest
 `.claude/commands/*.md` from upstream and merges latest
 `rules/*.md` + `CLAUDE.md` against the downstream's current state
-using block-level reconciliation against template-owned marker
-blocks. Reconciliation uses Option D (hybrid: per-block content
-hash for inline-edit detection + file-level baseline reference for
-deletion-vs-never-existed disambiguation). Markers use the pinned
-syntax `<!-- CC-TEMPLATE-BLOCK: <id> --> ... <!-- /CC-TEMPLATE-BLOCK -->`
-(id-only, no inline metadata). Refresh state — upstream baseline,
-per-block hashes, drift-version stamp, upstream directives — lives
-in a single machine-managed file at
-`.claude/claude-code-sdlc-template-refresh-state.md`. Inline-edit
-conflicts surface inline to the running session one block at a
-time, with three resolution choices (accept upstream / keep
-downstream / hand-merge). Auto-detects "merge-logic drift"
-(locally-loaded refresh logic behind upstream) and stages
-skills-first when warranted, prompting the consumer to re-invoke.
-Source-mode behavior: when invoked in a repo containing a
-`cc-template/` subdirectory at cwd, "upstream" is the local
-`cc-template/` subdir rather than the public GitHub URL (serves
-the source-of-truth repo's root↔dist sync and the vendored-template-
-lock-in use case). On first source-mode invocation in a repo,
-refresh content-inspects the `cc-template/` subdir to confirm it's
-this template and caches the determination in CLAUDE.md. Source-mode
-preserves the same three-way reconciliation semantics as public mode;
-only the "fetch baseline" step branches (network for public, disk
-for source). Two progressive-disclosure flags ship in v1:
-`--refresh-skills-only` (manual override for the drift-staging path)
-and `--no-claudemd` (skip CLAUDE.md from the merge). Full design
-contract in `docs/design-decisions.md` "Template marks its own
-content; reconciliation tolerates divergence" + checkpoint 002
-dispositions.
+using **stateless marker-state reconciliation** (adopted by
+[checkpoint 004](design/design-review-checkpoint-004.md) B1,
+replacing checkpoint 002's Option D hash/baseline/state-file
+mechanism — now an abandoned approach). Template-managed regions
+are wrapped in `CC-TEMPLATE-BLOCK` markers that carry per-block
+state: `template-owned` (normal, tracks upstream), `forked`
+(consumer-owned, set by asking once), and `removed` (a tombstone
+where a block was deleted or moved out). The marker memory lives
+in the rules / CLAUDE.md files themselves — there is **no sidecar
+state file, no per-block content hash, and no baseline reference.**
+
+Reconciliation is a **two-way compare + ask-once-and-record**,
+matched by block id: a block matching upstream is skipped; a
+divergent unmarked block triggers a one-time question (keep mine →
+`forked` / take upstream / hand-merge); a `forked` block is left
+alone (optionally noting upstream now differs); a `removed`
+tombstone is respected and never re-added; a block absent with no
+tombstone triggers a one-time question (never had it → add /
+removed it → write tombstone); a new upstream block is added. The
+executing Claude session performs the compare and the surgical
+merge (per `design-decisions.md` "Template marks its own
+content"). Markers use the pinned `CC-TEMPLATE-BLOCK` syntax with a
+stable kebab-case `<id>` and carry per-block state per NFR-4
+(`template-owned` / `forked` / `removed`); the exact encoding of
+that state in the marker is settled by the Phase 2.1.A build.
+
+**Drift** is handled by the command file's own
+`Refresh-logic-version` stamp as the **sole lever**: when
+upstream's stamp is higher, refresh pulls commands skills-only and
+asks the consumer to re-invoke. **Source-mode and public-mode
+converge** — the only difference is reading upstream-current from
+the local `cc-template/` subdir (when present at cwd) versus the
+public GitHub URL; there is no baseline to fetch, and public mode
+no longer needs git *history*. First-seed divergence is not a
+special case: the first refresh is a one-time guided
+yours/take/merge walk over diverged blocks, then quiet. On first
+source-mode invocation in a repo, refresh content-inspects the
+`cc-template/` subdir to confirm it's this template and caches the
+determination in CLAUDE.md. Two progressive-disclosure flags ship
+in v1: `--refresh-skills-only` (manual override for the
+drift-staging path) and `--no-claudemd` (skip CLAUDE.md from the
+merge). Full design contract in checkpoint 004 (B1 Option A) plus
+the surviving checkpoint 002 marker-syntax / coarse-wrapping /
+CLAUDE.md-partition decisions.
 
 **FR-14: `/write-user-documentation` is a Phase 2 deliverable.** A
 command that authors end-user documentation. Shipped in the dist;
@@ -187,17 +202,26 @@ load-bearing.** Stage detection parses for exact strings:
 placeholder text breaks stage detection — audit `Step 0`, `Step
 S1.5`, and `Step S1.A` of the relevant command file together. The
 template-marker syntax for `/refresh-from-repository` is similarly
-load-bearing — pinned by checkpoint 002 as
+load-bearing. Pinned by checkpoint 002 as
 `<!-- CC-TEMPLATE-BLOCK: <id> --> ... <!-- /CC-TEMPLATE-BLOCK -->`
-with `<id>` a stable human-readable kebab-case identifier (no
-inline metadata; per-block hashes live in the state file). The
-refresh state file at
-`.claude/claude-code-sdlc-template-refresh-state.md` is also
-load-bearing: refresh writes it; consumers don't hand-edit.
-Changing the marker open/close strings, the state-file path, or
-the state-file schema (sections: Upstream baseline / Block hashes
-/ Refresh logic version / Upstream directives) requires auditing
-the refresh logic and all template files that carry markers.
+with `<id>` a stable human-readable kebab-case identifier, and
+**revised by checkpoint 004 (B1 Option A)** so each block carries
+per-block **state**: `template-owned` (default, tracks upstream),
+`forked` (consumer-owned), or `removed` (a tombstone for a deleted
+or moved-out block). This state lives in the marker itself, in the
+rules / CLAUDE.md files — which **supersedes checkpoint 002's "no
+inline metadata" pin** (the marker now carries the one piece of
+metadata reconciliation needs) and **removes the refresh state file
+entirely** (checkpoint 004 abandoned the hash/baseline/state-file
+mechanism: there is no
+`.claude/claude-code-sdlc-template-refresh-state.md`, no per-block
+hashes, and no baseline reference). Marker memory in the template
+files is the sole reconciliation state. The exact encoding of
+`forked` / `removed` within the marker is pinned by the Phase
+2.1.A rewrite (Prompt 2.1.A). Changing the marker open/close
+strings or the state vocabulary (`template-owned` / `forked` /
+`removed`) requires auditing the refresh logic and all template
+files that carry markers.
 
 **NFR-5: Failures refuse explicitly.** Commands refuse with a
 pointer to the right command when prerequisites aren't met (e.g.
