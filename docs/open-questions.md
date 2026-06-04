@@ -304,6 +304,93 @@ paternalistic. Whether the seeded TODO.txt should be a sample
 users can rewrite freely vs. a structured artifact whose shape
 `/wind-down` preserves.
 
+#### First-refresh seed must treat consumer rule-edits as an expected path; collapse the redundant force-skills-only lever
+
+*Context.* Surfaced 2026-06-03 reviewing `/refresh-from-repository`
+before its first (dogfood) source-mode run. An inline fix was started
+and then pulled back when the divergences from checkpoint 002's
+signed-off contract multiplied past "small patch." Four coupled
+findings, all in the refresh seed/drift machinery:
+
+1. **First-seed divergence is the expected case, not an edge case.**
+   The README tells consumers to review and edit rules they disagree
+   with *before* running `/onboard` (README "How to use" step 3
+   precedes step 4; reinforced by the "Seed `cc-template/TODO.txt` as
+   the active onboarding checklist" story above). So by the first
+   `/refresh-from-repository`, a fresh project's template blocks have
+   *commonly already diverged* from upstream. The seed path must be
+   designed for "divergence present at first seed" as the default.
+   Jamie's framing: this warrants a rule-review walk *before*
+   `/onboard` even runs, so keep-vs-lift-vs-edit decisions are made
+   deliberately and captured, not silently absorbed by the first
+   refresh.
+
+2. **The re-seed path seeds its baseline from the wrong side.** When
+   markers exist but there is no state file (every fresh consumer's
+   first refresh — the command's Step 2 re-seed branch), the baseline
+   is seeded from the *downstream's current content*. Because the
+   three-way merge treats the baseline as "upstream as of the sync," a
+   consumer edit made before that first refresh is frozen into the
+   baseline, and on the *next* run the block is misclassified as
+   "downstream untouched, upstream changed" and silently reverted —
+   even with no real upstream change. The baseline must instead
+   represent upstream's content at the sync point. (A minimal "seed
+   from upstream-current" patch was scoped and then pulled back on
+   2026-06-03 in favor of resolving the reframe in (1) first.)
+
+3. **The pre-marker migration (Step 6) has the same latent defect.**
+   It seeds per-block hashes from the "now-marked" (downstream)
+   content. For a block where the consumer *keeps* a divergent edit
+   during migration, the baseline becomes that edit, so a later
+   upstream change to the block silently overwrites it. Same root
+   cause as (2): baseline sourced from downstream, not upstream. Does
+   not affect the source-repo root dogfood (root has no kept-divergent
+   template blocks), but bites real consumers.
+
+4. **The `force-skills-only-from` / `Upstream directives` lever is
+   redundant and unwired.** Checkpoint 002 R3 / R4-A1 gave the state
+   file a fourth `Upstream directives` section letting upstream force
+   a skills-only pass. It duplicates the version-stamp drift signal R4
+   settled (same job; the stamp's integer comparison already stages
+   every downstream behind a bump); its one distinct capability —
+   forcing skills-only while the merge logic is byte-identical — has
+   no reachable use case; and as specified nothing ingests it from
+   upstream into the downstream-owned state file, so it can only ever
+   be empty. The design docs even disagree on where it lives
+   (checkpoint 002 R3 disposition row says "in that file" = the command
+   file; the sign-off summary and `design-decisions.md` say the state
+   file). Candidate resolution: drop it, make the version-stamp bump
+   the sole drift lever, state file drops to three sections.
+
+*Proposed approach.* Take to a `/design-review` checkpoint — the
+seed/drift contract is pinned by checkpoint 002 and the reframe
+revises signed-off decisions, so it is past inline-patch scope.
+Direction only (options and dispositions are the review's job, per the
+findings-only discipline): (a) make "consumer edits present at first
+seed" a first-class expected flow — possibly a rule-review /
+keep-vs-lift walk before or at `/onboard`; (b) baseline-source
+correctness in both the re-seed path and Step 6 (baseline =
+upstream-at-sync, never downstream-current); (c) whether the first
+seed should *surface* divergences interactively or silently
+preserve-and-defer (proactive visibility vs. a noisy conflict walk on
+intentional edits); (d) collapse `force-skills-only-from` into the
+version-stamp lever.
+
+*Related.* Pairs with "Seed `cc-template/TODO.txt` as the active
+onboarding checklist" above (the review-before-onboard habit — the
+rule-walk idea may subsume part of it) and the Known Limitation
+"`/onboard` does not preserve CC-TEMPLATE-BLOCK markers" below.
+
+*Open sub-questions.* Does the rule-review walk belong in `/onboard`,
+in a pre-onboard step, or stay a README-documented manual habit
+(safety vs. paternalism)? If divergences are surfaced at first seed,
+how to avoid a noisy multi-block conflict walk for edits made on
+purpose? Does collapsing to the version-stamp lever lose any
+flexibility checkpoint 002's R3 caveat meant to preserve ("let a
+future version solve merging differently")? Should the
+baseline-source correctness fix ship ahead of the larger reframe as a
+standalone patch, or land with it?
+
 ### Known Limitations
 
 #### `/onboard` does not preserve CC-TEMPLATE-BLOCK markers when it rewrites mode-specific rules files
