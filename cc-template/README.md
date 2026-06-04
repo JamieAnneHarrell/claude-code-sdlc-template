@@ -25,10 +25,12 @@ walkable checklist and session handoff — follow them in order:
    matches your own collaboration philosophy — edit anything you
    disagree with. The rules are a starting agreement, not law; the
    template is meant to be customized per project. The universal rule
-   content sits inside `<!-- CC-TEMPLATE-BLOCK: <id> -->` markers; if
-   you want to keep a customization, lift that section out of its
-   markers (or delete the block) so `/refresh-from-repository` leaves
-   your edit alone. See "Keeping a project up to date" below.
+   content sits inside `<!-- CC-TEMPLATE-BLOCK: <id> -->` markers. Edit
+   in place freely — when you later run `/refresh-from-repository` it
+   asks, per changed block, whether to take the upstream version or
+   keep yours (keeping yours marks the block as yours so it's never
+   asked about again). You don't have to do anything special now to
+   protect an edit. See "Keeping a project up to date" below.
 
 4. **Open the new directory in Claude Code** and run:
    ```
@@ -56,24 +58,51 @@ improvements, run, in the project:
 /refresh-from-repository
 ```
 
-This **replaces** the shipped slash commands with the latest upstream
-versions and **block-merges** the universal rules and the
-template-owned sections of `CLAUDE.md` against what you have now. Your
-customizations are safe by design:
+Refresh fetches the latest upstream into a throwaway staging area,
+**shows you what would change and asks before touching anything**, then
+— on your go-ahead — **replaces** the shipped slash commands with the
+upstream versions and **block-merges** the universal rules and the
+template-owned sections of `CLAUDE.md` against what you have now.
+
+**It reviews the download before applying.** The slash commands are
+instructions Claude will later execute, so pulling them from the
+internet is a trust boundary. Before changing a single file in your
+project, refresh reads the fetched content — commands first — looking
+for anything that doesn't belong (injected directives, attempts to
+exfiltrate data or disable safeguards, surprising shell), summarizes
+what would change, and asks you to approve. If you decline, the staging
+copy is discarded and your project is left exactly as it was. There is
+no flag to skip this; the review is quick.
+
+Your customizations are safe by design:
 
 - Content inside `<!-- ONBOARD-FILL: ... -->` blocks (your
   project-specific scope, environment, tooling) is never touched.
 - Content **outside** the `<!-- CC-TEMPLATE-BLOCK: ... -->` markers is
   yours forever — refresh ignores it.
-- If you edited a rule *inside* a template block, refresh detects it
-  and asks, one block at a time, whether to take the upstream version,
-  keep yours, or hand-merge. It never silently overwrites an edit.
-- If you deleted a template block, refresh respects the absence and
-  doesn't re-add it.
+- If you edited a rule *inside* a template block, refresh asks, one
+  block at a time, whether to **take upstream**, **keep mine**, or
+  **hand-merge**. It never silently overwrites an edit. Choosing "keep
+  mine" marks that block as **yours** (`state=forked` in the marker) so
+  refresh leaves it alone from then on — it won't ask again.
+- If a template block is gone, refresh asks once whether you removed it
+  on purpose; if so it writes a small tombstone
+  (`state=removed`) and never re-adds the block.
+
+This is all the memory refresh needs — the marker states live right in
+your rules / `CLAUDE.md` files. There is no separate machine-managed
+state file to commit or worry about.
+
+**Moving a rule out is the same as owning it.** If you lift a template
+rule into your own section or file, refresh treats it as removed from
+the template (it works strictly within its own marked blocks and does
+not go hunting through your other files for it). Your relocated copy is
+yours; it simply won't receive upstream updates. If you want a rule to
+keep tracking upstream, leave it in its `CC-TEMPLATE-BLOCK`.
 
 A project onboarded before the marker system existed gets a one-time
 migration on its first run: refresh inserts the markers for you,
-aligning to upstream, and flags any section where your content has
+aligning to upstream, and asks about any section where your content has
 diverged.
 
 Two optional flags:
@@ -91,8 +120,10 @@ the `cc-template/` directory from the upstream commit you want into
 your own repo as a subdirectory. With a `cc-template/` subdir present,
 `/refresh-from-repository` runs in **source mode**: it treats that
 local subdir as the upstream and syncs it to your project root, with
-the same conflict-surfacing behavior. Upgrading the pin is a
-deliberate action you take (re-vendor a newer `cc-template/`); the
+the same block-merge and ask-once behavior. Because that upstream is
+your own local copy (already under your control), source mode shows a
+plain change summary instead of the security review. Upgrading the pin
+is a deliberate action you take (re-vendor a newer `cc-template/`); the
 routine sync from subdir to root stays stable and auditable.
 
 ### Installing the command into a project that doesn't have it yet
@@ -113,9 +144,9 @@ manually):
    you the latest version of every command at once.
 3. **Run `/refresh-from-repository`** in your project. With the command
    now present, it performs the one-time pre-marker migration (inserts
-   `CC-TEMPLATE-BLOCK` markers, seeds the refresh state file) and
-   block-merges the rest. From then on, refresh keeps itself current
-   like any other command.
+   `CC-TEMPLATE-BLOCK` markers, aligning to upstream and asking about
+   any diverged section) and block-merges the rest. From then on,
+   refresh keeps itself current like any other command.
 
 ## What the template ships with
 

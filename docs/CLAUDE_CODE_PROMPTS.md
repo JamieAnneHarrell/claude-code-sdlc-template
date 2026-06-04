@@ -640,8 +640,32 @@ Reading-order entry for `docs/design/`). Must land before Phase
 ask-once migration cleanly with no state file; FR-13 (Option A)
 satisfied; surviving 002 decisions intact.
 
-**Revisions since this prompt ran:** none yet (authored 2026-06-04
-by checkpoint 004 landing; not yet run).
+**Revisions since this prompt ran:**
+
+- 2026-06-04 — Block 1 landed (scope items 1–6: command rewrite + dist
+  docs). Split into two sessions: Block 2 (scope items 7–8 — source-mode
+  dogfood to root + root invariant pins + phase close) is next session.
+  Deviations beyond the written scope:
+  - Added a fetch→review→apply **security gate** (Step 2 of the
+    command) after Jamie flagged the supply-chain risk of importing
+    executable command files from a network upstream. Public mode does
+    an adversarial review + change summary before any live write; source
+    mode shows a change summary. New `design-decisions.md` entry.
+  - Pinned the public-mode fetch as a **shallow clone**
+    (`git clone --depth 1`) — checkpoint 004 left the fetch mechanism
+    unspecified. New `design-decisions.md` entry.
+  - Marker-state syntax pinned: `state=forked` / `state=removed` inline
+    on the open marker; `template-owned` is the bare default;
+    `removed` is a closerless tombstone.
+  - Per Jamie's wind-down instruction, the two fully-superseded Option-D
+    `design-decisions.md` entries (reconciliation mechanism,
+    content-hashing) were **removed** to `open-questions.md` § Abandoned
+    Approaches rather than left with supersession notes; the
+    partially-superseded entries were rewritten to surviving content.
+  - Stripped non-self-contained citations (checkpoint/finding IDs,
+    memory slugs) from the shipped command per the
+    distributable-self-contained rule.
+  - Queued a "/design-review security-review lens" deferred user story.
 
 ---
 

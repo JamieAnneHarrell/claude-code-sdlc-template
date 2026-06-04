@@ -370,53 +370,50 @@ users (see "Refresh progressive-disclosure flags" below).
 ## Template marks its own content; reconciliation tolerates divergence
 
 **Decision.** Template-owned content in rules files (and CLAUDE.md
-post-onboard) is wrapped in template-owned marker blocks. Markers
-carry "DO NOT EDIT — move elsewhere to personalize" language.
-`/refresh-from-repository` reconciles at the block level using a
-three-input matrix: downstream-current, upstream-current, and a
-baseline (what upstream looked like the last time this downstream
-sync'd). Each block carries enough metadata for the refresh to
-detect "user edited inline" — a content hash or recorded baseline
-content. Mismatch surfaces; refresh doesn't silently overwrite.
+post-onboard) is wrapped in `CC-TEMPLATE-BLOCK` marker blocks, matched
+by id. `/refresh-from-repository` reconciles each block with a two-way
+compare (downstream-current vs upstream-current); a block that diverges
+or is absent with no tombstone triggers a one-time question whose answer
+is recorded in the marker itself. Refresh never silently overwrites a
+consumer's edit and never re-adds a block the consumer removed.
 
 **Consumer contract (refresh's promise):**
 
-- Don't edit inside a template marker block. Refresh expects to
-  replace its contents.
-- To opt out: move the block out of the template region into your
-  own personalized-rules section, or delete the block entirely.
-  Refresh respects the absence as your decision.
-- Personalized rules are yours forever — refresh never touches them,
-  and they don't get upstream improvements by design.
+- Edit inside a template block freely. The first time refresh sees the
+  divergence it asks once — take upstream, or keep mine (the block
+  becomes `forked` and is never asked about again).
+- To opt out: delete the block (refresh asks once, then writes a
+  `removed` tombstone and never re-adds it) or fork it. Either way the
+  absence/ownership is respected as your decision.
+- Personalized (forked or relocated) content is yours forever — refresh
+  never touches it, and it doesn't get upstream improvements by design.
 - Inline edits are detected and surfaced, not silently overwritten.
 
 **Why.** Two earlier proposals failed. (a) "User wraps opt-outs in
-LOCAL markers" is unenforceable — consumers wholesale-delete rules
-they disagree with (Android project deletes "iPhone, not Android"),
-refresh has no signal it was deliberate, silently re-adds the rule.
-(b) "Diff-each-time without a baseline" can't distinguish
-"block-new-since-baseline" from "block-the-user-removed." Marking
-*our* content (which we can enforce) and tracking a baseline (which
-we can stamp ourselves) is the smallest mechanism that handles every
-deletion / edit / personalization case the consumer can throw at it.
-
-**Why not git-3-way as the only mechanism.** Requires upstream to
-maintain stable release tags AND downstream to track which tag it
-sync'd from. Self-contained per-block metadata is simpler for v1
-and doesn't preclude git-3-way as a later iteration.
+LOCAL markers" is unenforceable — consumers wholesale-delete rules they
+disagree with (Android project deletes "iPhone, not Android"), and a
+naive refresh has no signal it was deliberate, so it silently re-adds
+the rule. (b) "Diff-each-time" can't distinguish a brand-new upstream
+block from one the user removed. Both failures are about *memory of a
+deliberate choice*. Marking *our* content (which we can enforce) plus
+recording the consumer's one-time answer in the marker (`forked` /
+`removed`) is the smallest mechanism that handles every deletion / edit
+/ personalization case — and it keeps that memory in the files
+themselves rather than a sidecar (see "reconciliation: Option A").
 
 **Semantic conflict detection is the executing session's job.** When
-upstream's new blocks land alongside downstream's personalized
-content, the Claude session running `/refresh-from-repository` reads
-both and surfaces real semantic conflicts ("upstream's new rule R12
-says always-X; your personalized rule says never-X") using language
-understanding, not a heuristic engine. The command spec instructs
-the session to do this analysis directly.
+upstream's new blocks land alongside downstream's personalized content
+in the same file, the Claude session running `/refresh-from-repository`
+reads both and surfaces real semantic conflicts ("upstream's new rule
+says always-X; your adjacent rule says never-X") using language
+understanding, not a heuristic engine. The command spec instructs the
+session to do this directly, scoped to the file being merged.
 
-**Scope note.** This entry settles the contract and the matrix; the
-mechanism (algorithm, marker syntax, state file) was settled by
-checkpoint 002 — see "`/refresh-from-repository` reconciliation
-mechanism" below.
+**Scope note.** This entry settles the contract; the marker syntax and
+the stateless reconciliation mechanism are settled by
+"`/refresh-from-repository` reconciliation: Option A" below. The
+contract here is unchanged from checkpoint 002 — only the mechanism
+beneath it moved from a stored baseline to marker-state + ask-once.
 
 ---
 
@@ -537,15 +534,16 @@ provenance trade (refresh asks the consumer once instead of inferring
 from a baseline, with "take upstream" the git-recoverable safe
 default) was accepted 2026-06-04.
 
-**Scope note.** Supersedes the Option-D-era entries below —
-"reconciliation mechanism", "content hashing uses `git hash-object`",
-the state-file half of "consumer-boundary partition", and "Phase 2.1
-builds in `cc-template/` only; the refresh state file is
-dogfood-generated and committed". Those are reconciled to Option A as
-part of **Phase 2.1.A** (the command rewrite); until then they
-describe the abandoned mechanism. The surviving checkpoint 002
-decisions (marker syntax, coarse-grained wrapping, CLAUDE.md merge
-partition, "template marks its own content") carry forward unchanged.
+**Scope note.** The Option-D-era entries this replaced have been
+reconciled (Phase 2.1.A): the two whose entire substance was the
+abandoned mechanism — "reconciliation mechanism" and "content hashing
+uses `git hash-object`" — were removed and recorded in
+`docs/open-questions.md` § Abandoned Approaches; the partially-affected
+ones ("Template marks its own content", "consumer-boundary partition",
+and the build/dogfood entry) were rewritten to their surviving content.
+The surviving checkpoint 002 decisions (marker syntax, coarse-grained
+wrapping, CLAUDE.md merge partition, "template marks its own content")
+carry forward unchanged.
 
 ---
 
@@ -578,110 +576,43 @@ confirmed when the Phase 2.1.A source-mode dogfood runs.
 
 ---
 
-## `/refresh-from-repository` reconciliation mechanism
-
-**Decision.** Option D hybrid: per-block content hashes detect inline
-edits, file-level baseline references detect deletions, three-way
-comparison (downstream-current / upstream-current / baseline) drives
-the merge. Template content is wrapped in
-`<!-- CC-TEMPLATE-BLOCK: <id> --> ... <!-- /CC-TEMPLATE-BLOCK -->`
-markers (id-only kebab-case, file-scoped, no inline metadata).
-Per-block hashes and baseline live in a single machine-managed
-`.claude/claude-code-sdlc-template-refresh-state.md` carrying four
-sections: Upstream baseline, Block hashes, Refresh logic version,
-Upstream directives. Source-mode uses the same algorithm with a
-subtree content-hash of local `cc-template/` as the baseline.
-
-**Why.** Hash and baseline together resolve the consumer-edit matrix
-— inline edit, deletion, never-existed, reorder — that hash-alone or
-baseline-alone leave ambiguous (the canonical "Android deletes
-'iPhone, not Android'" case silently re-adds under hash-only).
-Pushing hashes into the state file rather than the marker is what
-makes coarse-grained wrapping (one block per top-level rule section)
-bounded to ~5-7% added line count, important because Phase 1.2 just
-came up short of its rules-file cleanup target.
-
-**Why not per-block hash alone (Option A).** Can't distinguish
-block-never-existed-yet from block-deliberately-deleted; silently
-re-adds rules consumers removed on purpose.
-
-**Why not file-level baseline alone (Option B).** Solves deletion
-but requires re-fetching upstream's historical file content per
-refresh to detect inline edits. Local hash carries that signal
-cheaply.
-
-**Why not git-3-way against tagged upstream releases (Option C).**
-Forces release-tag discipline on a one-maintainer upstream; exposes
-git conflict-marker syntax to consumers reading `.md` files. Real
-maintenance cost for negligible upside.
-
-**Why not inline `hash=` on each marker.** Re-inflates rules-file
-line count after Phase 1.2's cleanup. State-file storage keeps
-markers minimal.
-
-**Why not baseline metadata in user-facing files.** Pollutes the
-rules-reading experience consumers do every session per CLAUDE.md.
-`.claude/` is the conventional machine-state location and consumers
-rarely look there.
-
-**Scope note.** Refresh matches blocks by `id`, not file position —
-consumer reordering is preserved (R2c). Inline-edit divergences
-surface to the running session one block at a time with three
-choices: accept upstream / keep downstream / hand-merge (R2b).
-Unrecognized local block IDs surface a `--refresh-skills-only`
-suggestion (R2a). First source-mode invocation in a repo
-content-inspects the `cc-template/` subdir to confirm it's this
-template and caches the determination in CLAUDE.md (N1). Marker
-syntax, state-file path, and state-file schema are load-bearing per
-NFR-4 — future changes require auditing refresh logic and every
-file that carries markers. Full disposition log:
-[design-review-checkpoint-002.md](design/design-review-checkpoint-002.md).
-
----
-
 ## `/refresh-from-repository` consumer-boundary partition
 
-**Decision.** CLAUDE.md is partitioned post-onboard: Collaboration-
-rules section and Reading-order section are template-owned (wrapped
-in CC-TEMPLATE-BLOCK markers); banner, Project-specific context,
-and Load-bearing invariants are consumer-owned (free regions;
-refresh never touches), with `--no-claudemd` as the escape hatch
-for consumers who've heavily customized. Cross-file block migration
-is not tracked by default, with one exception: when a
-consumer-deleted block's hash matches a known block in another of
-the six shipped rules files, refresh offers to apply upstream's
-update. Refresh pre-flights by fetching upstream's
-`refresh-from-repository.md` to check for merge-logic drift AND
-reads the state file's Upstream directives section so upstream can
-force `--refresh-skills-only` via a directive.
+**Decision.** CLAUDE.md is partitioned post-onboard: the
+Collaboration-rules and Reading-order sections are template-owned
+(wrapped in `CC-TEMPLATE-BLOCK` markers); the banner, Project-specific
+context, and Load-bearing invariants are consumer-owned (free regions
+refresh never touches), with `--no-claudemd` as the escape hatch for
+consumers who've heavily customized. Refresh works **within its own
+boundaries** — the blocks it owns by id, per file — and does not scan
+across files to track relocated content.
 
-**Why.** The CLAUDE.md partition lets refresh push improvements to
-the load-bearing collaboration infrastructure (Collaboration-rules,
+**Why.** The partition lets refresh push improvements to the
+load-bearing collaboration infrastructure (Collaboration-rules,
 Reading-order) without overwriting the per-project content consumers
-customize. The cross-file migration exception catches the case
-where a consumer reorganized a template rule into their own
-personalized-rules file — without it, that consumer is locked out
-of upstream's improvements to that rule forever, which is
-inconsistent with the "respect deletion, surface inline edits"
-contract elsewhere in the design.
+customize.
 
 **Why not wrap Load-bearing invariants too.** Hardest section to
 partition cleanly — template-defined invariants and project-defined
 ones interleave. The `--no-claudemd` escape hatch covers consumers
 who need upstream's invariant updates merged.
 
-**Why not track arbitrary cross-file moves.** Consumer can paste
-any content anywhere; tracking arbitrary moves requires either an
-opt-in `TEMPLATE-MIGRATED-FROM` marker consumers wouldn't know to
-add, or expensive cross-file hash-matching across every consumer
-file on every refresh. Scoping the exception to the six shipped
-rules files is bounded and matches the realistic migration pattern.
+**Why not track cross-file relocations.** A consumer can move a
+template rule into their own section or file. Refresh does not chase
+it — detecting relocations means scanning every consumer file on every
+refresh (false-positive-prone) and contradicts the within-our-own-
+boundaries principle. A relocated block is simply `forked`/owned now;
+its original location gets a `removed` tombstone (or is re-added) via
+the normal ask-once. The consumer trades upstream updates for ownership
+— the same deal as any forked block.
 
-**Scope note.** "Six shipped rules files" =
-`coding-session-rules.md`, `design-philosophy-rules.md`,
+**Scope note.** "Six shipped rules files" that carry template-owned
+markers = `coding-session-rules.md`, `design-philosophy-rules.md`,
 `multi-agent-rules.md`, `project-rules.md`, `environment-rules.md`,
-`testing-rules.md`. Adding a seventh in a future phase extends the
-migration-detection set.
+`testing-rules.md`. An earlier Option-D design offered a hash-based
+cross-file migration upgrade (checkpoint 002 R2d); it was dropped with
+the hash mechanism — see § Abandoned Approaches in
+`docs/open-questions.md`.
 
 ---
 
@@ -1025,76 +956,33 @@ open sub-questions stay in `open-questions.md`.
 
 ---
 
-## `/refresh-from-repository` content hashing uses `git hash-object`
+## The refresh build edits `cc-template/` only; root is brought current by the source-mode dogfood
 
-**Decision.** The per-block content hash (Option D's inline-edit
-signal) is computed by taking the block's content between its markers,
-normalizing all line endings to LF, and piping it to
-`git hash-object --stdin`. The emitted object id is the stored hash.
-Same recipe everywhere a hash is written or compared.
+**Decision.** The build session edits `cc-template/` only — markers,
+the command file, and the dist docs. Root does **not** get hand-edited
+markers or a hand-mirrored command. Instead, root receives them by
+**running `/refresh-from-repository` in source mode against this repo**
+(the dogfood): the command mirrors itself to root and inserts the
+`CC-TEMPLATE-BLOCK` markers into root's rules + CLAUDE.md via the
+pre-marker migration. The only thing persisted is the markers in those
+files (no sidecar — see "reconciliation: Option A").
 
-**Why.** The template has no language runtime, but the command runs
-inside Claude Code, which has shell access and assumes a git repo
-already (the baseline is a git commit). `git hash-object` is git's own
-content-addressing — deterministic, present wherever git is, and
-needs no new dependency. LF normalization before piping removes the
-only platform-dependent byte difference (CRLF on Windows vs LF
-elsewhere), so the same block hashes identically on Windows, Linux,
-and macOS. This satisfies NFR-1 cross-platform without a hashing
-library.
+**Why.** This repo is a consumer of its own distribution, so the honest
+way to get markers and the command onto root is the same path every
+downstream consumer uses — which also makes the first run the real
+end-to-end test of source-mode + pre-marker migration on a live
+project, not a contrived sandbox.
 
-**Why not a platform hash utility** (`Get-FileHash` / `sha256sum` /
-`shasum`). Forces OS-branching in the spec, a temp file per block, and
-manual newline normalization — more surface and more failure modes
-(line-ending drift was the top rework risk the pre-flight flagged).
-
-**Why not store the normalized baseline text instead of a hash.**
-Simpler for the session (plain text compare, no hashing) but it
-deviates from checkpoint 002's landed "Block hashes" schema; changing
-that would need a `/design-review` addendum, not a build-time choice.
-
-**Scope note.** The recipe is load-bearing per NFR-4 — it gets pinned
-into root `CLAUDE.md` Load-bearing invariants alongside the marker
-syntax and state-file path (Prompt 2.1 scope item 13). Changing it
-requires bumping the command's Refresh-logic-version stamp.
-
----
-
-## Phase 2.1 builds in `cc-template/` only; the refresh state file is dogfood-generated and committed
-
-**Decision.** The Phase 2.1 build session edits `cc-template/` only —
-markers, the command file, and docs. Root does **not** get hand-edited
-markers, a hand-mirrored command, or a hand-written state file.
-Instead, root receives all of that by **running
-`/refresh-from-repository` in source mode against this repo** (the
-dogfood): the command pulls itself to root, pre-marker-migrates root's
-rules + CLAUDE.md, and seeds
-`.claude/claude-code-sdlc-template-refresh-state.md`. That generated
-state file is committed in this repo.
-
-**Why.** This repo is a consumer of its own distribution, so the
-honest way to get markers and the command onto root is the same path
-every downstream consumer uses — which also makes the first run the
-real end-to-end test of source-mode + pre-marker migration on a live
-project, not a contrived sandbox. Committing the generated state file
-(rather than gitignoring it) preserves checkpoint 002 B1-A1's "source
-mode keeps three-way semantics": the baseline must survive a clean
-clone, or source-mode degrades to copy-if-changed.
-
-**Why not hand-author the state file and hand-insert root markers.**
+**Why not hand-author root's markers and hand-mirror the command.**
 Faster to a committed result, but skips the dogfood validation and
 risks the hand-written artifacts diverging from what the command
 actually produces.
 
-**Why not gitignore the state file.** A clean clone would then have no
-baseline; the next source-mode run would re-seed and silently lose the
-ability to detect root edits made in another working copy.
-
-**Scope note.** Downstream consumers generate their own state file on
-first refresh; it never ships inside `cc-template/`. Whether a consumer
-commits or ignores theirs is their call. The dogfood run and the root
-CLAUDE.md invariant pin were deferred past the build session at Jamie's
-request (review the command first).
+**Scope note.** Originated in the Phase 2.1 build under the Option D
+mechanism (which seeded a committed state file); under Option A the
+dogfood writes only markers, but the build-in-dist-then-dogfood-to-root
+discipline is unchanged. The dogfood run and the root `CLAUDE.md`
+invariant pin are Phase 2.1.A Block 2.
 
 ---
 
@@ -1126,3 +1014,88 @@ closes the gap for everyone.
 
 **Scope note.** Surfaced during the Phase 2.1 build when working out
 how root and other repos first obtain the command.
+
+---
+
+## `/refresh-from-repository` public-mode fetch is a shallow clone
+
+**Decision.** In public mode, `/refresh-from-repository` reads upstream
+by shallow-cloning the repo (`git clone --depth 1 <baked-in-url>`) into
+a throwaway temp directory, reading the `cc-template/` subtree from it,
+and deleting the temp dir at the end of the run. History is not fetched
+(`--depth 1`) because Option A keeps no baseline. Adopted during the
+Phase 2.1.A build, 2026-06-04.
+
+**Why.** Under Option A both modes need only upstream's *current*
+content. A shallow clone gives the merge step the same thing source
+mode already has — a directory tree to read — so after the fetch the
+two modes converge on one mechanism ("read files from a directory"),
+which is exactly the convergence checkpoint 004 asked for. git is
+already a hard requirement of the surrounding workflow (every refresh
+ends in a `/wind-down` commit; this is a git repo), so requiring it for
+the fetch costs nothing new.
+
+**Why not raw HTTPS fetch** (`raw.githubusercontent.com/...` of a known
+file list). It would make public mode git-free, lowering the consumer
+bar — but it diverges the two modes (disk-dir vs N URL fetches) and
+needs a hardcoded file list that goes stale if the shipped set changes.
+The git-free benefit is small when the workflow is git-bound anyway.
+
+**Why not a tarball** (`api.github.com/.../tarball/HEAD`). One request
+and git-free, but adds tar-extraction tooling and unauthenticated API
+rate limits for negligible gain over the shallow clone.
+
+**Scope note.** This decision was not pinned by checkpoint 004 (which
+said only "public mode no longer needs git *history*" without naming
+the fetch mechanism). Recorded here so the build decision is on the
+record outside the checkpoint trail. The temp clone doubles as the
+quarantine for the security gate below.
+
+---
+
+## `/refresh-from-repository` reviews the download before applying
+
+**Decision.** `/refresh-from-repository` fetches upstream into a
+throwaway staging area and **reviews it before any live-tree write**.
+In **public mode** the executing session does an adversarial security
+read of the staged content (command files first — they are executable
+instructions a later session runs) looking for injected directives,
+exfiltration, safeguard-disabling, and surprising shell, then presents a
+change summary and asks for an explicit go/no-go; declining deletes the
+staging area and changes nothing. In **source mode** (the consumer's own
+local `cc-template/`, already trusted) the adversarial read is skipped
+and a plain change summary is shown. There is no flag to skip the
+review. Adopted during the Phase 2.1.A build, 2026-06-04.
+
+**Why.** Refresh imports executable instructions and behavior-shaping
+context from a network upstream. A compromised upstream — a stolen
+maintainer credential is the concrete scenario — could inject malicious
+instructions that a later session would then follow. Replacing files
+from the network is a trust boundary, and `design-philosophy-rules.md`
+already carves out destructive/expensive operations as requiring an
+explicit affirmative. The shallow-clone temp dir is already a natural
+quarantine, so gating between download and apply costs almost nothing.
+
+**Why the public/source split.** Source mode's upstream is the
+consumer's own repo content — already under their control — so an
+adversarial scan there is friction without a threat. Public mode is the
+untrusted-network case the gate exists for. Simple by default, with the
+heavyweight check where the risk actually is (progressive disclosure).
+
+**Why not a `--skip-review` / `--trust` flag.** The safe path should be
+the default, and the review is cheap (a handful of small markdown
+files). A skip flag is exactly the affordance an attacker's social-
+engineering ("just run it with --trust") would target.
+
+**Why not route this through a `/design-review` checkpoint first.** It
+is a safety guardrail Jamie directed in-session, not a speculative
+feature; a settled safety requirement doesn't need a checkpoint to
+authorize it. The *broader* idea — a standing security-review lens for
+`/design-review` that flags common attack vectors — is queued as a
+deferred user story in `docs/open-questions.md`, separate from this
+build.
+
+**Scope note.** Like the shallow-clone decision above, this was not
+pinned by checkpoint 004; it surfaced during the 2026-06-04 build when
+Jamie flagged the supply-chain risk. Recorded here so it is on the
+record outside the checkpoint trail.

@@ -363,3 +363,157 @@ Abandoned-Approaches-as-constraint note belongs in S1.1 (read time) or
 S1.4 (finding-composition rules) — probably S1.1 so the constraint is
 loaded before any option drafting begins.
 
+#### `/design-review` should carry a security-review lens
+
+*Context.* Surfaced 2026-06-04 during the Phase 2.1.A build. While
+pinning the `/refresh-from-repository` design we found a real
+attack surface the original design review (checkpoint 002) and the
+reframe (checkpoint 004) both missed: the command imports executable
+instructions (`.claude/commands/*.md`) from a network upstream, so a
+compromised upstream could inject malicious directives. We pinned a
+fetch→review→apply security gate for that command in-session (see
+`design-decisions.md` "`/refresh-from-repository` reviews the download
+before applying"), but the *general* gap remains — `/design-review`
+has no standing prompt to consider common attack vectors when it
+reviews a high-risk transition. A network-touching, self-modifying,
+or credential-adjacent feature should get a security pass as a matter
+of course, not because the reviewer happens to think of it.
+
+*Proposed approach.* Add a security-review lens to `/design-review`
+Stage 1 — a checklist the review applies when a transition touches an
+attack surface: supply-chain / upstream-trust (does this import code or
+instructions? from where? is there a review gate before execution?),
+injection (does untrusted content reach a place that shapes Claude's
+behavior or runs shell?), credential / secret surfaces, and
+data-exfiltration paths. The lens produces findings in the normal
+severity-tiered shape (likely Blockers for unguarded execution of
+imported content). Keep it proportionate — KISS / progressive
+disclosure: the lens fires when the trigger conditions are present, not
+as boilerplate on every checkpoint (a pure-markdown refactor doesn't
+need a threat model).
+
+*Implementation surfaces to touch (when built).*
+
+- `.claude/commands/design-review.md` Stage 1 — add the security lens
+  with its trigger conditions to the finding-composition step.
+- Mirror to `cc-template/.claude/commands/design-review.md` per NFR-9.
+
+*Open sub-questions.* Whether the lens is a distinct numbered step or a
+sub-checklist inside the existing finding pass. What the exact trigger
+conditions are (network I/O, self-modification, credential handling,
+untrusted input — and how the reviewer detects them). Whether it
+warrants a short companion section in `rules/` (e.g. a security-posture
+note) or lives entirely in the command spec. Whether `/exit-test-plan`
+should gain an analogous "did we test the attack surface" prompt.
+
+#### Encode the design-decisions ↔ abandoned-approaches hygiene rule in the commands
+
+*Context.* Surfaced 2026-06-04 during the Phase 2.1.A Block 1
+wind-down. When this session superseded the Option D refresh mechanism,
+the first instinct was to leave the abandoned `design-decisions.md`
+entries in place with "Superseded by …" tombstone notes. Jamie
+corrected the rule: a **fully** abandoned decision is *moved out* to
+`open-questions.md` § Abandoned Approaches (design-decisions is for
+current decisions only — "why is it this way?"); a **partially**
+superseded decision is *rewritten to its surviving content* in place;
+neither is left with a tombstone note. Right now that rule lives only
+in a session correction — the commands that maintain these docs
+(`/wind-down` Step 3, `/design-review` Stage 2 landing) don't encode
+it, so a fresh Claude (or a downstream consumer's Claude) would re-make
+the tombstone-note mistake. This is the natural extension of the
+existing "`/wind-down` owns the open-questions ↔ design-decisions
+reconciliation" decision (which encoded the *move* of resolved
+questions) to the design-decisions ↔ abandoned-approaches relationship.
+
+*Proposed approach.* Add to `/wind-down` Step 3's design-decisions /
+open-questions guidance (and `/design-review` Stage 2's land path,
+which also writes `design-decisions.md`): when a decision is superseded
+during the session, classify it — **fully abandoned** (the entire
+substance is the dead mechanism) → move it to `open-questions.md`
+§ Abandoned Approaches (what it was / why abandoned / what replaced it)
+and remove it from `design-decisions.md`; **partially superseded** (the
+core decision lives, a sub-mechanism changed) → rewrite to surviving
+content in place. Never leave a "Superseded by …" tombstone note
+lingering in `design-decisions.md`. Part of the full coherence sweep —
+applies to entries that predate the session too.
+
+*Implementation surfaces to touch.*
+
+- `.claude/commands/wind-down.md` Step 3 — the `design-decisions.md`
+  and `open-questions.md` subsections.
+- `.claude/commands/design-review.md` Stage 2 land path.
+- Mirror both to `cc-template/.claude/commands/` per NFR-9.
+
+*Open sub-questions.* Whether the rule lives in `/wind-down` only or
+also `/design-review` (probably both — both write `design-decisions.md`
+at their boundaries). Whether "fully vs partially abandoned" needs
+concrete criteria or stays a surfaced judgment call (likely judgment).
+Whether the Abandoned Approaches entry is drafted from the removed
+entry's content or composed fresh.
+
+---
+
+### Abandoned Approaches
+
+#### `/refresh-from-repository` reconciliation via per-block hash + baseline + sidecar state file (Option D)
+
+*What it was.* The first-built mechanism for
+`/refresh-from-repository` (checkpoint 002, built 2026-06-03; never
+shipped). Template-owned content was wrapped in `CC-TEMPLATE-BLOCK`
+markers (that part survives); each block's content was hashed with
+`git hash-object` (LF-normalized for cross-platform determinism); a
+sidecar `.claude/claude-code-sdlc-template-refresh-state.md` held four
+sections (Upstream baseline, Block hashes, Refresh logic version,
+Upstream directives). Reconciliation was a **three-way** compare —
+downstream-current / upstream-current / baseline-from-state-file —
+matched by id, with the per-block hash as the change-classifier and the
+baseline distinguishing "block the consumer deleted" from "block that
+never existed yet." Source mode used a subtree content-hash of the
+local `cc-template/` as the baseline.
+
+*Why it was abandoned (checkpoint 004 B1, 2026-06-04).* Patching the
+seed path surfaced that the whole bug class lived in the storage
+mechanism itself. The baseline was seeded from the wrong side
+(downstream-current) in both the re-seed branch and the pre-marker
+migration, so a pre-existing consumer edit would freeze into the
+baseline and the *next* run would misclassify it as "downstream
+untouched, upstream changed" and silently revert it. Two observations
+dissolved the class: (1) the memory of "this block was deleted /
+customized on purpose" can live **in the rules file itself** as a
+marker state (a tombstone or a `forked` flag), set by asking once — no
+sidecar baseline needed; (2) the *merge* is already the executing
+session's job, so the per-block hash was only doing **classification**,
+which a two-way compare plus a one-time question does without any stored
+baseline. Following that thread removed the state file, the per-block
+hashes, the `git hash-object` recipe, the `last-synced` reference, and
+the baseline — leaving markers + the command's version stamp + the LLM.
+
+*What replaced it.* Option A — stateless marker-state + ask-once. See
+`design-decisions.md` "`/refresh-from-repository` reconciliation:
+Option A". The marker syntax and coarse-grained wrapping from checkpoint
+002 carried forward; the hash/baseline/state-file machinery did not.
+
+*The accepted trade (so it is not re-litigated).* Option A is weaker
+than Option D in exactly one place: **provenance**. Option D could infer
+"who changed this block" from a stored baseline; Option A asks the
+consumer once and records the answer in the marker, relying on the
+consumer recognizing their own edit (possibly months later), with "take
+upstream" the git-recoverable safe default. Jamie accepted this trade
+2026-06-04. The determinism Option D preserved was **not** judged worth
+its correctness-and-maintenance surface: keeping seeded/shipped hashes
+correct, cross-platform LF/`hash-object` discipline, committing the
+state file so the baseline survives a clean clone, and the recurring
+drift risk across all of it. **Do not re-propose a stored-baseline /
+per-block-hash mechanism** without new information that changes this
+calculus (rule 3).
+
+*Sibling mechanisms also considered and rejected* (at checkpoint 002,
+when Option D was chosen; none revived by Option A). **Per-block-hash
+alone** and **file-level-baseline alone** — each leaves
+deleted-vs-never-existed ambiguous (Option A resolves that by asking
+once). **git-3-way against tagged upstream releases** — forces
+release-tag discipline on a one-maintainer upstream and exposes git
+conflict-marker syntax to consumers who read these `.md` files every
+session; Option A keeps all conflict resolution inside the running
+session with no markers in the files.
+

@@ -355,6 +355,14 @@ marker-state + ask-once** model adopted by checkpoint 004 (B1
 Option A), dissolving the seed/drift bug class so the command ships
 safely for fresh consumers.
 
+**Status (2026-06-04): Block 1 landed; Block 2 next.** Block 1 (the
+`cc-template/` command rewrite + dist-side docs — deliverables 1–6
+below) landed 2026-06-04, plus two in-build decisions the checkpoint
+left open (a fetch→review→apply security gate; public-mode fetch via
+shallow clone). Block 2 (the source-mode dogfood to root + the root
+`CLAUDE.md` / ARCHITECTURE / NFR-4 marker-syntax pins + phase close —
+deliverables 7–8) is the next session.
+
 **Deliverables.**
 - Rewrite `cc-template/.claude/commands/refresh-from-repository.md`
   to the marker-state model: markers carry `template-owned` /
