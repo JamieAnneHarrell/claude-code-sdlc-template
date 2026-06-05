@@ -6,6 +6,7 @@ shell prefix, language version) at the bottom.
 
 ---
 
+<!-- CC-TEMPLATE-BLOCK: cross-platform-discipline -->
 ## Cross-platform discipline
 
 ### Windows is primary, Linux and macOS are supported
@@ -42,9 +43,11 @@ is a bug, not a platform quirk to document around.
 
 Use `.gitattributes` with `* text=auto` to let git normalize. Don't
 commit CRLF-fixing scripts.
+<!-- /CC-TEMPLATE-BLOCK -->
 
 ---
 
+<!-- CC-TEMPLATE-BLOCK: shell-handling -->
 ## Shell handling — when Claude runs commands vs. when Jamie does
 
 Jamie's working environment is fixed and known. **Don't rediscover
@@ -94,9 +97,11 @@ Windows PowerShell 5.1 doesn't support `&&` chaining. Use `;` for
 unconditional sequencing or `if ($?) { ... }` for conditional. In
 Bash, prefer `&&`. For commit handoffs (rule 7) the rule is
 stricter: **one command per copyable line**, no chaining.
+<!-- /CC-TEMPLATE-BLOCK -->
 
 ---
 
+<!-- CC-TEMPLATE-BLOCK: scratch-files -->
 ## Scratch files
 
 When Claude needs a temporary file for diagnostics (JSON inspection
@@ -107,9 +112,11 @@ invent other repo-local scratch directories. If `tmp/` doesn't
 exist and you need it, offer to create it. Application output (real
 artifacts the project produces) is separate and goes to the
 project's documented output location.
+<!-- /CC-TEMPLATE-BLOCK -->
 
 ---
 
+<!-- CC-TEMPLATE-BLOCK: logging-discipline -->
 ## Logging discipline
 
 Use the language's structured logging library, not `print` / `echo`
@@ -122,25 +129,31 @@ Use the language's structured logging library, not `print` / `echo`
 
 `print` (or equivalent) is reserved for: final user-facing CLI
 summary output, CLI help text, progress bars (tqdm and equivalents).
+<!-- /CC-TEMPLATE-BLOCK -->
 
 ---
 
+<!-- CC-TEMPLATE-BLOCK: html-comments-are-free -->
 ## HTML comments are free
 
 Single-line `<!-- ... -->` content is stripped before Claude reads
 CLAUDE.md and rules files — put human-only prose there, never content
 Claude must act on.
+<!-- /CC-TEMPLATE-BLOCK -->
 
 ---
 
+<!-- CC-TEMPLATE-BLOCK: version-freshness -->
 ## Version freshness
 
 Never assume training-time versions are current — see
 `rules/coding-session-rules.md` § Rule 10. Applies before pinning any
 version into a project artifact.
+<!-- /CC-TEMPLATE-BLOCK -->
 
 ---
 
+<!-- CC-TEMPLATE-BLOCK: database-credentials-policy -->
 ## Database credentials policy
 
 A backstop — authoritative source is the "Secrets and credentials
@@ -156,6 +169,7 @@ design implies a DB). This rule fires even if the NFR was skipped.
 
 If a session is about to write a connection string with a violating
 username, stop and surface the policy.
+<!-- /CC-TEMPLATE-BLOCK -->
 
 ---
 

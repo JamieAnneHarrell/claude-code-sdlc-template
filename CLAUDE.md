@@ -9,6 +9,7 @@
 <!-- ONBOARD-STATUS: COMPLETE 2026-05-24 -->
 <!-- BOOTSTRAP-STATUS: COMPLETE 2026-05-24 -->
 <!-- DEPLOYMENT-PLAN-STATUS: UNCONFIGURED -->
+<!-- REFRESH-SOURCE-MODE-VERIFIED: cc-template/ confirmed a claude-code-sdlc-template distribution 2026-06-04 (machine note; /refresh-from-repository skips the source-mode identity re-check) -->
 
 > ✅ **Onboarded and bootstrapped.**
 >
@@ -29,51 +30,47 @@
 > **Run:** N/A — markdown only &nbsp;·&nbsp; **Test:** N/A — validated by use of the template on real projects
 > **Developer setup:** see `README.md`
 
+<!-- CC-TEMPLATE-BLOCK: reading-order -->
 ## Reading order at session start
 
 1. **This file** — quick orientation and reading list.
-2. **`TODO.txt`** — gitignored session handoff. First entry is
-   what we pick up next; the rest is the upcoming queue.
+2. **`TODO.txt`** — gitignored session handoff. First entry is what
+   we pick up next; the rest is the upcoming queue.
 3. **`docs/PROJECT_PLAN.md`** — active phase queue.
-4. **`docs/CLAUDE_CODE_PROMPTS.md`** — authoritative prompt for
-   the current phase.
+4. **`docs/CLAUDE_CODE_PROMPTS.md`** — authoritative prompt for the
+   current phase.
 5. **`docs/design/`** — design intake plus any `/design-review`
-   checkpoints in flight. A checkpoint with
-   `AWAITING-DECISIONS` frontmatter means Stage 1 ran but Stage
-   2 hasn't walked dispositions yet (or there's an addendum
-   round mid-iteration).
-6. **`docs/test-plans/`** — if the current phase has a test plan
-   in flight, it'll be `phase-NNN-exit.md` here.
-   `AWAITING-DISPOSITIONS` means the phase is somewhere in the
-   iterative test-and-polish loop (original run, dispositions,
-   polish coding session, optional §6.N addendums); `LANDED`
-   means every run log is PASS / SKIP, every Fix-now is
-   verified, and the phase exit is closed.
+   checkpoints in flight. A checkpoint with `AWAITING-DECISIONS`
+   frontmatter means Stage 1 ran but Stage 2 hasn't walked
+   dispositions yet (or there's an addendum round mid-iteration).
+6. **`docs/test-plans/`** — if the current phase has a test plan in
+   flight, it'll be `phase-NNN-exit.md` here. `AWAITING-DISPOSITIONS`
+   means the phase is somewhere in the iterative test-and-polish
+   loop (original run, dispositions, polish coding session, optional
+   §6.N addendums); `LANDED` means every run log is PASS / SKIP,
+   every Fix-now is verified, and the phase exit is closed.
+<!-- /CC-TEMPLATE-BLOCK -->
 
+<!-- CC-TEMPLATE-BLOCK: collaboration-rules -->
 ## Collaboration rules
 
 The two universal rule files are named in the directive at the top of
 this file; read them end-to-end before responding.
 
-- [`rules/coding-session-rules.md`](rules/coding-session-rules.md) —
-  the 10 standing rules.
-- [`rules/design-philosophy-rules.md`](rules/design-philosophy-rules.md)
-  — design judgment framework.
+- `rules/coding-session-rules.md` — the 10 standing rules.
+- `rules/design-philosophy-rules.md` — design judgment framework.
 
 **Read these when relevant to the current task:**
 
-- [`rules/project-rules.md`](rules/project-rules.md) — project scope
-  discipline.
-- [`rules/testing-rules.md`](rules/testing-rules.md) — test discipline.
-- [`rules/environment-rules.md`](rules/environment-rules.md) —
-  cross-platform conventions.
-- [`rules/multi-agent-rules.md`](rules/multi-agent-rules.md) — subagent
-  use.
+- `rules/project-rules.md` — project scope discipline.
+- `rules/testing-rules.md` — test discipline.
+- `rules/environment-rules.md` — cross-platform conventions.
+- `rules/multi-agent-rules.md` — subagent use.
 
 If Jamie says "rule 4" or "this is a rule 1 issue" mid-session, that's a
-drift signal pointing at
-[`rules/coding-session-rules.md`](rules/coding-session-rules.md).
-Acknowledge, correct course, move on.
+drift signal pointing at `rules/coding-session-rules.md`. Acknowledge,
+correct course, move on.
+<!-- /CC-TEMPLATE-BLOCK -->
 
 ## Project-specific context
 

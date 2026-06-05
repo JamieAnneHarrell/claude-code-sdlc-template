@@ -162,9 +162,13 @@ recorded in-file when a block diverges or is absent with no
 tombstone (keep mine → `forked` / take upstream / hand-merge;
 never-had-it → add / removed-it → write tombstone). The executing
 Claude session performs the merge. The **state vocabulary** and the
-no-state-file rule are load-bearing per NFR-4; the exact syntax that
-encodes `forked` / `removed` in the marker is pinned by the Phase
-2.1.A build (Prompt 2.1.A). Logic drift between a downstream's loaded
+no-state-file rule are load-bearing per NFR-4. The marker encoding
+(pinned by the Phase 2.1.A build): `template-owned` is the bare
+`<!-- CC-TEMPLATE-BLOCK: <id> -->` (refresh never writes
+`state=template-owned`); `forked` is `state=forked` on the open
+marker with body and closer unchanged; `removed` is a closerless
+tombstone — a single `<!-- CC-TEMPLATE-BLOCK: <id> state=removed -->`
+comment with no body and no closer. Logic drift between a downstream's loaded
 refresh and upstream's is handled separately by the command file's
 `Refresh-logic-version` stamp, not by these markers.
 

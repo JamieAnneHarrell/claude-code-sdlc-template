@@ -63,6 +63,7 @@ those invariants.
 
 ## Briefing rule (every subagent invocation)
 
+<!-- CC-TEMPLATE-BLOCK: briefing-rule state=forked -->
 Treat every subagent like **a smart colleague who just walked
 into the room** — it has not seen this conversation, doesn't know
 what's already been tried, and doesn't understand why this task
@@ -77,3 +78,4 @@ Brief it accordingly:
 
 Never delegate understanding. Don't write "based on your findings, fix
 the bug" — synthesis is the main thread's job.
+<!-- /CC-TEMPLATE-BLOCK -->

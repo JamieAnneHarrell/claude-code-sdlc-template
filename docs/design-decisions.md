@@ -1099,3 +1099,39 @@ build.
 pinned by checkpoint 004; it surfaced during the 2026-06-04 build when
 Jamie flagged the supply-chain risk. Recorded here so it is on the
 record outside the checkpoint trail.
+
+---
+
+## `CC-TEMPLATE-BLOCK` marker encoding lives with the skill + design docs, not `CLAUDE.md`
+
+**Decision.** The byte-level marker-state encoding (`template-owned`
+= bare marker; `forked` = `state=forked` on the open marker;
+`removed` = closerless tombstone) is documented in the owning command
+`.claude/commands/refresh-from-repository.md` (operational authority),
+`docs/REQUIREMENTS.md` NFR-4, and `docs/ARCHITECTURE.md`. It is
+deliberately **not** added to root `CLAUDE.md`'s "Load-bearing
+invariants" section.
+
+**Why.** `/refresh-from-repository` is the sole consumer of the
+encoding, and the command file is self-contained and shipped — the
+natural source of truth; the design docs carry the maintainer's
+record. CLAUDE.md's invariants section is a "don't break this"
+tripwire list; duplicating the full encoding there creates a second
+copy that drifts from the skill, for a string only one skill parses.
+
+**Why not mirror the `ONBOARD-FILL` precedent.** `ONBOARD-FILL`
+marker names ARE pinned in CLAUDE.md invariants, which invites
+"fix the inconsistency" by adding CC-TEMPLATE-BLOCK too. The
+difference: `ONBOARD-FILL` names are short identifiers referenced
+across multiple skills (`/onboard`, `/bootstrap`,
+`/refresh-from-repository`); CC-TEMPLATE-BLOCK's `state=` syntax is
+single-skill operational detail.
+
+**Why not a one-line CLAUDE.md tripwire pointer.** Considered and
+declined — the markers are self-evident inline in the files, and a
+pointer carrying no encoding adds maintenance surface for little gain.
+
+**Scope note.** Decided 2026-06-04 during the Phase 2.1.A Block 2
+pins, superseding that block's planned "pin marker syntax into root
+CLAUDE.md" scope item. Revisit the tripwire-pointer option if a
+future hand-edit actually mangles a marker in practice.

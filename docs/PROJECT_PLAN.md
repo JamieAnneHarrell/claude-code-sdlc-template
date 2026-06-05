@@ -218,7 +218,7 @@ and gets exercised on the source first.
 
 ---
 
-## Phase 2.1 — `/refresh-from-repository` (roadmap)
+## Phase 2.1 — `/refresh-from-repository` (SUPERSEDED by Phase 2.1.A)
 
 **Goal.** Build the single-stage downstream update command that
 lets consumers pull latest commands and merge latest rules /
@@ -347,7 +347,7 @@ partition (R3), and the inline-edit conflict UX (R2b).
 
 ---
 
-## Phase 2.1.A — `/refresh-from-repository` Option A rewrite (active)
+## Phase 2.1.A — `/refresh-from-repository` Option A rewrite (COMPLETE)
 
 **Goal.** Rewrite the built `/refresh-from-repository` from the
 Option D hash/baseline/state-file mechanism to the **stateless
@@ -355,13 +355,20 @@ marker-state + ask-once** model adopted by checkpoint 004 (B1
 Option A), dissolving the seed/drift bug class so the command ships
 safely for fresh consumers.
 
-**Status (2026-06-04): Block 1 landed; Block 2 next.** Block 1 (the
-`cc-template/` command rewrite + dist-side docs — deliverables 1–6
-below) landed 2026-06-04, plus two in-build decisions the checkpoint
-left open (a fetch→review→apply security gate; public-mode fetch via
-shallow clone). Block 2 (the source-mode dogfood to root + the root
-`CLAUDE.md` / ARCHITECTURE / NFR-4 marker-syntax pins + phase close —
-deliverables 7–8) is the next session.
+**Status (2026-06-04): COMPLETE.** Block 1 (the `cc-template/`
+command rewrite + dist-side docs — deliverables 1–6 below) landed
+2026-06-04, plus two in-build decisions the checkpoint left open (a
+fetch→review→apply security gate; public-mode fetch via shallow
+clone). Block 2 (the source-mode dogfood to root + the root
+ARCHITECTURE / REQUIREMENTS NFR-4 marker-encoding pins + phase close
+— deliverables 7–8) landed 2026-06-04: the dogfood ran the Step 6
+pre-marker migration cleanly (30 template-owned blocks inserted in
+sync, `briefing-rule` kept as `state=forked`, `collaboration-rules`
+took upstream), a second refresh verified quiet, and the marker
+encoding is pinned in ARCHITECTURE + NFR-4. Deviation: the planned
+CLAUDE.md marker pin was **not** applied — Jamie ruled the byte-level
+encoding belongs with the owning skill + design docs, not duplicated
+into CLAUDE.md invariants; CLAUDE.md left clean.
 
 **Deliverables.**
 - Rewrite `cc-template/.claude/commands/refresh-from-repository.md`
@@ -396,8 +403,8 @@ divergent blocks surface as guided yours/take/merge; no state file
 written); the surviving checkpoint 002 marker-syntax /
 coarse-wrapping / CLAUDE.md-partition decisions are intact; FR-13
 (Option A) is satisfied by the rewritten command. Then pin the
-marker-syntax invariants into root `CLAUDE.md` and close Phase 2.1
-+ 2.1.A.
+marker encoding into the design docs (ARCHITECTURE + REQUIREMENTS
+NFR-4) and close Phase 2.1 + 2.1.A.
 
 **Design review checkpoint:**
 [checkpoint 004](design/design-review-checkpoint-004.md) (LANDED

@@ -1,5 +1,6 @@
 # Design Philosophy Rules
 
+<!-- CC-TEMPLATE-BLOCK: kiss -->
 ## KISS — Keep It Simple, Silly
 
 Default to the simplest thing that solves the actual need. The rule
@@ -16,9 +17,11 @@ is the judgment frame; rule 4 is the behavioral gate.
 Scope-expansion signals to stop and check: "while we're at it…",
 "it would be cleaner if…", "this will be useful later…", "let me
 make this configurable…", "I'll add a fallback in case…".
+<!-- /CC-TEMPLATE-BLOCK -->
 
 ---
 
+<!-- CC-TEMPLATE-BLOCK: progressive-disclosure -->
 ## Progressive Disclosure
 
 Simple by default, complex by access. The common case requires zero
@@ -57,9 +60,11 @@ foreground it.
 Destructive or expensive operations (deleting data, spending money,
 sending messages) require an explicit affirmative. Progressive
 disclosure governs default behavior, not safety guardrails.
+<!-- /CC-TEMPLATE-BLOCK -->
 
 ---
 
+<!-- CC-TEMPLATE-BLOCK: other-guiding-principles -->
 ## Other guiding principles
 
 ### Don't add capability you don't need
@@ -84,3 +89,4 @@ it.
 Don't explain WHAT the code does — well-named identifiers do that.
 Don't reference current task, fix, or callers ("used by X", "added
 for the Y flow") — that belongs in the PR description.
+<!-- /CC-TEMPLATE-BLOCK -->

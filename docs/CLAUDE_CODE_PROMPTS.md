@@ -667,6 +667,23 @@ satisfied; surviving 002 decisions intact.
     distributable-self-contained rule.
   - Queued a "/design-review security-review lens" deferred user story.
 
+- 2026-06-04 — Block 2 landed (scope items 7–8). The source-mode
+  dogfood ran the Step 6 pre-marker migration at this repo's root: 30
+  template-owned blocks inserted in sync; `briefing-rule` kept
+  (`state=forked`); `collaboration-rules` took upstream (clickable
+  links → plain code spans). A second refresh verified quiet (zero
+  re-asks). Marker encoding pinned in ARCHITECTURE + REQUIREMENTS
+  NFR-4. Deviations from written scope:
+  - The CLAUDE.md marker-encoding pin (scope item 8) was **not**
+    applied — Jamie ruled the byte-level encoding belongs with the
+    owning skill + design docs, not duplicated into CLAUDE.md
+    invariants. CLAUDE.md left clean; a source-mode identity machine
+    note (`REFRESH-SOURCE-MODE-VERIFIED`) is the only CLAUDE.md
+    addition.
+  - Noted, not fixed: root files are CRLF, `cc-template/` is LF —
+    pre-existing cross-tree EOL drift, queued for a future sweep.
+  - Phase 2.1 marked SUPERSEDED; Phase 2.1.A COMPLETE.
+
 ---
 
 ## Prompt 2.2: `/write-user-documentation`

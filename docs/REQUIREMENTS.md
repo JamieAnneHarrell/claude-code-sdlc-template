@@ -216,9 +216,14 @@ entirely** (checkpoint 004 abandoned the hash/baseline/state-file
 mechanism: there is no
 `.claude/claude-code-sdlc-template-refresh-state.md`, no per-block
 hashes, and no baseline reference). Marker memory in the template
-files is the sole reconciliation state. The exact encoding of
-`forked` / `removed` within the marker is pinned by the Phase
-2.1.A rewrite (Prompt 2.1.A). Changing the marker open/close
+files is the sole reconciliation state. The marker encoding,
+pinned by the Phase 2.1.A build: `template-owned` is the **bare
+marker** `<!-- CC-TEMPLATE-BLOCK: <id> -->` (refresh never writes
+`state=template-owned`); `forked` adds `state=forked` to the open
+marker with body and `<!-- /CC-TEMPLATE-BLOCK -->` closer unchanged;
+`removed` is a **closerless tombstone** — a single
+`<!-- CC-TEMPLATE-BLOCK: <id> state=removed -->` comment with no body
+and no closing marker. Changing the marker open/close
 strings or the state vocabulary (`template-owned` / `forked` /
 `removed`) requires auditing the refresh logic and all template
 files that carry markers.
