@@ -115,6 +115,17 @@ PowerShell or shell script), it goes through the standard
 dependency-justification rule in the General rules section
 above.
 
+### Shipped content references no root-project artifacts
+
+Files under `cc-template/` must never cite this repo's internal
+artifact IDs (`docs/REQUIREMENTS.md` FR/NFR numbers, `docs/design/`
+checkpoint/finding IDs, `docs/test-plans/` phase-exit IDs). They seed
+*other* projects with their own such IDs, where "per NFR-4" is
+meaningless — name shipped behavior by what it does, not by the
+artifact that recorded the decision. Source-only files at root cite
+IDs freely; they never ship. (Local form of the self-containment
+habit; cf. NFR-9, which governs duplication, not citation.)
+
 ### Out-of-scope until further notice
 
 - **Markdown linting / style enforcement automation.** Style

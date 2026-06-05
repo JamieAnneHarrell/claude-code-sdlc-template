@@ -451,6 +451,194 @@ concrete criteria or stays a surfaced judgment call (likely judgment).
 Whether the Abandoned Approaches entry is drafted from the removed
 entry's content or composed fresh.
 
+#### `/design-review` is iterative — mid-round `/wind-down` is optional, and the user should be told
+
+*Context.* `/design-review` runs across rounds (Stage 1 initial →
+Stage 2 walk → optional addendum rounds → land). Only two boundaries
+surface a rule-7 commit handoff: Stage 1 *initial* (new checkpoint)
+and Stage 2 *landing* (`LANDED`). Stage 1 *addendum* and Stage 2
+*open-another-round* are mid-iteration — no handoff; pending changes
+wind down at session close (the "commit handoffs only on artifact
+boundaries" invariant). Nothing *stops* a user running `/wind-down`
+between iterations, but it isn't necessary — and a user who doesn't
+know the lifecycle may wind down (and commit) after every round out
+of habit, fragmenting one logical checkpoint into many commits.
+
+*Proposed approach.* Add a short advisory so the user knows
+mid-iteration wind-down is optional, surfaced either in
+`/design-review`'s mid-iteration output (the close of a Stage 1
+addendum or a Stage 2 open-another-round) or in the skill's
+description / README. A single line of the shape: "this checkpoint
+is still in flight; you don't need to `/wind-down` until it lands —
+run it now only if you're stopping for the session." Document-vs-skill
+placement TBD.
+
+*Open sub-questions.* Where the advisory lives — command output at
+the mid-iteration boundary reaches the user at exactly the decision
+moment but adds a line to every mid-round close; the skill description
+or README is quieter but easier to miss. Whether `/exit-test-plan`
+needs the same advisory — it has the identical mid-iteration shape
+(addendum branch, open-another-round) and the same "only landing
+surfaces a handoff" rule, so probably yes, as a paired change.
+
+#### Parameterize maintainer identity (name / pronouns / initials) for the public repo
+
+*Context.* The repo is public, and shipped files hardcode the
+maintainer's identity: "Jamie" by name, "she/her" by pronoun, and
+"JAH" as initials (e.g. the `/design-review` AUDIT-NOTE marker
+`AUDIT NOTE — JAH:`). A consumer who seeds a project from
+`cc-template/` inherits all of it — their rules talk about Jamie,
+their design reviews want Jamie's initials. Identity should be
+placeholder-driven, with `/onboard` collecting the consumer's name,
+pronouns, and initials and substituting them.
+
+*Proposed approach.* Replace hardcoded identity in shipped files
+with placeholder tokens; have `/onboard` ask for name / pronouns /
+initials and fill them, the same way it already fills `ONBOARD-FILL`
+blocks. Scope spans every `cc-template/` file that names the
+maintainer: `rules/*.md`, `.claude/commands/*.md`, `CLAUDE.md`,
+`README.md`.
+
+*Open sub-questions.* Placeholder syntax — reuse the `ONBOARD-FILL`
+marker family, or inline tokens like `{{MAINTAINER}}` / `{{PRONOUN}}`
+/ `{{INITIALS}}`? The initials are load-bearing: `AUDIT NOTE — JAH:`
+is the string `/design-review` stage detection keys decisions on, so
+parameterizing initials means auditing `design-review.md` (both
+copies) and `CLAUDE.md`'s invariant wording in lockstep. Whether
+`/refresh-from-repository` re-collects identity on update or treats
+filled identity as consumer-owned (probably consumer-owned, like
+`ONBOARD-FILL`). The fallback if a consumer skips the questions (a
+neutral default like "the maintainer" / "they" / a two-letter
+placeholder). Whether this gates public-launch readiness — it is
+what makes the repo genuinely reusable rather than personalized, so
+likely high-priority once public launch is on the table.
+
+#### `/wind-down`'s coherence sweep is repo-wide, not session-scoped
+
+*Context.* Standing intent (and memory) hold that `/wind-down`'s
+doc-coherence sweep fixes pre-existing and unrelated drift too — not
+just this session's diffs. But the spec contradicts that:
+`.claude/commands/wind-down.md` scopes the sweep to "any docs the
+calling skill doesn't own — run the full ritual below, **scoped to
+what the session actually changed**." So a downstream Claude (or a
+fresh maintainer Claude) reading the spec would sweep only
+session-touched docs and leave stale cross-doc drift in place. The
+intent is the opposite: the sweep should catch anything out of sync
+repo-wide and surface it for resolution, regardless of whether this
+session touched it, and pull it back into coherence.
+
+*Proposed approach.* Rewrite the coherence-sweep step so it is
+repo-wide: surface every doc-coherence drift the sweep finds and pull
+stale items in, even in docs the session never opened. Reconcile the
+artifact-boundary-invocation line ("scoped to what the session
+actually changed") with the repo-wide stance — likely the
+artifact-boundary path still runs the full repo-wide sweep, just
+attributed to the calling skill's landing.
+
+*Open sub-questions.* Surface-only vs auto-fix for *unrelated* drift
+— the standing intent says the sweep "fixes" pre-existing drift, but
+a repo-wide auto-fix every session is heavier and riskier than
+surface-for-Jamie-to-resolve; the item's own wording ("surface to be
+resolved") reads as surface-first. Likely default: fix obvious
+mechanical drift inline, surface judgment-call drift for Jamie. The
+scope/cost of a genuine repo-wide pass every session vs a bounded set
+of tracking docs (REQUIREMENTS / ARCHITECTURE / PROJECT_PLAN /
+CLAUDE_CODE_PROMPTS / design-decisions / open-questions / CLAUDE.md /
+command docs). How the repo-wide sweep interacts with the
+artifact-boundary scoping note.
+
+#### `/design-review` pins every pinnable decision; only truly-unknowable ones reach the coding session
+
+*Context.* Coding sessions should be as fully specified as possible
+after a design review. In practice, reviews sometimes leave a
+decision open "for the coding session to decide" when it could have
+been pinned at review time — lazy under-specification. This is
+distinct from, and not licensed by, the "First-level decisions
+primary" load-bearing invariant: that invariant legitimately defers
+sub-decisions that *genuinely depend* on an unmade first-level A/B/C
+pick, and its own text already routes those to "a separate finding in
+the next addendum" — never to the coding session. The gap is the
+*lazy* leak, not the dependent deferral.
+
+The discipline, in three buckets. Every decision a review touches is
+one of:
+
+1. **Pinnable now** — no dependency blocks it; decidable at review
+   time. *Pin it.* The default and the bulk; never punt to the coding
+   session.
+2. **Genuinely dependent** — sub-decisions that only make sense once
+   a first-level pick lands, and complex enough to be load-bearing.
+   *Open an addendum* to fully spec them once the pick is made;
+   surface 1–2 sentence implications now. Not coding-session work.
+3. **Truly unknowable until implementation** — resolvable only by
+   running code (e.g. "does this API actually return X"). *Explicitly
+   flag* as a coding-session decision **and** state the decision
+   criteria so the session isn't improvising.
+
+A decision may reach the coding session only if it is bucket 3, with
+criteria attached.
+
+*Proposed approach.* Refine `/design-review`'s finding-composition
+step to encode the three buckets and the bar (pin by default;
+addendum for dependent trees; coding-session only for bucket 3 with
+criteria). Extend the "First-level decisions primary" invariant
+wording to name the lazy-leak failure mode and the
+addendum-as-resolution path. Lands as a **spec refinement, not a
+checkpoint** — it clarifies and tightens the existing invariant's
+addendum mechanism rather than reversing a contract (precedent: the
+"`/wind-down` owns the open-questions ↔ design-decisions
+reconciliation" decision landed without a checkpoint as "a root-cause
+spec fix honoring an existing contract").
+
+*Implementation surfaces to touch.*
+
+- `.claude/commands/design-review.md` finding-composition step
+  (Stage 1).
+- The "First-level decisions primary" bullet in root `CLAUDE.md`
+  § Load-bearing invariants.
+- Mirror the command edit to
+  `cc-template/.claude/commands/design-review.md` per NFR-9.
+
+*Open sub-questions.* The bucket-1-vs-bucket-3 boundary is a judgment
+call ("could this have been decided at review?") — whether it needs
+sharper criteria or stays judgment (likely judgment, surfaced).
+Whether the bucket-2 "suggest an addendum" prompt needs a complexity
+threshold or fires whenever dependent sub-decisions are non-trivial.
+Whether `/exit-test-plan` has an analogous "don't leave the tester
+improvising" refinement.
+
+#### `/refresh-from-repository` defers EOL handling to git instead of detecting it
+
+*Context.* During the 2026-06-04 dogfood, `/refresh-from-repository`
+spent real effort detecting CRLF-vs-LF differences between root
+(CRLF) and `cc-template/` (LF), which surfaced as all-lines-changed
+diffs that buried the actual content changes. EOL is a git concern —
+`.gitattributes` normalizes it at commit time — so the command
+shouldn't be doing line-ending forensics during a merge.
+
+*Proposed approach.* Two coupled actions:
+
+1. Normalize cross-tree EOL via `.gitattributes` so endings are
+   handled at commit time (also clears the pre-existing root-CRLF /
+   dist-LF drift).
+2. `/refresh-from-repository` stops detecting CRLF-vs-LF: diff
+   ignoring whitespace, defer to git normalization, handle EOL only
+   at the end if at all. Only if git rules don't normalize **and**
+   upstream/downstream genuinely differ in ending, ask once whether
+   downstream keeps its local EOL or takes upstream's.
+
+*Implementation surfaces to touch.*
+
+- `.gitattributes` at repo root (new).
+- `.claude/commands/refresh-from-repository.md` merge/diff step
+  (both copies per NFR-9).
+
+*Open sub-questions.* Whether `.gitattributes` alone removes the need
+for any in-command EOL handling (likely yes for the common case),
+leaving the ask-once path as a rare fallback. Whether the
+whitespace-ignoring diff is the default for all of refresh's content
+comparison or scoped to EOL only.
+
 ---
 
 ### Abandoned Approaches
@@ -516,4 +704,88 @@ release-tag discipline on a one-maintainer upstream and exposes git
 conflict-marker syntax to consumers who read these `.md` files every
 session; Option A keeps all conflict resolution inside the running
 session with no markers in the files.
+
+---
+
+### Open Questions
+
+#### Portability audit — what makes *this* project work better than a freshly-seeded one?
+
+*Context.* Consumers run the template in their own environments,
+seeded only from `cc-template/` via `/onboard`. But this project also
+benefits from things that **don't** ship: root `CLAUDE.md`'s
+Load-bearing invariants and project context (source-only), the global
+`~/.claude/CLAUDE.md` (Jamie's TODO.txt workflow, design philosophy,
+migration pointers — machine-scoped), and project memory under
+`~/.claude/projects/.../memory/`. Some of that is load-bearing for how
+well this project runs. A seeded project gets none of it. The
+question: which of those behaviors are doing real work, and which
+should move into a *shipped* surface (`project-rules.md` or a skill)
+so consumers inherit them?
+
+*What we know so far.* `/onboard` seeds from `cc-template/`; root
+`CLAUDE.md` invariants + project context are source-only and never
+copied. Global `~/.claude/CLAUDE.md` (TODO.txt workflow,
+progressive-disclosure philosophy) applies on Jamie's machine to
+*every* project, so a consumer on another machine never sees it.
+Project memory is local auto-memory, not shipped. The memories that
+shape behavior (e.g. the repo-wide wind-down sweep, the
+distributable-self-contained habit) are candidates for promotion to
+shipped rules — some are already being promoted (the
+self-containment habit lands as a project rule in
+`rules/project-rules.md`; the repo-wide sweep is its own story
+above).
+
+*Nested sub-question — should `project-rules.md` be an always-loaded
+read?* Today the session-start directive at the top of `CLAUDE.md`
+mandates only `coding-session-rules.md` and `design-philosophy-rules.md`
+end-to-end; `project-rules.md` is "read when relevant." If
+project-scope discipline is load-bearing enough to belong in every
+session's working memory, it should join the always-loaded set.
+Trade-off: more mandatory reading at session start vs. relying on
+just-in-time relevance. Resolve as part of the same audit.
+
+*What would unblock an answer.* A deliberate pass that diffs root
+`CLAUDE.md` + global/project memory against what a freshly-seeded
+project receives, classifying each behavior as (a) correctly
+source-only / machine-local, (b) should-be-promoted to a shipped
+rule, or (c) should-be-promoted into a skill. The promotion
+candidates then become their own stories.
+
+#### One-line `CLAUDE.md` guardrail: "Claude never touches `CC-TEMPLATE-BLOCK` markers"
+
+*Context.* During the `/refresh-from-repository` dogfood, the plan
+tried to insert verbose marker-state encoding prose into `CLAUDE.md`
+to pin the markers. Rejected — too verbose, and `CLAUDE.md` loads
+into *every* session's context even when markers are irrelevant. That
+*encoding-pin* form was decided against on 2026-06-04
+("`CC-TEMPLATE-BLOCK` marker encoding lives with the skill + design
+docs, not `CLAUDE.md`"), which also declined even a one-line
+*encoding* pointer.
+
+But the proposal here is a **different artifact**: not the byte-level
+encoding, but a one-line **behavioral hands-off guardrail** — e.g.
+*"Claude never edits `CC-TEMPLATE-BLOCK` HTML-comment markers; they
+belong to the `/refresh-from-repository` skill."* That's a "don't
+touch this" tripwire (the kind `CLAUDE.md` § Load-bearing invariants
+already carries), not an encoding spec. Whether the behavioral
+framing clears the bar the encoding-pin didn't is genuinely open.
+
+*What we know so far.* The encoding-pin was declined for drift +
+every-context-weight reasons; its scope note set a re-open trigger:
+"Revisit the tripwire-pointer option if a future hand-edit actually
+mangles a marker in practice." No marker has been mangled yet. The
+behavioral guardrail is new information relative to the rejection
+(rule 3's "say so once with new information" path), because its
+*purpose* differs (prevent accidental edits, vs. document the
+encoding). Counter-argument: a hands-off line still adds permanent
+every-session weight for a risk that hasn't materialized, and the
+markers are fairly self-evident inline.
+
+*What would unblock an answer.* The scope-note trigger firing (a real
+hand-edit mangles a marker), or a decision that the one-line
+behavioral guardrail earns its place preemptively as cheap insurance
+against a foreseeable mistake. If it lands, the natural home is
+`CLAUDE.md` § Load-bearing invariants as a single tripwire line, not
+an encoding block.
 
