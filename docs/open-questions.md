@@ -737,6 +737,106 @@ docs-only / UI-polish phases don't get padded. Whether this raises
 before/after example in `onboard.md` itself rather than only the
 narrative requirements.
 
+#### Promote the "good morning" session-start + per-prompt kickoff ritual to a skill
+
+*Context.* Surfaced 2026-06-06 from a downstream consumer where the
+SDLC workflow has matured enough that session start runs as a clean,
+two-beat ritual driven by short prompts. The sequence Jamie used:
+
+1. *"Good morning Claude — please check project rules and await
+   further instructions."* Claude acknowledged the rules, oriented
+   from the session-start reading order (TODO.txt / PROJECT_PLAN /
+   CLAUDE_CODE_PROMPTS), and proposed moving to the next prompt —
+   without Jamie pasting that prompt into the window.
+2. *"Let's move forward with prompt 2. Acknowledge the scope, and
+   advise if you need plan mode or if things are specified well
+   enough to use just a checklist."* Claude read the next phase prompt
+   from `docs/CLAUDE_CODE_PROMPTS.md` itself, acknowledged its scope,
+   recommended a checklist over plan mode, surfaced confirming
+   questions about one design decision, and then proceeded.
+
+The valuable, hard-to-replicate part is beat 2: a named discipline
+that, before any code, (a) loads the next phase prompt without the
+human re-pasting it, (b) acknowledges scope back, (c) makes an
+explicit **plan-mode vs. checklist** call, and (d) surfaces confirming
+questions up front. That prevents under-specified coding sessions.
+Beat 1 is mostly already codified by `CLAUDE.md`'s "Reading order at
+session start" + the top-of-file directive to read the two universal
+rules files — its only new element is the conversational
+"orient, then await / propose the next prompt" handoff. The workflow
+proving itself on a live project is exactly the bar this template
+sets for new rituals.
+
+*Proposed approach.* Genuinely open between three shapes — name the
+trade rather than defaulting to a new command (KISS; the template
+deliberately keeps its command set small):
+
+- **Skill** (e.g. `/kickoff` or `/good-morning`) — packages both beats
+  into one invokable ritual: orient at session start, then for "the
+  next prompt" load it from CLAUDE_CODE_PROMPTS, acknowledge scope,
+  force the plan-vs-checklist decision, and surface confirming
+  questions before proceeding. Most replicable and most reliable
+  (prose in CLAUDE.md is followed softly; an invoked skill is a hard
+  ritual), but adds a command and must clear the "earned its place"
+  bar. Could be one skill spanning both beats or two thin ones; lean
+  one.
+- **Strengthen existing prose** — fold the plan-vs-checklist +
+  scope-acknowledgment discipline into `CLAUDE.md`'s reading-order
+  section or `coding-session-rules.md`. No new surface, but inherits
+  the soft-adherence problem this story is trying to solve.
+- **SessionStart hook** — could mechanically inject the reading at
+  session start, but the conversational acknowledgment and the
+  plan-vs-checklist judgment are Claude behavior, not something a hook
+  can carry. At best covers beat 1's loading, not beat 2.
+
+My lean: worth a `/design-review` checkpoint rather than an inline
+build, because it overlaps two live items and the skill-vs-prose call
+is load-bearing. It directly answers the existing open sub-question
+*"Whether the 'Reading order at session start' section is itself
+bloat … might belong in a hook or a skill"* under "CLAUDE.md as a
+thin index", and it's a concrete instance of the "Portability audit"
+open question's "which behaviors should be promoted into a skill?"
+Resolve together so we don't land a skill that re-litigates the
+thin-index stance.
+
+*Recommendation (2026-06-06, recorded so we don't re-litigate).*
+Jamie and Claude reviewed this the day it was surfaced and settled
+the framing — treat the points below as decided going in, not
+re-openable from scratch:
+
+- **It's two beats, and only beat 2 is novel.** Beat 1 (orient at
+  session start) is already covered by `CLAUDE.md`'s "Reading order
+  at session start" + the top-of-file rules directive; its only new
+  element is the conversational "propose the next prompt" handoff.
+  Beat 2 — load the next phase prompt without re-pasting, acknowledge
+  scope, make the explicit **plan-vs-checklist** call, surface
+  confirming questions before any code — is the real deliverable. If
+  anything is built, scope it to beat 2; don't pad a skill with beat 1
+  just to make it feel substantial.
+- **Don't build inline.** The skill-vs-prose call is load-bearing and
+  collides with two live items, so it goes through a `/design-review`
+  checkpoint, not a coding session.
+- **Resolve it together with the thin-index and portability-audit
+  questions** so a `/good-morning`-style skill can't silently
+  re-litigate the "CLAUDE.md as a thin index" stance. This story is
+  the concrete instance that should force those two to a decision.
+- **KISS bar still applies.** A new command must clear the template's
+  "earned its place on a live project" bar; the live-project evidence
+  here is for the *workflow*, not yet for it being a *command*. The
+  review weighs skill vs. strengthened prose vs. hook on that basis.
+
+*Open sub-questions.* One skill spanning both beats vs. two thin ones
+(orientation vs. per-prompt kickoff). Whether beat 1 is too thin to
+warrant a skill given the reading order already covers it — i.e.
+whether only beat 2 (the plan-vs-checklist kickoff) is the real
+deliverable. How the skill decides plan-vs-checklist without
+over-prescribing (a surfaced judgment call with a stated heuristic,
+not a rigid gate). Whether it should hard-require the confirming-
+questions step or leave it to judgment. Whether the skill reads "the
+next prompt" by scanning TODO.txt's first entry / the current phase in
+PROJECT_PLAN, and how it disambiguates when those disagree. Whether
+promoting this resolves or merely relocates the thin-index tension.
+
 ---
 
 ### Abandoned Approaches
