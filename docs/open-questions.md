@@ -639,6 +639,104 @@ leaving the ask-once path as a rare fallback. Whether the
 whitespace-ignoring diff is the default for all of refresh's content
 comparison or scoped to EOL only.
 
+#### `/onboard` should author prescriptive prompts — self-contained exit criteria and contract-level scope items
+
+*Context.* Surfaced 2026-06-06 from a downstream consumer (a
+sales-tax/Odoo tool). The project's spec, discovery, and design
+docs were solid, but the `docs/CLAUDE_CODE_PROMPTS.md` `/onboard`
+produced was weakly specified: scope items gestured at FR numbers
+without stating the contract, and **every exit-criteria line was a
+bare reference — "Per PROJECT_PLAN Phase N."** After running the
+first two prompts the consumer realized they were too thin to code
+against without chasing references, and had Claude rewrite the whole
+file. The rewrite is the evidence for what "prescriptive" means
+here; four patterns separate the weak originals from the strong
+revisions:
+
+1. **Exit criteria became self-contained and testable.** Original:
+   "Per PROJECT_PLAN Phase 2." Revised: a concrete acceptance
+   paragraph naming the inputs (the committed fixtures), the required
+   outputs, the exact abort behavior with its row-pointed message,
+   and the determinism / bounded-memory invariants — something you
+   could hand straight to `/exit-test-plan`. The prompt no longer
+   forces a hop to PROJECT_PLAN to learn when the phase is done.
+2. **Scope items spell out the contract, not just FR pointers.**
+   Original: "Parse the rate file to `RateRow`s; active-row filter
+   honoring `--as-of` (FR-PJ-1/2/6)." Revised: the full 9-column
+   layout, which column carries the rate (col 4 Intrastate), the
+   exact active predicate (`effective ≤ as-of ≤ expiration`), the
+   sentinel (`29991231`), and the default (`--as-of` = today). FR /
+   PRD numbers stay as cross-references, but the prompt is buildable
+   without dereferencing them.
+3. **"Read first" points at specific anchors.** Revised names the
+   `design-decisions.md` entries by their decision title and the
+   exact PRD / ARCHITECTURE subsections, not just the file names —
+   so the coding session loads precisely the right context.
+4. **Constraints name the trap and the why.** Revised constraints
+   call out the specific failure each one prevents (the ×100
+   decimal→percent conversion lives only in the emit phase — "prevents
+   the 100× silent-rate error"; read boundary column 1 exactly, never
+   substring-match `Z5`; cross-quarter rate/boundary pairing is a
+   normal published state, don't abort).
+
+Root cause in the spec: `onboard.md`'s `### docs/CLAUDE_CODE_PROMPTS.md`
+"Per-prompt structure" lists "Exit criteria" as a bare bullet with no
+demand that it be self-contained or testable, and the design-review
+prompt template it models exit criteria on is itself a pure reference
+("Checkpoint LANDED per Phase N exit criteria"). It then points at
+*this* project's `docs/CLAUDE_CODE_PROMPTS.md` as "the canonical
+shape" — so however thin that exemplar's exit criteria are, `/onboard`
+reproduces thin prompts downstream.
+
+*Proposed approach.* Tighten the "Per-prompt structure" requirements
+for **feature** prompts in `onboard.md`:
+
+- **Exit criteria must be self-contained and testable** — restate the
+  acceptance bar inside the prompt (named inputs, required outputs /
+  artifacts, expected abort behavior with the row-pointed message,
+  any determinism / performance invariant), reading like an
+  `/exit-test-plan` input. Cross-reference the PROJECT_PLAN phase
+  exit, but never *only* reference it.
+- **Scope items state the contract** — when a phase has a concrete
+  data contract (column layout, predicate, sentinel, ID scheme,
+  precedence rule), write it into the scope item; keep FR / PRD
+  numbers as cross-references, not as the sole source.
+- **Read-first names specific anchors** — the `design-decisions.md`
+  entries by title and the PRD / ARCHITECTURE subsections, not just
+  the file.
+- **Constraints name the trap and the why** — the specific failure
+  mode each constraint prevents.
+
+The design-review prompt template is explicitly **out of scope** —
+its exit criteria *is* the checkpoint landing ("Checkpoint LANDED per
+Phase N"), which is correct, because the review's own boundary, not a
+feature acceptance test, defines done. This tightening applies only
+to feature prompts.
+
+*Implementation surfaces to touch.*
+
+- `cc-template/.claude/commands/onboard.md` § `docs/CLAUDE_CODE_PROMPTS.md`
+  "Per-prompt structure" — add the four requirements above; scope
+  them to feature prompts and exempt the design-review template.
+- Root `.claude/commands/onboard.md` — mirror per NFR-9.
+- This project's own `docs/CLAUDE_CODE_PROMPTS.md` — `onboard.md`
+  cites it as "the canonical shape," so the exemplar must meet the
+  raised bar (audit its feature-prompt exit criteria) or the citation
+  propagates thin prompts.
+
+*Open sub-questions.* The KISS / rule-4 tension: self-contained exit
+criteria restate part of PROJECT_PLAN's phase exit inside the prompt,
+creating two places that can drift. How much to restate vs reference,
+and whether `/wind-down`'s coherence sweep should own keeping the two
+in sync (the revised file accepted the duplication for
+self-containment — name that trade in the spec). Whether "states the
+contract" needs a concrete trigger (only when a phase has a
+machine-checkable data contract?) or stays a judgment call so
+docs-only / UI-polish phases don't get padded. Whether this raises
+`/onboard`'s per-prompt authoring cost enough to want a worked
+before/after example in `onboard.md` itself rather than only the
+narrative requirements.
+
 ---
 
 ### Abandoned Approaches
