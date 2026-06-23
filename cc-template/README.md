@@ -20,6 +20,10 @@ walkable checklist and session handoff — follow them in order:
    Multiple files are fine. A richer design produces a richer
    generated PROJECT_PLAN; a one-paragraph design produces a thin
    one. See `docs/design/README.md` for what good looks like.
+   (Prefer to build the first spec interactively? Run
+   `/product-visioning` instead — it authors the first PRD
+   `docs/design/PRD-<slug>-001.md`, which `/onboard` then treats as the
+   design intake.)
 
 3. **Review the rules.** Read each `rules/*.md` file and make sure it
    matches your own collaboration philosophy — edit anything you
@@ -40,13 +44,45 @@ walkable checklist and session handoff — follow them in order:
    questions (project name, language, multi-agent mode, scope
    statements), and generates the rest of the project documents.
 
-5. **Run `/bootstrap`** in the next session to plan the developer
+5. **Run `/design-review`** for a post-onboard sanity check — did
+   REQUIREMENTS / ARCHITECTURE / the plan decompose cleanly from the
+   design intake? Mark up the checkpoint it writes, then re-run
+   `/design-review` to walk the dispositions and land it. This comes
+   before `/bootstrap`.
+
+6. **Run `/bootstrap`** in the next session to plan the developer
    environment (shell, tooling, dev secrets) and write the README
    Developer setup section. It's a hard prerequisite to Phase 0.
 
-6. **Run Phase 0** by pasting Prompt 0 from
+7. **Run Phase 0** by pasting Prompt 0 from
    `docs/CLAUDE_CODE_PROMPTS.md`. This sets up the language tooling,
    CI workflow, and project skeleton.
+
+## After setup: the recurring lifecycle
+
+The configuration commands above (`/onboard`, `/bootstrap`,
+`/deployment-plan`) run once. From Phase 0 onward the project settles
+into a repeating loop:
+
+- **Every coding session** closes with `/wind-down` — it rewrites
+  `TODO.txt`, keeps the tracking docs coherent, and hands you the
+  commit.
+- **A phase that ships user-observable behavior** closes with
+  `/exit-test-plan` — a manual walkthrough against the phase's exit
+  criteria.
+- **A high-risk transition** gets a `/design-review` checkpoint before
+  the next phase starts.
+- **When the current movement is complete** — every phase done, and you
+  need to decide what to build next — run `/product-visioning`. It's an
+  interactive session that produces the next PRD
+  (`docs/design/PRD-<slug>-NNN.md`). `/onboard` then decomposes that PRD
+  into a fresh `PROJECT_PLAN` + prompts (archiving the prior movement's
+  plan), `/design-review` reviews the decomposition, and the loop
+  repeats.
+
+A *movement* is a strategic chunk opened this way. Bug fixes, cleanup,
+and release work are tactical — no PRD needed; `/wind-down` offers them
+as a menu when a movement lands.
 
 ## Keeping a project up to date
 
@@ -163,6 +199,7 @@ cc-template/
 │   │   ├── deployment-plan.md     ← /deployment-plan slash command
 │   │   ├── design-review.md       ← /design-review slash command
 │   │   ├── exit-test-plan.md      ← /exit-test-plan slash command
+│   │   ├── product-visioning.md   ← /product-visioning slash command
 │   │   ├── wind-down.md           ← /wind-down slash command
 │   │   └── refresh-from-repository.md ← /refresh-from-repository slash command
 │   ├── settings.local.json.example
@@ -182,7 +219,8 @@ cc-template/
 ```
 
 After onboarding runs, `docs/` also contains `REQUIREMENTS.md`,
-`ARCHITECTURE.md`, `PROJECT_PLAN.md`, `CLAUDE_CODE_PROMPTS.md`, and
+`ARCHITECTURE.md`, `PRODUCT_VISION.md`, `PROJECT_PLAN.md`,
+`CLAUDE_CODE_PROMPTS.md`, the first PRD `design/PRD-<slug>-001.md`, and
 the rules files have project-specific sections appended.
 
 ## What's pre-decided vs. what onboarding asks

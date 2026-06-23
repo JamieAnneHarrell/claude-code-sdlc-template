@@ -7,12 +7,13 @@ during `/onboard`. Each item is a single testable statement.
 
 ## Functional requirements
 
-**FR-1: Ship six slash commands.** The distributable
-(`cc-template/.claude/commands/`) ships six commands as markdown
-files: `/onboard`, `/bootstrap`, `/deployment-plan`,
-`/design-review`, `/exit-test-plan`, `/wind-down`. The same six
-commands live at the source root (`.claude/commands/`) for the
-source-of-truth project's own self-consumption.
+**FR-1: Ship the SDLC slash commands.** The distributable
+(`cc-template/.claude/commands/`) ships the SDLC commands as markdown
+files: `/onboard`, `/bootstrap`, `/deployment-plan`, `/design-review`,
+`/exit-test-plan`, `/product-visioning`, `/wind-down`, plus
+`/refresh-from-repository` per FR-13. The same commands live at the
+source root (`.claude/commands/`) for the source-of-truth project's own
+self-consumption.
 
 **FR-2: Distributable is a copyable subdirectory.** Consumers copy
 the `cc-template/` subdirectory of this repo into a new project
@@ -21,15 +22,18 @@ is no nested `cc-template/cc-template/` after the copy — the
 consumer's new project directory IS the rename of the copied
 `cc-template/`.
 
-**FR-3: `/onboard` produces the planning docs.** Given one or more
-design docs in `docs/design/`, `/onboard` writes
-`docs/REQUIREMENTS.md`, `docs/ARCHITECTURE.md`,
-`docs/PROJECT_PLAN.md`, and `docs/CLAUDE_CODE_PROMPTS.md`. It also
-fills the `<!-- ONBOARD-FILL: project-scope -->` block in
-`rules/project-rules.md`, rewrites `rules/multi-agent-rules.md`
-to the chosen mode, writes a README stub, and flips
-`<!-- ONBOARD-STATUS: UNCONFIGURED -->` to
-`<!-- ONBOARD-STATUS: COMPLETE <date> -->`.
+**FR-3: `/onboard` decomposes the next PRD into the planning docs.** On the
+**first PRD** (the design intake in `docs/design/` — a dropped design doc or
+a `/product-visioning` `PRD-<slug>-001`), `/onboard` writes
+`docs/REQUIREMENTS.md`, `docs/ARCHITECTURE.md`, `docs/PRODUCT_VISION.md`,
+`docs/PROJECT_PLAN.md`, `docs/CLAUDE_CODE_PROMPTS.md`, and adopts the
+design intake as `docs/design/PRD-<slug>-001.md` (`ACTIVE`); fills the
+`<!-- ONBOARD-FILL: project-scope -->` block in `rules/project-rules.md`,
+rewrites `rules/multi-agent-rules.md` to the chosen mode, writes a README
+stub, and flips `<!-- ONBOARD-STATUS: ... -->` to `COMPLETE <date>`. On a
+**later movement's PRD** it applies the PRD's vision revisions to
+`PRODUCT_VISION.md`, archives the prior plan to `docs/project-plans/`, and
+authors the new movement's PROJECT_PLAN + prompts (no re-setup).
 
 **FR-4: `/bootstrap` has two modes keyed off `BOOTSTRAP-STATUS`.**
 Write mode (from `UNCONFIGURED`) writes the README "Developer
@@ -86,7 +90,7 @@ demarcate downstream-owned content from template-owned content for
 `/refresh-from-repository` (Phase 2).
 
 **FR-11: Universal content is identical between source and dist.**
-The 10 coding-session rules, design philosophy rules, the six
+The 10 coding-session rules, design philosophy rules, the
 command files, and the placeholder rules files
 (`multi-agent-rules.md`, `project-rules.md`,
 `environment-rules.md`, `testing-rules.md`) ship identical at root
@@ -171,6 +175,15 @@ comment renames, `ONBOARD-FILL` marker drift, zero-pad-width
 changes in `checkpoint-NNN` / `phase-NNN-exit` filenames).
 Specifics deferred until a real regression motivates the work.
 
+**FR-17: `/product-visioning` is an interactive session that produces the
+next PRD.** First PRD or n-th, its single output is a stand-alone `DRAFT`
+`docs/design/PRD-<slug>-NNN.md` — the movement's starting point, scope (in /
+out / deferred), proposed `PRODUCT_VISION.md` revisions, and decisions.
+Routing happens in dialogue (no inline mark-up step). It never edits
+`PRODUCT_VISION.md`, `PROJECT_PLAN.md`, `CLAUDE_CODE_PROMPTS.md`, or other
+docs — `/onboard` decomposes the PRD (FR-3), which is what writes those and
+flips the PRD to `ACTIVE`.
+
 ## Non-functional requirements
 
 **NFR-1: Cross-platform.** Windows 11 is primary; Linux and macOS
@@ -179,28 +192,32 @@ on Windows is a bug, not a platform quirk to document around. Per
 [`rules/environment-rules.md`](../rules/environment-rules.md).
 
 **NFR-2: Zero-padded 3-digit filenames for recurring artifacts.**
-`docs/design/design-review-checkpoint-NNN.md` and
-`docs/test-plans/phase-NNN-exit.md` — pad width fixed at 3 so
-files sort lexicographically as numeric order through 999.
-`/design-review`, `/exit-test-plan`, and `/wind-down` depend on
-this glob shape.
+`docs/design/design-review-checkpoint-NNN.md`,
+`docs/test-plans/phase-NNN-exit.md`, `docs/design/PRD-<slug>-NNN.md`,
+and `docs/project-plans/{project-plan,claude-code-prompts}-NNN.md` —
+pad width fixed at 3 so files sort lexicographically as numeric order
+through 999. PRD and plan-archive share one movement counter
+(movement N → `PRD-<slug>-N`; opening N archives N−1 as
+`project-plan-(N-1)`). `/design-review`, `/exit-test-plan`,
+`/product-visioning`, and `/wind-down` depend on these glob shapes.
 
 **NFR-3: Per-file frontmatter status on recurring artifacts.**
 `AWAITING-DECISIONS` / `LANDED` on
 `docs/design/design-review-checkpoint-*.md`;
 `AWAITING-DISPOSITIONS` / `LANDED` on
-`docs/test-plans/phase-*-exit.md`. Frontmatter status is the
-source of truth for the recurring-artifact lifecycle (the three
-status comments in `CLAUDE.md` govern only the configuration
-ritual).
+`docs/test-plans/phase-*-exit.md`; `DRAFT` / `ACTIVE` /
+`SUPERSEDED <date>` on `docs/design/PRD-<slug>-*.md` (latest `ACTIVE`
+is the definitive movement scope). Frontmatter status is the source
+of truth for the recurring-artifact lifecycle (the three status
+comments in `CLAUDE.md` govern only the configuration ritual).
 
 **NFR-4: Stage-detection and refresh-marker placeholders are
 load-bearing.** Stage detection parses for exact strings:
 `> _[UNMARKED — replace this line with your decision per the legend above]_`
 (in `/design-review` AUDIT NOTE blocks) and `[PENDING]` (in
-`/exit-test-plan` §4 / §6.N run log rows). Changing the
-placeholder text breaks stage detection — audit `Step 0`, `Step
-S1.5`, and `Step S1.A` of the relevant command file together. The
+`/exit-test-plan` §4 / §6.N run log rows). Changing the placeholder
+text breaks stage detection — audit `Step 0`, `Step S1.5`, and `Step
+S1.A` of the relevant command file together. The
 template-marker syntax for `/refresh-from-repository` is similarly
 load-bearing. Pinned by checkpoint 002 as
 `<!-- CC-TEMPLATE-BLOCK: <id> --> ... <!-- /CC-TEMPLATE-BLOCK -->`
@@ -246,12 +263,16 @@ design-decisions, open-questions, this README, root CLAUDE.md)
 ship under CC BY-NC-ND 4.0 — those project-management docs are
 not meant to be redistributed.
 
-**NFR-8: File ownership doesn't overlap.** Each command's "What
-this command does NOT do" section lists what the others own.
-`/design-review` owns `docs/design/design-review-checkpoint-*.md`
-and `docs/design/REVIEWS.md` exclusively. `/exit-test-plan` owns
-`docs/test-plans/phase-*-exit.md` exclusively. The other commands
-surface and warn but never edit those files.
+**NFR-8: File ownership doesn't overlap.** Each command's "What this
+command does NOT do" section lists what the others own. `/onboard` owns
+`docs/PRODUCT_VISION.md`, the in-flight `docs/PROJECT_PLAN.md` /
+`docs/CLAUDE_CODE_PROMPTS.md`, their `docs/project-plans/` archives, and
+PRD status transitions. `/product-visioning` authors
+`docs/design/PRD-<slug>-*.md` (DRAFT). `/design-review` owns
+`docs/design/design-review-checkpoint-*.md` and `docs/design/REVIEWS.md`
+(and edits the tactical docs on its review-land path). `/exit-test-plan`
+owns `docs/test-plans/phase-*-exit.md`. The other commands surface and
+warn but never edit those files.
 
 **NFR-9: Source/dist duplication is deliberate and audited.**
 Universal content (rules, design philosophy, command files) is

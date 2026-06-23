@@ -47,6 +47,11 @@ alternatives)
 or what could re-open it.
 ```
 
+**Write forward-looking.** State the decision and why the *current*
+design is right; don't narrate the earlier approach that was wrong — the
+git history records what changed. `Why not <alternative>` covers genuine
+design alternatives, not a corrected mistake reframed as one.
+
 ---
 
 ## Source/dist subdirectory split
@@ -62,7 +67,7 @@ never copies into the distributable.
 
 **Why.** The template has grown complex enough (iterative
 `/design-review` and `/exit-test-plan` lifecycles, fifteen-plus
-load-bearing invariants in `CLAUDE.md`, six commands with overlapping
+load-bearing invariants in `CLAUDE.md`, commands with overlapping
 concerns) that copy-paste-without-history became a regression risk.
 Git history on the source makes changes auditable and revertible
 without disrupting the consumer experience of "copy a directory
@@ -151,11 +156,10 @@ entry still stands; the two-stage detail does not.
 
 ---
 
-## All six commands ship at the source root, not just the recurring ones
+## All commands ship at the source root, not just the recurring ones
 
-**Decision.** Root `.claude/commands/` carries all six commands —
-`/onboard`, `/bootstrap`, `/deployment-plan`, `/design-review`,
-`/exit-test-plan`, `/wind-down` — identical to what the dist ships.
+**Decision.** Root `.claude/commands/` carries all commands,
+identical to what the dist ships.
 The source-of-truth project is itself a downstream consumer of its
 own template; it runs the same commands against its own docs that
 any seeded project would.
@@ -1135,3 +1139,43 @@ pointer carrying no encoding adds maintenance surface for little gain.
 pins, superseding that block's planned "pin marker syntax into root
 CLAUDE.md" scope item. Revisit the tripwire-pointer option if a
 future hand-edit actually mangles a marker in practice.
+
+---
+
+## `/product-visioning` authors PRDs; `/onboard` decomposes them; `/design-review` only reviews
+
+**Decision.** The strategic-planning layer is three commands, one job
+each. `/product-visioning` runs an interactive session whose sole output
+is the next `docs/design/PRD-<slug>-NNN.md` (`DRAFT`). `/onboard`
+decomposes a PRD — the first PRD is full project setup (adopting the
+design intake as `PRD-<slug>-001`); a later movement applies the PRD's
+vision revisions to `PRODUCT_VISION.md`, archives the prior plan to
+`docs/project-plans/`, authors the new `PROJECT_PLAN` + prompts, and
+flips PRD status (`DRAFT`→`ACTIVE`, prior→`SUPERSEDED`). `/design-review`
+only reviews the result. PRDs and plan archives share one movement
+counter; `PRODUCT_VISION.md` is onboard-owned with a surviving "Product
+personality & positioning" section. Per-file PRD frontmatter
+(`DRAFT`/`ACTIVE`/`SUPERSEDED`) is the source of truth — no status banner.
+
+**Why.** One job per command keeps ownership clean: the review command
+stays read-only and findings-only (rule 4), and decomposition stays with
+`/onboard`, which already does it for the first PRD — so a later movement
+is the same job, one decomposer, no second to drift.
+
+**Why not let `/product-visioning` decompose too.** Re-merges
+intent-capture with doc-generation; `/onboard` already decomposes the
+first PRD, so reusing it for later movements is simpler than a second
+decomposer.
+
+**Why not a `PRODUCT-VISION-STATUS` comment/banner.** Per-file PRD
+frontmatter is the source of truth (mirrors the recurring-artifact
+frontmatter-not-banner separation); a fourth status comment would
+conflate the strategic loop with the three-status configuration ritual.
+
+**Scope note.** Built out-of-band (a downstream project needed the
+movement workflow first), edited in `cc-template/` only; root command
+files + the `CLAUDE.md` `reading-order` convention-check nudge sync via
+the source-mode dogfood next session. `design-review.md` is pure-review,
+owned by Jamie via git. Recorded as Phase 2.2. Full model + invariants
+live in `CLAUDE.md` § "/product-visioning + PRD / product-vision
+artifacts" and the file-ownership list.

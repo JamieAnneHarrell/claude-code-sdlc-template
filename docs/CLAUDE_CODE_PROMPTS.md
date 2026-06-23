@@ -686,17 +686,17 @@ satisfied; surviving 002 decisions intact.
 
 ---
 
-## Prompt 2.2: `/write-user-documentation`
+## Prompt 2.3: `/write-user-documentation`
 
 **Read first.**
 - [`docs/REQUIREMENTS.md`](REQUIREMENTS.md) FR-14
-- [`docs/PROJECT_PLAN.md`](PROJECT_PLAN.md) Phase 2.2
+- [`docs/PROJECT_PLAN.md`](PROJECT_PLAN.md) Phase 2.3
 - Whichever existing command file has the closest shape (likely
   [`.claude/commands/onboard.md`](../.claude/commands/onboard.md)
   given it also produces user-facing artifacts)
 - This project's design intake at
   [`docs/design/cc-template-product-spec.md`](design/cc-template-product-spec.md)
-  — Prompt 2.2 will eat its own dog food by running on this
+  — Prompt 2.3 will eat its own dog food by running on this
   project to produce user docs for the template itself.
 
 **Scope.**

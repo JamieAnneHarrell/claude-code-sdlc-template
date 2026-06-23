@@ -46,6 +46,108 @@ would unblock an answer.
 
 ### Deferred User Stories
 
+#### Dedicated end-to-end command-lifecycle doc
+
+*Context.* No single doc narrates the full command lifecycle (setup →
+first movement → tactical loop → next movement). The pieces are
+scattered: `cc-template/README.md` "How to use" (setup), root `CLAUDE.md`
+load-bearing invariants (per-command mechanics), and the command files
+(their own handoffs). The 2026-06-22 `/product-visioning` reshape added a
+strategic layer and widened the gap; `cc-template/README.md` now carries
+a brief "After setup: the recurring lifecycle" section as the minimal
+fix. Surfaced 2026-06-22.
+
+*Proposed approach.* If the README section proves insufficient, author a
+standalone lifecycle doc (one diagram + prose). Weigh against the
+project's "don't add a doc without strong justification" bar — build it
+only when a reader genuinely can't reconstruct the loop from README +
+invariants.
+
+*Open sub-questions.* Where it lives (`docs/` source-only vs.
+`cc-template/docs/` shipped); whether it ships to consumers; and the
+stale "lifecycle is two commands" line in
+`docs/design/cc-template-product-spec.md` (historical intake doc) — fix
+in place or leave as history.
+
+#### Sweep local Claude-memory items that are really project guidance into checked-in docs
+
+*Context.* Project-level guidance (how to write / maintain this template)
+was mistakenly filed into local `~/.claude/.../memory/` files, which are
+per-machine and invisible to other maintainers. This session's mis-files
+were cleared, but pre-existing memories carry the same issue — e.g.
+`distributable-self-contained` duplicates the existing project rule "Shipped
+content references no root-project artifacts"; `winddown-coherence-sweep`
+and `zero-pad-counters` are project-level. Surfaced 2026-06-16.
+
+*Proposed approach.* Audit the local memory index; for each entry decide
+**project-level** (→ move into the right checked-in doc — CLAUDE.md, rules,
+or ARCHITECTURE — and delete the memory) vs **genuine cross-project working
+preference** (→ keep in memory). Prefer existing homes; collapse redundant
+ones (`distributable-self-contained` is already covered by project-rules).
+
+*Open sub-questions.* The line between "project-specific" and "cross-project
+preference" for skill-usage habits (e.g. design-review / plan-mode working
+notes) is a judgment call per item.
+
+#### "Broken-window" rule — fix small not-by-design errors within a larger edit
+
+*Context.* Small broken items — a typo, a stale or now-incoherent note
+that isn't there by design — compound if left. A coherence sweep should
+catch and resolve them, not pass over them. Surfaced 2026-06-15 after a
+sweep missed a stale migration note in `CLAUDE.md`.
+
+*Proposed approach.* Add a standing rule (likely in
+`rules/coding-session-rules.md`): when you notice a small not-by-design
+error, surface it and fix it folded into a larger edit pass — primary
+work first, then suggest the sweep, surfacing items before fixing.
+Rule 4 still holds: this is for fixing errors, never design changes or
+new design decisions.
+
+*Open sub-questions.* Which rules file it belongs in (coding-session vs a
+project rule); exact wording; whether it's a new numbered rule or a
+clause on an existing one (e.g. rule 1 root-cause, or the `/wind-down`
+coherence sweep).
+
+#### Command "does NOT do" sections duplicate the ownership map
+
+*Context.* Each command file's "What this command does NOT do" section
+re-states which files OTHER commands own ("never edits X — /design-review
+owns it"). Read across all commands together, this cross-referencing is
+redundant and multiplies as commands are added. Root CLAUDE.md's
+ownership invariant was collapsed to "owners list + skills don't write
+files they don't own"; the command files weren't. Surfaced 2026-06-15.
+
+*Proposed approach.* Sweep every command's "does NOT do" section: keep
+each command's own non-responsibilities, but replace the
+per-other-command ownership restatements with a single "a skill never
+writes a file it doesn't own" line pointing at the CLAUDE.md ownership
+map. Mirror to `cc-template/` per NFR-9.
+
+*Open sub-questions.* Whether each command still needs a short pointer to
+the ownership map, or whether the one rule suffices.
+
+#### Brittle hardcoded command/file counts across planning docs
+
+*Context.* Several source-only planning docs hardcode counts that go
+stale as the command/rules set grows — "six commands", "seven SDLC
+commands", "six rules files". A 2026-06-15 grep found instances in
+`docs/PROJECT_PLAN.md`, `docs/CLAUDE_CODE_PROMPTS.md`,
+`docs/REQUIREMENTS.md`, and `docs/design-decisions.md`. Frozen artifacts
+(LANDED `docs/design/design-review-checkpoint-*.md`, the
+`docs/design/cc-template-product-spec.md` intake) carry the same counts
+but are historical record and must not be edited.
+
+*Proposed approach.* Sweep the non-frozen planning docs to number-free
+phrasing ("the commands", "the rules files", enumerate by name when
+useful). Leave frozen artifacts. The live shipped instance
+(`refresh-from-repository.md` Step 7's rules-file count) and the
+`REQUIREMENTS.md` FR-1 contract count are fixed in-session; this backlog
+item covers the historical planning-doc records.
+
+*Open sub-questions.* Whether definitional counts (the "10 rules", which
+are literally numbered 1–10) should stay as-is — yes, they're not
+brittle.
+
 #### Artifact-boundary command landings should route session-end through `/wind-down`
 
 *Context.* When Claude finishes a self-contained multi-step task

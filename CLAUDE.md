@@ -15,9 +15,10 @@
 >
 > **Project:** `claude-code-sdlc-template` — a self-modifying
 > project seed for new software projects driven by Claude Code.
-> The distributable subdirectory `cc-template/` ships six slash
+> The distributable subdirectory `cc-template/` ships the SDLC slash
 > commands (`/onboard`, `/bootstrap`, `/deployment-plan`,
-> `/design-review`, `/exit-test-plan`, `/wind-down`) plus curated
+> `/design-review`, `/exit-test-plan`, `/product-visioning`,
+> `/wind-down`) plus `/refresh-from-repository` and curated
 > collaboration rules. Consumers copy `cc-template/` into a new
 > project, drop a design doc into `docs/design/`, and run the
 > configuration ritual. This repository is itself a downstream
@@ -217,14 +218,38 @@ Changing one of these requires auditing the whole chain.
   another round" are mid-iteration — no handoff; wind-down
   stages pending changes at session close.
 
+### `/product-visioning` + PRD / product-vision artifacts
+
+`/product-visioning` is an interactive session whose only output is the next
+`docs/design/PRD-<slug>-NNN.md`. `/onboard` then decomposes that PRD — first
+PRD or a later movement — into the planning docs. **Decomposition is
+onboard's job, not design-review's.**
+
+- **`docs/design/PRD-<slug>-NNN.md`** — a stand-alone per-movement PRD with its
+  own current-state section. `/product-visioning` authors it (`status: DRAFT`);
+  `/onboard` flips it `DRAFT`→`ACTIVE` and marks the prior `SUPERSEDED` when it
+  decomposes. The latest `ACTIVE` is the definitive scope and may contradict
+  prior PRDs. No `PRODUCT-VISION-STATUS` banner — frontmatter is source of truth.
+- **`docs/PRODUCT_VISION.md`** — durable strategy plus a surviving *Product
+  personality & positioning* section. `/onboard` writes it, applying each PRD's
+  proposed vision revisions when it decomposes; `/product-visioning` proposes
+  those changes in the PRD and never edits this file.
+- **Detection.** `/product-visioning`: newest PRD `DRAFT` → refine it, else open
+  the next (`N = newest + 1`, or `001` if none). `/onboard`: `ONBOARD-STATUS`
+  `UNCONFIGURED` → first PRD; `COMPLETE` + a newer undecomposed PRD (its
+  `movement:` > `PROJECT_PLAN.md`'s) → decompose that movement.
+- **Movement vs. tactical.** A movement is `/product-visioning` → PRD →
+  `/onboard` → `/design-review`. Bug fixes, cleanup, and release are tactical
+  and need no PRD; `/wind-down` offers them as a menu and never forces a movement.
+
 ### Cross-cutting
 
-- **Filename conventions, zero-padded 3-digit N**:
-  `docs/design/design-review-checkpoint-NNN.md` and
-  `docs/test-plans/phase-NNN-exit.md` (e.g. `001`, `010`, `100`).
-  Pad width fixed at 3 so files sort lexicographically through
-  999. `/design-review`, `/exit-test-plan`, `/wind-down`, and any
-  future scanner depend on this glob shape.
+- **Filename conventions, zero-padded 3-digit N** (sort through 999):
+  `docs/design/design-review-checkpoint-NNN.md`,
+  `docs/test-plans/phase-NNN-exit.md`, `docs/design/PRD-<slug>-NNN.md`,
+  `docs/project-plans/{project-plan,claude-code-prompts}-NNN.md`. PRD +
+  plan-archive share the **movement counter** (movement N →
+  `PRD-<slug>-N`; opening N archives N−1 as `project-plan-(N-1)`).
 - **README section names, exact spelling**: `Developer setup`
   (stub by `/onboard`, replaced by `/bootstrap`) and `Deployment`
   (stub by `/onboard`, replaced by `/deployment-plan`). Don't
@@ -234,13 +259,20 @@ Changing one of these requires auditing the whole chain.
   `rules/environment-rules.md` (`/bootstrap` fills) and
   `<!-- ONBOARD-FILL: project-scope -->` in
   `rules/project-rules.md` (`/onboard` fills).
-- **File ownership doesn't overlap.** `/design-review` owns
-  `docs/design/design-review-checkpoint-*.md` and
-  `docs/design/REVIEWS.md` exclusively. `/exit-test-plan` owns
-  `docs/test-plans/phase-*-exit.md` exclusively. Other commands
-  surface and warn but never edit. Each command's "What this
-  command does NOT do" section lists what others own — when
-  adding a responsibility, audit the others.
+- **CC-TEMPLATE-BLOCK edits reach every downstream.** Those sections are
+  template-owned and pulled downstream by `/refresh-from-repository`.
+  Don't edit one unless necessary; when you must, make it identical in
+  root `CLAUDE.md`, `cc-template/CLAUDE.md`, and every rules file that
+  carries it — a one-sided edit becomes a merge divergence in every
+  downstream refresh.
+- **File ownership doesn't overlap.** `/onboard`: `PRODUCT_VISION.md`, the
+  in-flight `PROJECT_PLAN.md` / `CLAUDE_CODE_PROMPTS.md`, their
+  `docs/project-plans/` archives, and PRD status transitions.
+  `/product-visioning`: authors `docs/design/PRD-<slug>-*.md` (DRAFT).
+  `/design-review`: `design-review-checkpoint-*.md`, `REVIEWS.md` (and edits the
+  tactical docs on its review-land path). `/exit-test-plan`: `phase-*-exit.md`.
+  A skill never writes a file it doesn't own; audit this list when adding a
+  responsibility.
 
 ## Design principles for template changes
 
@@ -248,19 +280,20 @@ Changing one of these requires auditing the whole chain.
   [`rules/design-philosophy-rules.md`](rules/design-philosophy-rules.md)).
   *iPhone, not Android. Macintosh, not PC.*
 - **Don't add another command** without strong justification.
-  The template already ships three configuration commands and
-  two recurring ones; each recurring command earned its place by
-  first proving itself on a live project. New commands should
-  clear the same bar.
+  The template ships three configuration commands and three
+  recurring ones (`/design-review`, `/exit-test-plan`,
+  `/product-visioning`); each recurring command earned its place by
+  first proving itself on a live project (`/product-visioning` from
+  the ds-ziptax post-MVP planning pilot). New commands should clear
+  the same bar.
 - **Tailored questions per stack** — don't ask universal questions
   when the design doc already pins the stack.
 - **Failures refuse explicitly** with a pointer to the right
   command. No silent fallbacks.
-
-## Migrating projects from older template versions
-
-If a project was onboarded under a previous template version (e.g.
-the old single-`DS-TEMPLATE-STATUS` system), the migration steps
-are documented in
-`C:\Users\jamie\.claude\plans\good-morning-claude-the-zippy-wind.md`
-section C. Reuse that checklist; don't re-derive.
+- **Writing discipline.** Files that load every prompt — CLAUDE.md,
+  rules — stay terse: rules to self, not operator prose; every word is a
+  per-prompt cost. A parenthetical or aside signals a vague sentence;
+  tighten it. State a fact once — don't restate its inverse elsewhere;
+  prefer one owners list plus "a skill never writes a file it doesn't
+  own" over per-command cross-references. Skill files are operational:
+  describe the job, not why the command exists.

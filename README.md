@@ -2,9 +2,10 @@
 
 `claude-code-sdlc-template` is a self-modifying project seed for
 new software projects driven by Claude Code. The distributable
-subdirectory [`cc-template/`](cc-template/) ships six slash
+subdirectory [`cc-template/`](cc-template/) ships the SDLC slash
 commands — `/onboard`, `/bootstrap`, `/deployment-plan`,
-`/design-review`, `/exit-test-plan`, `/wind-down` — plus curated
+`/design-review`, `/exit-test-plan`, `/product-visioning`,
+`/wind-down` — plus `/refresh-from-repository` and curated
 collaboration rules. Consumers copy `cc-template/` into a new
 project, drop a design doc into `docs/design/`, and run the
 configuration ritual. This repository is itself a downstream
@@ -29,11 +30,13 @@ claude-code-sdlc-template/             ← THIS REPO (source-of-truth)
 ├── docs/                             ← this project's own design docs
 │   ├── REQUIREMENTS.md
 │   ├── ARCHITECTURE.md
+│   ├── PRODUCT_VISION.md
 │   ├── PROJECT_PLAN.md
 │   ├── CLAUDE_CODE_PROMPTS.md
 │   ├── design-decisions.md
 │   ├── open-questions.md
-│   └── design/                       ← design intake + /design-review checkpoints
+│   ├── design/                       ← design intake + /design-review checkpoints + PRD-<slug>-NNN.md
+│   └── project-plans/                ← archived movement plans + prompts
 ├── .claude/commands/                 ← live commands this project uses on itself
 └── cc-template/                      ← THE DISTRIBUTABLE (what gets copied to seed new projects)
     ├── CLAUDE.md                     ← new-project session-start
@@ -42,7 +45,7 @@ claude-code-sdlc-template/             ← THIS REPO (source-of-truth)
     ├── LICENSE                       ← MIT (covers everything in this subtree)
     ├── .gitignore
     ├── rules/                        ← shipping rules with ONBOARD-FILL placeholders
-    └── .claude/                      ← all 6 shipping commands + settings example
+    └── .claude/                      ← all shipping commands + settings example
 ```
 
 ## Seeding a new project
@@ -75,8 +78,9 @@ The convention:
   design-decisions entries) lives only at root and never copies
   into the dist.
 
-`/design-review`, `/exit-test-plan`, and `/wind-down` are the
-recurring commands this project uses on its own docs. The
+`/design-review`, `/exit-test-plan`, `/product-visioning`, and
+`/wind-down` are the recurring commands this project uses on its own
+docs. The
 configuration commands (`/onboard`, `/bootstrap`,
 `/deployment-plan`) only make sense for *new* projects seeded
 from the dist — except for this project, which ran them on

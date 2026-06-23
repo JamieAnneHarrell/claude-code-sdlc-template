@@ -16,10 +16,10 @@ Two physical surfaces in one git repository:
   decisions, open questions, root `CLAUDE.md`, and root `README.md`
   — none of which copy into the distributable. Also holds a full
   set of rules and `.claude/commands/` so the source can run the
-  six commands on its own docs.
+  commands on its own docs.
 - **Distributable** at `cc-template/` (subdirectory of the repo).
   This is what consumers copy when seeding a new project. Ships
-  the six commands, the curated rules with `ONBOARD-FILL`
+  the commands, the curated rules with `ONBOARD-FILL`
   placeholders, and stub docs. Renamed by the consumer after the
   copy so their new project directory IS the renamed
   `cc-template/` contents.
@@ -39,11 +39,13 @@ claude-code-sdlc-template/                ← repo root (source-of-truth)
 ├── docs/                                 ← source-only project docs
 │   ├── REQUIREMENTS.md                   ← (this project's requirements)
 │   ├── ARCHITECTURE.md                   ← (this project's architecture)
+│   ├── PRODUCT_VISION.md                 ← (this project's strategic north star)
 │   ├── PROJECT_PLAN.md                   ← (this project's phase queue)
 │   ├── CLAUDE_CODE_PROMPTS.md            ← (this project's per-phase prompts)
 │   ├── design-decisions.md
 │   ├── open-questions.md
-│   ├── design/                           ← design intake + /design-review checkpoints
+│   ├── design/                           ← design intake + /design-review checkpoints + PRD-<slug>-NNN.md movement PRDs
+│   ├── project-plans/                    ← archived movement plans + prompts (created when a 2nd movement opens)
 │   └── test-plans/                       ← /exit-test-plan artifacts (created on demand)
 ├── .claude/commands/                     ← live commands the source uses on itself
 └── cc-template/                          ← THE DISTRIBUTABLE
@@ -66,16 +68,20 @@ claude-code-sdlc-template/                ← repo root (source-of-truth)
   ([`rules/design-philosophy-rules.md`](../rules/design-philosophy-rules.md))
 - Environment, multi-agent, project, and testing rules placeholders
   with `ONBOARD-FILL` markers
-- The six command files
+- The command files
   ([`.claude/commands/onboard.md`](../.claude/commands/onboard.md),
   `bootstrap.md`, `deployment-plan.md`, `design-review.md`,
-  `exit-test-plan.md`, `wind-down.md`)
+  `exit-test-plan.md`, `product-visioning.md`, `wind-down.md`,
+  `refresh-from-repository.md`)
 
 **Source-only content** — lives only at repo root:
 
-- REQUIREMENTS / ARCHITECTURE / PROJECT_PLAN / CLAUDE_CODE_PROMPTS
-- `docs/design/` (design intake docs + this project's
-  `/design-review` checkpoints when they exist)
+- REQUIREMENTS / ARCHITECTURE / PROJECT_PLAN / CLAUDE_CODE_PROMPTS /
+  PRODUCT_VISION
+- `docs/design/` (design intake docs, this project's `/design-review`
+  checkpoints, and `PRD-<slug>-NNN.md` movement PRDs when they exist)
+- `docs/project-plans/` (archived movement plans + prompts when they
+  exist)
 - `docs/test-plans/` (this project's `/exit-test-plan` artifacts
   when they exist)
 - `docs/design-decisions.md`, `docs/open-questions.md`
@@ -177,24 +183,32 @@ refresh and upstream's is handled separately by the command file's
 - `docs/design/design-review-checkpoint-NNN.md` where N is
   zero-padded 3 digits (`001`, ..., `999`).
 - `docs/test-plans/phase-NNN-exit.md` same pad width.
+- `docs/design/PRD-<slug>-NNN.md` — the stand-alone per-movement PRD
+  (`<slug>` = the project slug from `/onboard`); lives in the
+  `docs/design/` intake set, same pad width.
+- `docs/project-plans/project-plan-NNN.md` +
+  `docs/project-plans/claude-code-prompts-NNN.md` — the archived
+  (landed) movement plan + prompts, same pad width.
 
 Pad width is fixed at 3 so files sort lexicographically as numeric
-order through 999. Multiple commands (`/design-review`,
-`/exit-test-plan`, `/wind-down`) depend on this glob shape.
+order through 999. PRD and plan-archive share one **movement
+counter**: movement N is `PRD-<slug>-N`; opening movement N archives
+movement N−1's in-flight plan as `project-plan-(N-1)`. Multiple
+commands (`/design-review`, `/exit-test-plan`, `/product-visioning`,
+`/wind-down`) depend on these glob shapes.
 
 ### Stage-detection placeholders
 
-Stage detection in `/design-review` and `/exit-test-plan` parses
-literal strings to distinguish marked from unmarked findings and
-filled from pending run logs:
+Stage detection in `/design-review` and `/exit-test-plan` parses literal
+strings to distinguish marked from unmarked findings and filled from
+pending run logs:
 
 - `> _[UNMARKED — replace this line with your decision per the legend above]_`
   — AUDIT NOTE blocks in design-review checkpoints
 - `[PENDING]` — run log rows in test plans
 
-Changing the placeholder text without auditing all three relevant
-steps in the consuming command file (Step 0, Step S1.5, Step
-S1.A) breaks stage detection.
+Changing a placeholder text without auditing the consuming command file's
+stage-detection steps (Step 0, Step S1.5, Step S1.A) breaks detection.
 
 ### Recurring-artifact section structure
 
@@ -212,6 +226,34 @@ S1.A) breaks stage detection.
   dispositions, §6.N polish addendums (with their own first-class
   TCs + run log + comments)
 
+`docs/design/PRD-<slug>-NNN.md`:
+- Frontmatter `prd` / `movement` / `project` / `created` /
+  `status: DRAFT | ACTIVE | SUPERSEDED <date>` / `opened-by`
+- A "Starting point / current state" section (the PRD is stand-alone —
+  readable without the prior PRD series), the movement's goals + scope
+  (in / out / deferred), the proposed PRODUCT_VISION revisions `/onboard`
+  applies on decompose, and the decisions made this session. May contradict
+  earlier movements' PRDs; the latest `ACTIVE` is definitive.
+
+`docs/PRODUCT_VISION.md`:
+- A durable, slowly-changing strategic doc: thesis, a surviving
+  *Product personality & positioning* section, the roadmap of movements,
+  and the foreclosure-watch enablers. Written by `/onboard`, which applies
+  each PRD's proposed vision revisions when it decomposes.
+
+### `PROJECT_PLAN` movement header & phase-status token
+
+- `docs/PROJECT_PLAN.md` carries a header naming the `movement:` it
+  represents and its `source-prd:` (the `PRD-<slug>-NNN` it was
+  decomposed from). `/onboard` compares the latest `ACTIVE` PRD's movement
+  ordinal against this header to decide whether a newer PRD is a movement
+  to decompose (archive the prior plan + author fresh) vs. already done.
+- Phase headers in `docs/PROJECT_PLAN.md` mark completion with the
+  literal token `(COMPLETE)` / `(COMPLETE <date>)`. `/wind-down` reads
+  it to detect a fully-landed movement (every non-roadmap phase
+  `(COMPLETE)`, ignoring `(roadmap)` / `(SUPERSEDED …)`). Don't rename
+  the token without auditing `/wind-down` and `/design-review`.
+
 ## Runtime / data flow
 
 **Consumer-facing flow** (new project from the dist):
@@ -219,17 +261,22 @@ S1.A) breaks stage detection.
 1. Consumer copies `cc-template/` into a new project directory and
    renames it.
 2. Consumer drops one or more design docs into `docs/design/`.
-3. Consumer runs `/onboard` — writes REQUIREMENTS / ARCHITECTURE /
-   PROJECT_PLAN / CLAUDE_CODE_PROMPTS, fills rules `ONBOARD-FILL`
-   blocks, writes README stub, flips `ONBOARD-STATUS`.
+3. Consumer runs `/onboard` — decomposes the first PRD into REQUIREMENTS /
+   ARCHITECTURE / PRODUCT_VISION / PROJECT_PLAN / CLAUDE_CODE_PROMPTS +
+   `PRD-<slug>-001`, fills rules `ONBOARD-FILL` blocks, writes README
+   stub, flips `ONBOARD-STATUS`.
 4. Consumer runs `/bootstrap` — plans dev environment in two
    modes (write, then verify), fills README "Developer setup",
    flips `BOOTSTRAP-STATUS`.
 5. Consumer optionally runs `/deployment-plan` when test/prod
    planning is needed.
-6. Throughout project life: `/design-review` at high-risk
-   transitions, `/exit-test-plan` at phase exits, `/wind-down` at
-   session close.
+6. Throughout project life: `/product-visioning` at milestones to plan the
+   next movement (writes a `PRD-<slug>-NNN`), which `/onboard` then
+   decomposes into the next PROJECT_PLAN + prompts (archiving the prior
+   movement's pair to `docs/project-plans/` and updating PRODUCT_VISION);
+   `/design-review` reviews the decomposition and gates high-risk
+   transitions; `/exit-test-plan` at phase exits; `/wind-down` at session
+   close.
 
 **Self-consumption flow** (this project):
 
@@ -263,7 +310,7 @@ The full rationale lives in
    choose when to refresh via `/refresh-from-repository` (Phase 2).
    Rejected: push model where the maintainer runs a command to
    merge into specific downstream paths.
-3. **All six commands at source root, not just recurring.** The
+3. **All commands at source root, not just recurring.** The
    source-of-truth project is itself a downstream consumer of its
    own template; commands stay identical between root and dist to
    avoid drift.

@@ -265,10 +265,11 @@ This staging is automatic; the consumer never has to know to reach for
 
 ## Step 4 — Replace the commands
 
-Overwrite every `.claude/commands/*.md` with the staged
-upstream-current copy. (In source mode this is a root↔dist copy; in
-public mode it is a copy out of the staging clone.) If
-`--refresh-skills-only`, stop here and report.
+Sync the command set to upstream: overwrite every changed
+`.claude/commands/*.md` and add any command upstream ships that the
+downstream lacks. (In source mode this is a root↔dist copy; in public
+mode it is a copy out of the staging clone.) If `--refresh-skills-only`,
+stop here and report.
 
 Commands carry no markers and are not reconciled block-by-block — they
 are replaced wholesale, having passed the Step 2 review. This is the
@@ -379,7 +380,7 @@ time refresh runs there.
 Because there is no baseline and no state file, this is just "insert the
 markers, aligning to upstream, and ask once where content diverges":
 
-1. For each of the six template-managed rules files and (unless
+1. For each template-managed rules file and (unless
    `--no-claudemd`) `CLAUDE.md`, align the downstream's current sections
    against **upstream's marked copy**, matching by section heading /
    content. Insert the upstream block's open/close markers (with its

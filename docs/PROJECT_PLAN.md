@@ -4,7 +4,7 @@ Phased plan for `claude-code-sdlc-template`. Derived from
 [`docs/ARCHITECTURE.md`](ARCHITECTURE.md) and the design intake
 at [`docs/design/cc-template-product-spec.md`](design/cc-template-product-spec.md).
 
-Phases currenlty never close with `/exit-test-plan`. High-risk transitions 
+Phases currently never close with `/exit-test-plan`. High-risk transitions 
 between phases get a `/design-review` checkpoint — see the markers below.
 
 Phase 0 was scoped before this plan was written, so its prompt is
@@ -412,7 +412,55 @@ NFR-4) and close Phase 2.1 + 2.1.A.
 
 ---
 
-## Phase 2.2 — `/write-user-documentation` (roadmap)
+## Phase 2.2 — `/product-visioning` strategic-planning layer (COMPLETE; root sync pending dogfood)
+
+**Goal.** Add the strategic-planning front-end the tactical SDLC loop
+lacked: an interactive `/product-visioning` that authors the next PRD,
+with `/onboard` reshaped into the PRD decomposer (first PRD or a later
+movement) and `/design-review` reverted to pure review. Built
+out-of-band ahead of the roadmap because a downstream project needed the
+movement workflow first.
+
+**Status (2026-06-22): COMPLETE in `cc-template/`; root sync deferred.**
+The command set, the PRD / `PRODUCT_VISION` artifact model, and the
+supporting doc edits landed in `cc-template/` and the source-only docs.
+The source-mode dogfood that propagates the command set + the `CLAUDE.md`
+`reading-order` convention-check nudge to root is the **next session**
+(split out for a clean, separately-reviewed refresh).
+
+**Deliverables.**
+- `cc-template/.claude/commands/product-visioning.md` authored
+  (interactive session → `DRAFT` `docs/design/PRD-<slug>-NNN.md`; no
+  decompose, no `PRODUCT_VISION` write, no PRD-status flips).
+- `cc-template/.claude/commands/onboard.md` reshaped into a dual-mode
+  decomposer (first PRD = full setup + adopt the intake as
+  `PRD-<slug>-001`; later movement = apply vision revisions, archive the
+  prior plan, author the new `PROJECT_PLAN` + prompts, flip PRD status).
+- `cc-template/.claude/commands/wind-down.md`: DRAFT-PRD safety net,
+  movement-complete suggestion menu, archival/decompose re-attributed
+  `/design-review` → `/onboard`.
+- `cc-template/.claude/commands/refresh-from-repository.md`: one-time
+  product-vision migration step removed; Step numbering reconciled (0–7).
+- `cc-template/.claude/commands/design-review.md` reverted to pure
+  review (Jamie owns it via git).
+- Artifact model: `docs/PRODUCT_VISION.md` (onboard-owned) and
+  `docs/design/PRD-<slug>-NNN.md` (product-visioning authors `DRAFT`,
+  onboard flips status), sharing the `docs/project-plans/` movement
+  counter.
+- Supporting docs swept: root + `cc-template/` `CLAUDE.md`, ARCHITECTURE,
+  REQUIREMENTS (FR-3, FR-17), both READMEs, design-decisions,
+  open-questions.
+
+**Exit criteria.** Source-mode dogfood at this repo's root syncs the
+reshaped command set (adds `product-visioning.md`; updates onboard /
+wind-down / refresh / design-review) and block-merges the `CLAUDE.md`
+`reading-order` nudge ("take upstream"); a second refresh verifies quiet;
+root and `cc-template/` command files reach parity. Until the dogfood
+runs, root is intentionally one step behind `cc-template/`.
+
+---
+
+## Phase 2.3 — `/write-user-documentation` (roadmap)
 
 **Goal.** Ship a command that authors end-user documentation —
 used in the source-of-truth project to document itself, and used
@@ -421,7 +469,7 @@ documentation.
 
 **Deliverables.**
 - `cc-template/.claude/commands/write-user-documentation.md`
-  written. Spec deferred to Phase 2.2 design session.
+  written. Spec deferred to Phase 2.3 design session.
 - Mirrored at `.claude/commands/write-user-documentation.md`.
 - This project's own user documentation produced by running the
   new command on itself (eats own dog food).
