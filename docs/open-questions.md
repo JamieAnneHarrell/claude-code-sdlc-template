@@ -939,6 +939,50 @@ next prompt" by scanning TODO.txt's first entry / the current phase in
 PROJECT_PLAN, and how it disambiguates when those disagree. Whether
 promoting this resolves or merely relocates the thin-index tension.
 
+#### Stamp shipped `cc-template/` files with an inline copyright + license pointer
+
+*Context.* Surfaced 2026-06-22. The MIT `cc-template/LICENSE` and
+`cc-template/README.md` are the only places the template's licensing is
+recorded, and both get replaced downstream — `/onboard` rewrites the
+README, and a consumer naturally drops in their own project LICENSE.
+Once those two files are gone, nothing inside the shipped skill files
+(`.claude/commands/*.md`) or rules files (`rules/*.md`) indicates they
+are MIT-licensed work by Jamie Anne Harrell. A consumer could then ship
+template content under the wrong license unknowingly. This is also a
+license-compliance gap, not just lost provenance: MIT requires the
+copyright + permission notice be retained in "all copies or substantial
+portions of the Software," so stripping every record of it is
+technically out of compliance with our own LICENSE.
+
+*Proposed approach.* Add one low-weight provenance line to each shipped
+file — the standard fix is an SPDX-style header comment, e.g.
+`<!-- SPDX-License-Identifier: MIT · Copyright (c) 2026 Jamie Anne Harrell · see LICENSE and README -->`
+at the top of every `cc-template/.claude/commands/*.md`, `rules/*.md`,
+and `CLAUDE.md`. The HTML-comment form keeps it invisible in render and
+holds down the per-prompt context cost that rules / CLAUDE files pay
+every session. Simpler alternative to weigh (KISS): ship a single
+`NOTICE` file and rely on the `LICENSE` staying present, rather than
+annotating every file — lighter, but it does *not* survive the consumer
+who deletes or replaces those root files, which is the exact failure
+this story is about. Lean SPDX-per-file for that reason, but it is a
+real coverage-vs-weight trade.
+
+*Open sub-questions.* Which files get stamped — every shipped `.md`, or
+only the rules + command files (the "substantial portions")? The
+copyright holder is **not** a parameterizable maintainer token — it
+records the upstream author and must stay fixed, which collides head-on
+with the "Parameterize maintainer identity (name / pronouns / initials)
+for the public repo" story below: a consumer who reskins "Jamie / she /
+JAH" must *not* also rewrite the upstream copyright line. Resolve the
+two together. How `/refresh-from-repository` treats the line
+(template-owned, always upstream — likely inside or alongside a
+`CC-TEMPLATE-BLOCK` so it is not consumer-editable). The per-prompt
+context cost of an HTML comment in every rules file (small but nonzero —
+the writing-discipline bar). Whether the root-repo files under the
+separate CC BY-NC-ND license need an analogous but *different* stamp
+(root is source-only under a different license — don't cross the
+streams).
+
 ---
 
 ### Abandoned Approaches
