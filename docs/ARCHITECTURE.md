@@ -46,7 +46,8 @@ claude-code-sdlc-template/                ← repo root (source-of-truth)
 │   ├── open-questions.md
 │   ├── design/                           ← design intake + /design-review checkpoints + PRD-<slug>-NNN.md movement PRDs
 │   ├── project-plans/                    ← archived movement plans + prompts (created when a 2nd movement opens)
-│   └── test-plans/                       ← /exit-test-plan artifacts (created on demand)
+│   ├── test-plans/                       ← /exit-test-plan artifacts (created on demand)
+│   └── published/                        ← /write-documentation sources + manifest (created on demand)
 ├── .claude/commands/                     ← live commands the source uses on itself
 └── cc-template/                          ← THE DISTRIBUTABLE
     ├── CLAUDE.md                         ← new-project session-start (with status comments)
@@ -72,7 +73,7 @@ claude-code-sdlc-template/                ← repo root (source-of-truth)
   ([`.claude/commands/onboard.md`](../.claude/commands/onboard.md),
   `bootstrap.md`, `deployment-plan.md`, `design-review.md`,
   `exit-test-plan.md`, `product-visioning.md`, `wind-down.md`,
-  `refresh-from-repository.md`)
+  `refresh-from-repository.md`, `write-documentation.md`)
 
 **Source-only content** — lives only at repo root:
 
@@ -84,6 +85,8 @@ claude-code-sdlc-template/                ← repo root (source-of-truth)
   exist)
 - `docs/test-plans/` (this project's `/exit-test-plan` artifacts
   when they exist)
+- `docs/published/` (this project's `/write-documentation` sources,
+  images, and documentation-plan manifest when they exist)
 - `docs/design-decisions.md`, `docs/open-questions.md`
 - `README.md` at repo root (the "this is the source-of-truth"
   README)
@@ -189,13 +192,18 @@ refresh and upstream's is handled separately by the command file's
 - `docs/project-plans/project-plan-NNN.md` +
   `docs/project-plans/claude-code-prompts-NNN.md` — the archived
   (landed) movement plan + prompts, same pad width.
+- `docs/published/documentation-plan-NNN.md` — the numbered
+  `/write-documentation` plan (manifest); newest governs. Same pad
+  width; its own counter (not the movement counter).
 
 Pad width is fixed at 3 so files sort lexicographically as numeric
 order through 999. PRD and plan-archive share one **movement
 counter**: movement N is `PRD-<slug>-N`; opening movement N archives
-movement N−1's in-flight plan as `project-plan-(N-1)`. Multiple
-commands (`/design-review`, `/exit-test-plan`, `/product-visioning`,
-`/wind-down`) depend on these glob shapes.
+movement N−1's in-flight plan as `project-plan-(N-1)`. The
+documentation-plan counter is independent (it advances on a doc-set
+re-scope, not on a movement). Multiple commands (`/design-review`,
+`/exit-test-plan`, `/product-visioning`, `/wind-down`,
+`/write-documentation`) depend on these glob shapes.
 
 ### Stage-detection placeholders
 
@@ -206,9 +214,12 @@ pending run logs:
 - `> _[UNMARKED — replace this line with your decision per the legend above]_`
   — AUDIT NOTE blocks in design-review checkpoints
 - `[PENDING]` — run log rows in test plans
+- `> _[UNMARKED — approve / adjust: <note> / drop, per the legend above]_`
+  — DOC DECISION blocks in `/write-documentation` documentation plans
 
 Changing a placeholder text without auditing the consuming command file's
-stage-detection steps (Step 0, Step S1.5, Step S1.A) breaks detection.
+stage-detection steps (each command's Step 0 plus its Stage 1 steps) breaks
+detection.
 
 ### Recurring-artifact section structure
 
@@ -240,6 +251,18 @@ stage-detection steps (Step 0, Step S1.5, Step S1.A) breaks detection.
   *Product personality & positioning* section, the roadmap of movements,
   and the foreclosure-watch enablers. Written by `/onboard`, which applies
   each PRD's proposed vision revisions when it decomposes.
+
+`docs/published/documentation-plan-NNN.md` (`/write-documentation`):
+- Frontmatter `documentation-plan` / `project` / `created` /
+  `status: AWAITING-APPROVAL | ACTIVE | SUPERSEDED <date>` (newest governs) /
+  `documented-through` (a `{ movement, phase }` tuple) / `renderer`.
+- A proposed-doc-set section with one `DOC DECISION — JAH:` block per doc, an
+  audience×feature matrix, the render-config, a release-readiness ledger
+  (stale / unfilled visual / conformance gap), and an append-only authoring
+  log. Markdown sources + `images/` live alongside under `docs/published/`.
+- Currency is **movement-aware**: a re-run is STALE when the active movement
+  differs from `documented-through.movement`, or a later phase shipped in the
+  same movement (phase numbers compared only within one movement).
 
 ### `PROJECT_PLAN` movement header & phase-status token
 
@@ -329,7 +352,9 @@ The full rationale lives in
 ## What this architecture explicitly does NOT include
 
 - **No language runtime.** Markdown only. No interpreter,
-  compiler, or build step.
+  compiler, or build step. (`/write-documentation`'s optional PDF render is an
+  *environment-side* build a project may add — it ships nothing, and the
+  authored deliverable stays markdown.)
 - **No GUI, no web service, no API.** The deliverable is the file
   tree.
 - **No traditional test suite.** Validation is the live-test

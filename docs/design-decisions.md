@@ -1214,3 +1214,50 @@ deliberate exception.
 of the LF dist into the CRLF root surfaced the patchwork). If raw
 root↔`cc-template/` comparisons get noisy again, the remedy is a
 re-checkout to uniform CRLF, not adding `.gitattributes`.
+
+---
+
+## `/write-documentation` is a two-stage reasoning command with a numbered, movement-aware manifest
+
+**Decision.** `/write-documentation` (Phase 2.3) authors audience-facing
+product documentation — for end users, admins, support, developers, and
+contributors — and ships for downstream consumers to document their own
+products. It is a *reasoning* command: Stage 1 surveys the project (internal
+docs **and** the real implementation), infers product type + audiences, and
+writes a numbered sign-off manifest `docs/published/documentation-plan-NNN.md`
+(`AWAITING-APPROVAL` → `ACTIVE` → `SUPERSEDED`, newest governs); Stage 2 authors
+the marked set or reconciles the current set for a same-movement phase advance.
+Currency is derived and **movement-aware** — the manifest stamps
+`documented-through { movement, phase }`; a re-run is STALE when the active
+movement differs or a later phase shipped in the same movement. The command
+embeds a documentation-craft doctrine (Diátaxis modes; per-audience voice
+profiles; CLI-reference / readability / anti-pattern rules) and surfaces
+doc/code conformance gaps without editing product code (rule 8). Markdown is
+the deliverable; rendering is environment-side. Full spec: FR-14 and the
+shipped command file.
+
+**Why.** Every other command operates on SDLC artifacts of fixed shape; this
+one's output depends on an arbitrary product the template never envisioned, so
+a hard-coded doc structure would be "Android, not iPhone." A
+survey-infer-propose-author loop (like `/product-visioning`) gated by a sign-off
+manifest (like `/design-review`) is the shape that fits. Movement-aware currency
+is required because phase numbers reset per movement — a plain phase number
+can't detect staleness across a movement boundary, but the active PRD's movement
+identity can. The craft doctrine is the load-bearing part (a skill that nails
+the mechanics but writes mediocre prose has missed the point), grounded in
+Diátaxis, the Google/Microsoft style guides, minimalism, and "every page is page
+one"; it lives in the command so it updates as doctrines improve.
+
+**Why not a single-stage emit (no persisted manifest).** The incremental-update
+requirement needs persisted memory to reconcile against; the numbered manifest
+is the cheapest thing that is at once the sign-off gate, the
+`documented-through` anchor, the audience map, and the ownership record.
+
+**Scope note.** Built in `cc-template/` only this session (root arrives via the
+`/refresh-from-repository` source-mode dogfood). The **render architecture is
+under review** — as first built the command renders in-session (`--render`) with
+the recipe in the manifest, but that likely belongs in a scaffolded
+multi-target build script run at release time; see `open-questions.md`
+§ Deferred User Stories. A light Phase 2.3 `/design-review` validates the
+invariant ownership and resolves the render story before Block 2 (sibling
+wiring) and the dog-foods.

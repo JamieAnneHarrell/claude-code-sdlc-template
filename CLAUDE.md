@@ -250,18 +250,40 @@ onboard's job, not design-review's.**
   `/onboard` → `/design-review`. Bug fixes, cleanup, and release are tactical
   and need no PRD; `/wind-down` offers them as a menu and never forces a movement.
 
+### `/write-documentation` lifecycle
+
+- **Two stages, auto-detected** from `docs/published/documentation-plan-*.md`
+  (newest governs). Stage 1 writes a numbered manifest for sign-off
+  (`AWAITING-APPROVAL`); Stage 2 authors the marked set or **reconciles** the
+  current set for a same-movement phase advance, then `ACTIVE`. A re-scope
+  supersedes the prior (`SUPERSEDED`). No CLAUDE.md status comment.
+- **Currency is derived and movement-aware.** The manifest stamps
+  `documented-through { movement, phase }`; a re-run is STALE when the active
+  movement (newest `ACTIVE` PRD, or `initial`) differs from the stamp, or a
+  later phase shipped in the *same* movement. Phase numbers compare only within
+  one movement. No `LANDED`.
+- **DOC DECISION placeholder is load-bearing.** Stage detection parses the exact
+  `> _[UNMARKED — approve / adjust: <note> / drop, per the legend above]_`.
+  Changing it breaks Step 0.
+- **Release-readiness ledger** (stale / unfilled visual / conformance gap) is a
+  signal a release process consumes; the command surfaces conformance gaps but
+  never edits product code (rule 8). Render is single-owned (recipe in the
+  manifest); `/deployment-plan` references it, never re-defines it.
+
 ### Cross-cutting
 
 - **Filename conventions, zero-padded 3-digit N** (sort through 999):
   `docs/design/design-review-checkpoint-NNN.md`,
   `docs/test-plans/phase-NNN-exit.md`, `docs/design/PRD-<slug>-NNN.md`,
-  `docs/project-plans/{project-plan,claude-code-prompts}-NNN.md`. PRD +
-  plan-archive share the **movement counter** (movement N →
-  `PRD-<slug>-N`; opening N archives N−1 as `project-plan-(N-1)`).
+  `docs/project-plans/{project-plan,claude-code-prompts}-NNN.md`,
+  `docs/published/documentation-plan-NNN.md`. PRD + plan-archive share the
+  **movement counter** (movement N → `PRD-<slug>-N`; opening N archives N−1 as
+  `project-plan-(N-1)`); the documentation-plan counter is independent.
 - **README section names, exact spelling**: `Developer setup`
   (stub by `/onboard`, replaced by `/bootstrap`) and `Deployment`
   (stub by `/onboard`, replaced by `/deployment-plan`). Don't
-  rename without updating all three commands.
+  rename without updating all three commands. `/write-documentation` owns the
+  rest (user-facing sections) by offer and never touches these two.
 - **Marker blocks in rules files**:
   `<!-- ONBOARD-FILL: environment -->` in
   `rules/environment-rules.md` (`/bootstrap` fills) and
@@ -279,6 +301,9 @@ onboard's job, not design-review's.**
   `/product-visioning`: authors `docs/design/PRD-<slug>-*.md` (DRAFT).
   `/design-review`: `design-review-checkpoint-*.md`, `REVIEWS.md` (and edits the
   tactical docs on its review-land path). `/exit-test-plan`: `phase-*-exit.md`.
+  `/write-documentation`: `docs/published/` (the `documentation-plan-NNN.md`
+  manifest, doc sources, images), the user-facing README sections +
+  `CONTRIBUTING.md` by offer, and the doc render recipe.
   A skill never writes a file it doesn't own; audit this list when adding a
   responsibility.
 

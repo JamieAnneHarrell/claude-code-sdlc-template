@@ -10,10 +10,10 @@ during `/onboard`. Each item is a single testable statement.
 **FR-1: Ship the SDLC slash commands.** The distributable
 (`cc-template/.claude/commands/`) ships the SDLC commands as markdown
 files: `/onboard`, `/bootstrap`, `/deployment-plan`, `/design-review`,
-`/exit-test-plan`, `/product-visioning`, `/wind-down`, plus
-`/refresh-from-repository` per FR-13. The same commands live at the
-source root (`.claude/commands/`) for the source-of-truth project's own
-self-consumption.
+`/exit-test-plan`, `/product-visioning`, `/wind-down`,
+`/refresh-from-repository` (FR-13), and `/write-documentation` (FR-14). The
+same commands live at the source root (`.claude/commands/`) for the
+source-of-truth project's own self-consumption.
 
 **FR-2: Distributable is a copyable subdirectory.** Consumers copy
 the `cc-template/` subdirectory of this repo into a new project
@@ -153,11 +153,28 @@ merge). Full design contract in checkpoint 004 (B1 Option A) plus
 the surviving checkpoint 002 marker-syntax / coarse-wrapping /
 CLAUDE.md-partition decisions.
 
-**FR-14: `/write-user-documentation` is a Phase 2 deliverable.** A
-command that authors end-user documentation. Shipped in the dist;
-used in the source-of-truth project to document itself; used in
-downstream projects by consumers to create their product
-documentation. Spec deferred to Phase 2.2.
+**FR-14: `/write-documentation` authors audience-facing documentation.**
+A two-stage command shipped in the dist — used in the source-of-truth
+project to document itself and by downstream consumers to document their
+products. It is a *reasoning* command. Stage 1 surveys the project (internal
+docs **and** the real implementation), infers the product type and audiences,
+and writes a numbered sign-off manifest
+`docs/published/documentation-plan-NNN.md` (status
+`AWAITING-APPROVAL` → `ACTIVE` → `SUPERSEDED`, newest governs). Stage 2 authors
+or reconciles the markdown sources under `docs/published/` (the user-facing
+README sections, quick-start, guides, reference, troubleshooting) applying an
+embedded documentation-craft doctrine (Diátaxis modes; per-audience voice
+profiles; CLI-reference, readability, and anti-pattern rules). Markdown is the
+deliverable; PDF rendering is an opt-in, environment-side build via a
+per-project-recorded toolchain (NFR-6 unaffected). Currency is **derived and
+movement-aware**: the manifest stamps `documented-through { movement, phase }`,
+and a re-run is STALE when the active movement differs or a later phase shipped
+in the same movement. The manifest's release-readiness ledger (stale docs /
+unfilled visuals / doc-vs-code **conformance gaps**) is a signal a release
+process may gate on; the command surfaces conformance gaps but never edits
+product code (rule 8). Renamed from the working title
+`/write-user-documentation` — it documents every audience, not only end users.
+Full spec in the shipped command file.
 
 **FR-15: `/exit-test-plan` Phase 1.1 revision adds a BLOCKED
 disposition.** Test plan items not runnable due to a blocker

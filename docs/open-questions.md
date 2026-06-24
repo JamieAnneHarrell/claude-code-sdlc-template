@@ -983,6 +983,45 @@ separate CC BY-NC-ND license need an analogous but *different* stamp
 (root is source-only under a different license — don't cross the
 streams).
 
+#### `/write-documentation` render: scaffold a multi-target render script run at release time, not an in-manifest in-session render
+
+*Context.* Surfaced 2026-06-24 while building `/write-documentation`
+(Phase 2.3). As first built, the command owns rendering as an in-session
+`--render` action with the render recipe recorded in the documentation-plan
+manifest (single-owned; `/deployment-plan` references it). Jamie flagged this
+is probably the wrong shape: (1) rendering has multiple **targets** — PDF and
+HTML at least; the ds-zip-tax sister project hand-wrote a render-to-HTML script
+alongside its `pandoc --pdf-engine=typst` PDF build. (2) A render whose output
+ships in a release must run at **release time in CI / a build step**, and CI
+cannot invoke a Claude slash command, so an in-session `--render` does not serve
+the release path. (3) Putting per-project render config in the *documentation
+plan* mixes a build concern into the doc-content plan. The current command,
+`docs/ARCHITECTURE.md`, and the root `CLAUDE.md` `/write-documentation`
+invariant encode the in-manifest / in-session model **pending this review** —
+treat them as provisional on this finding.
+
+*Proposed approach.* Reframe rendering so `/write-documentation` **scaffolds a
+render script** (parameterized by target — PDF, HTML, … — and engine) that is a
+committed build artifact, like ds-zip-tax's `scripts/build-docs.py`, run by the
+**release process** (so `/deployment-plan`'s procedure and CI invoke the script
+at tag time). `--render`, if kept, runs that same script for a local preview —
+preserving the single-render-owner principle (one render definition, not two);
+this finding is about *where* that definition lives and *what shape* it takes,
+not about re-splitting ownership with `/deployment-plan`.
+
+*Open sub-questions.* Which targets are first-class (PDF + HTML, or more);
+one multi-target script vs. per-target scripts; the script language for a
+markdown-only template — a `.py` assumes a Python runtime (ds-zip-tax has one);
+a `.ps1`/`.sh` pair or a Makefile may be more portable, and NFR-6 keeps the
+*deliverable* runtime-free though the maintainer/CI environment may have one;
+where the render config lives if it leaves the manifest (the script itself? a
+small committed config? `/bootstrap` / environment territory, since it is a
+per-project toolchain); whether `/write-documentation` even owns the render or
+just authors markdown and hands the build to `/deployment-plan`; whether
+decoration templates (cover/header/footer) are per-target; and reconciling all
+of it with the `/deployment-plan` release-gate + render-reference loop already
+designed.
+
 ---
 
 ### Abandoned Approaches
