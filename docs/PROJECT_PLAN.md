@@ -428,9 +428,10 @@ root-sync dogfood ran 2026-06-24: `/refresh-from-repository` added
 `product-visioning.md`, updated `onboard` / `wind-down` /
 `refresh-from-repository` at root, and took-upstream on the `CLAUDE.md`
 `reading-order` convention-check nudge; the forked `briefing-rule` block
-was un-forked back to template-owned. An optional confirming refresh and a
-one-time working-tree line-ending re-checkout remain as housekeeping
-(carried in TODO.txt).
+was un-forked back to template-owned. The working-tree line-ending
+re-checkout was verified complete 2026-06-24 (index blobs all-LF, working
+tree all-CRLF, status clean); the optional confirming refresh was not
+needed.
 
 **Deliverables.**
 - `cc-template/.claude/commands/product-visioning.md` authored
