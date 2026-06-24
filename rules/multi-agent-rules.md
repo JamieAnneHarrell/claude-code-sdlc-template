@@ -63,14 +63,11 @@ those invariants.
 
 ## Briefing rule (every subagent invocation)
 
-<!-- CC-TEMPLATE-BLOCK: briefing-rule state=forked -->
-Treat every subagent like **a smart colleague who just walked
-into the room** — it has not seen this conversation, doesn't know
-what's already been tried, and doesn't understand why this task
-matters.
-
+<!-- CC-TEMPLATE-BLOCK: briefing-rule -->
+When briefing any subagent, treat it like "a smart colleague who just
+walked into the room" — it has not seen this conversation, doesn't
+know what's been tried, and doesn't understand why this task matters.
 Brief it accordingly:
-
 - State the goal.
 - Describe what's already been ruled out.
 - Provide enough context for judgment calls.

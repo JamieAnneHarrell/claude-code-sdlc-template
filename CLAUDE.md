@@ -50,6 +50,14 @@
    loop (original run, dispositions, polish coding session, optional
    §6.N addendums); `LANDED` means every run log is PASS / SKIP,
    every Fix-now is verified, and the phase exit is closed.
+
+**Product-vision convention check.** If this project is onboarded (a
+`docs/PROJECT_PLAN.md` exists) but has no `docs/PRODUCT_VISION.md`, or a
+`docs/design/PRD-<slug>-NNN.md` lacks a valid `status:`
+(`DRAFT` / `ACTIVE` / `SUPERSEDED`) in its frontmatter, it predates the
+`/product-visioning` convention. Suggest a `/product-visioning` session
+to align the PRD and `PRODUCT_VISION.md` before proceeding with movement
+work.
 <!-- /CC-TEMPLATE-BLOCK -->
 
 <!-- CC-TEMPLATE-BLOCK: collaboration-rules -->

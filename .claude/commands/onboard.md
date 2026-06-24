@@ -1,25 +1,25 @@
 ---
-description: Onboard a new project from cc-template based on a design doc Jamie dropped into docs/design/.
+description: Decompose the next PRD into the project's planning docs. The first PRD configures a new project (from a dropped design doc or /product-visioning) and routes to /design-review then /bootstrap; a later movement's PRD updates the vision, archives the prior plan, opens the new movement, and routes straight to /design-review.
 ---
 
 # /onboard
 
-Walk Jamie through configuring this project from the cc-template seed.
-This is the **first** of three sequential configuration commands:
+`/onboard` **decomposes the next PRD** into the project's planning docs. It
+runs two ways, auto-detected (Step 0):
 
-1. **`/onboard`** (this command) — *what are we building?* Produces
-   the planning docs from the design intake.
-2. **`/bootstrap`** — *how do I start coding?* Plans the dev
-   environment. Hard prerequisite to Phase 0.
-3. **`/deployment-plan`** — *how does this ship?* Optional and
-   deferrable.
+- **First PRD** — a new project. The design intake in `docs/design/` (a design
+  doc Jamie dropped, or a `PRD-<slug>-001` from `/product-visioning`) becomes
+  REQUIREMENTS, ARCHITECTURE, PRODUCT_VISION, PROJECT_PLAN, CLAUDE_CODE_PROMPTS,
+  the design-decisions seed, and the project-specific rules sections. This is
+  the first of three configuration commands: `/onboard` → `/bootstrap` (dev
+  environment, prerequisite to Phase 0) → `/deployment-plan` (deferrable).
+- **A later movement** — `/product-visioning` has produced a new PRD.
+  `/onboard` applies its vision revisions, archives the prior movement's plan,
+  and authors the new movement's PROJECT_PLAN + prompts. No re-setup; the next
+  action is `/design-review`, not `/bootstrap`.
 
-The output of `/onboard` is a working set of project documents —
-REQUIREMENTS, ARCHITECTURE, PROJECT_PLAN, CLAUDE_CODE_PROMPTS — plus
-the design-decisions seed and project-specific scope/test-tooling
-sections in the rules files. After `/onboard` completes, Jamie can
-review the docs at her own pace; `/bootstrap` is the next required
-step before Phase 0 work begins.
+After onboard completes, Jamie reviews the docs at her own pace; the next action
+is whatever Step 0's case routed to.
 
 This command runs in the current working directory and writes files
 relative to it.
@@ -33,20 +33,35 @@ commit handoffs through `/wind-down`). Skipping these leads to drift
 
 ---
 
-## Step 0: Verify the project is unconfigured
+## Step 0: Detect the case (first PRD or a later movement)
 
-Read `CLAUDE.md` and grep for the status comment:
-`<!-- ONBOARD-STATUS: UNCONFIGURED -->`.
+Read `CLAUDE.md`'s `<!-- ONBOARD-STATUS: ... -->`:
 
-- If the comment is `UNCONFIGURED`: proceed.
-- If the comment is `COMPLETE <date>`: tell Jamie the project is
-  already onboarded and ask whether she wants to re-run onboarding
-  (which will overwrite generated docs). If yes, proceed; if no, exit.
-- If the comment is missing entirely: surface the unexpected state and
-  ask Jamie how to proceed. Do not assume.
+- **`UNCONFIGURED` → first PRD.** A new project. The design intake in
+  `docs/design/` is the first PRD — a design doc Jamie dropped, or a
+  `PRD-<slug>-001.md` from `/product-visioning`. Run the **First PRD** path
+  (Steps 1–7). Next action after onboard: `/design-review` (the post-onboard
+  sanity check that gates `/bootstrap`), then `/bootstrap`.
+- **`COMPLETE <date>` → check for a later movement.** Read the project `<slug>`
+  from `docs/PRODUCT_VISION.md` (or the newest PRD's `project:` field) and glob
+  `docs/design/PRD-<slug>-*.md`. Compare the newest PRD's `movement:` to
+  `docs/PROJECT_PLAN.md`'s `movement:` header:
+  - Newest PRD's movement is **newer** (and `DRAFT` or `ACTIVE`-not-yet-decomposed)
+    → run the **Decompose a later movement** path below.
+  - Newest PRD matches the in-flight plan (already decomposed) → nothing to do;
+    redirect: "This movement is already decomposed — run `/product-visioning` to
+    plan the next, or `/design-review` to review the current." (To deliberately
+    re-run first-PRD setup and overwrite, Jamie says so explicitly.)
+- **Missing comment** → surface the unexpected state and ask. Don't assume.
 
 The other two status comments (`BOOTSTRAP-STATUS`, `DEPLOYMENT-PLAN-STATUS`)
 are not this command's concern — leave them as-is.
+
+---
+
+# First PRD — set up a new project (Steps 1–7)
+
+Reached from Step 0 when `ONBOARD-STATUS` is `UNCONFIGURED`.
 
 ## Step 1: Verify a design intake exists
 
@@ -56,7 +71,9 @@ List files in `docs/design/`. Ignore any `README.md` in that folder
 - If no design files found: stop and tell Jamie to drop her design
   doc(s) into `docs/design/` first, then re-run `/onboard`.
 - If one or more design files found: read all of them in full. They
-  are the source of truth for what we're building.
+  are the source of truth for what we're building. One may be a
+  `PRD-<slug>-001.md` from `/product-visioning` — that *is* the first
+  PRD; treat it as the design intake.
 
 ## Step 2: Reconnaissance
 
@@ -187,6 +204,32 @@ Extract the architectural narrative from the design doc(s):
 If the design doc is already in this shape, lift it directly with
 section headers normalized.
 
+### `docs/PRODUCT_VISION.md`
+The strategic north star — slowly-changing, the counterpart to the
+tactical PROJECT_PLAN. Extract from the design doc(s) the *why* and the
+*where it's going* (not the phase-by-phase how). If the intake is a
+`/product-visioning` PRD, its *Proposed PRODUCT_VISION revisions* section
+is the founding vision — treat it as the primary source. Sections:
+- **Vision / thesis** — the problem, the bet, why this product exists.
+- **Product personality & positioning** — who it's for, the voice, the
+  market position. This section **survives and evolves** across future
+  `/product-visioning` sessions; write it so later sessions append or
+  refine rather than restart. If the design doc carries little of this,
+  capture what's there and leave a short "to deepen in product
+  visioning" note.
+- **Roadmap of movements** — the post-MVP direction from the design's
+  roadmap / post-MVP framing, named as *movements* (strategic chunks),
+  not phases. The MVP itself is movement 001.
+- **Enablers** (optional) — anything cheap to honor now but expensive to
+  retrofit later that the design flags; a foreclosure-watch list.
+
+Vision/strategy lives here — keep PROJECT_PLAN purely tactical (phases +
+exit criteria, no "long-term vision" section). This is the first
+PRODUCT_VISION, built from the first PRD; each later movement updates it
+when `/onboard` applies that PRD's proposed revisions (see "Decompose a
+later movement"). `/product-visioning` proposes the changes; `/onboard`
+writes them.
+
 ### `docs/PROJECT_PLAN.md`
 Phased plan derived from architecture. Each phase has:
 - Phase letter or number (A, B, C, … or 0, 1, 2, …)
@@ -197,8 +240,11 @@ Phased plan derived from architecture. Each phase has:
 Phase 0 is always project scaffolding. Phase 1+ are functional
 deliverables. Final phase is launch hardening.
 
-Open PROJECT_PLAN.md with a short orientation paragraph that
-names the two recurring close-out commands:
+Open PROJECT_PLAN.md with YAML frontmatter naming the movement it
+represents — `movement: 001` and `source-prd: PRD-<slug>-001` (the first
+movement; `/onboard` reads this header to tell a later movement's PRD
+from the one already decomposed) — then a short orientation paragraph
+that names the two recurring close-out commands:
 
 > Phases close with `/exit-test-plan` (manual walkthrough against
 > the phase's exit criteria) when the phase ships user-observable
@@ -240,6 +286,36 @@ introduce sub-numbering like X.Y.5. The corresponding prompt in
 
 PROJECT_PLAN.md is the at-a-glance phase queue, so design reviews
 show up as phases Jamie sees when she scans the plan.
+
+### `docs/design/PRD-<slug>-001.md` — adopt the intake as the first PRD
+The first PRD **is the design intake itself**, recorded under the PRD name
+so later `/product-visioning` PRDs and onboard's movement decompositions
+have a baseline. Don't author a separate PRD — adopt the intake:
+
+- **Intake is already `PRD-<slug>-001.md`** (from `/product-visioning`):
+  you decomposed it above — just flip its frontmatter
+  `status: DRAFT → ACTIVE`.
+- **Intake is a raw design doc** (e.g. `<name>-spec.md`): **rename it** to
+  `docs/design/PRD-<slug>-001.md` and add the frontmatter below; its
+  existing content is the PRD body — don't rewrite it. If several design
+  docs were dropped, adopt the primary one and leave the rest as
+  supporting intake in `docs/design/`.
+
+Frontmatter (add for a raw design doc; confirm for a `/product-visioning`
+PRD):
+
+```
+---
+prd: 001
+movement: 001
+project: <slug>
+created: <YYYY-MM-DD>
+status: ACTIVE
+opened-by: onboard (first PRD)
+---
+```
+
+This `PRD-<slug>-001` becomes `SUPERSEDED` when the next movement opens.
 
 ### `docs/CLAUDE_CODE_PROMPTS.md`
 
@@ -391,14 +467,14 @@ Required sections (use these exact section names — `/bootstrap` and
 The template ships a starter `TODO.txt` whose first entry is "Run
 /onboard". Rewrite it after onboarding completes:
 - First entry under "What's next": "Run `/design-review` for a
-  post-onboarding sanity check (REQUIREMENTS / ARCHITECTURE
-  coherence, dependency justifications, design-intake fidelity)
-  before `/bootstrap`. Mark up the resulting checkpoint inline
-  (one decision per AUDIT NOTE block), then re-run
-  `/design-review` to walk dispositions. Stage 2 will ask whether
-  to land the doc or open an addendum round."
-- Second entry: "After the review lands, run `/bootstrap` to plan
-  the dev environment before starting Phase 0."
+  post-onboarding sanity check (did REQUIREMENTS / ARCHITECTURE / the
+  plan decompose cleanly from the PRD; dependency justifications;
+  design-intake fidelity) before `/bootstrap`. Mark up the resulting
+  checkpoint inline (one decision per AUDIT NOTE block), then re-run
+  `/design-review` to walk dispositions. Stage 2 asks whether to land
+  the doc or open an addendum round."
+- Second entry: "After the review lands, run `/bootstrap` to plan the
+  dev environment before starting Phase 0."
 - Third entry: "After `/bootstrap`, paste Prompt 0 from
   `docs/CLAUDE_CODE_PROMPTS.md` to run Phase 0."
 - Leave Carryover and Deferred decisions empty (`/wind-down`
@@ -430,7 +506,8 @@ Rewrite `CLAUDE.md`:
    > rewritten at each session close.
    >
    > Before proceeding in any later session, check `docs/test-plans/`
-   > and `docs/design/` for an in-flight test plan or review checkpoint.
+   > and `docs/design/` for an in-flight test plan, review checkpoint,
+   > or `DRAFT` PRD.
    >
    > **Project:** \<name\> — \<one-paragraph description\>
    > **Language / framework:** \<from Step 3\>
@@ -486,16 +563,86 @@ Summarize for Jamie:
   PROJECT_PLAN.md and CLAUDE_CODE_PROMPTS.md alongside the
   feature phases they precede)
 - What the next session should do: run `/design-review` for the
-  post-onboarding sanity check, then `/bootstrap`, then Prompt 0
+  post-onboard sanity check, then `/bootstrap`, then Prompt 0
   from `CLAUDE_CODE_PROMPTS.md`. The first action in `TODO.txt` is
   the design review.
 - Any open questions that surfaced during onboarding (write these into
   `docs/open-questions.md` as well)
 
-End with: "Onboarding complete. Read `docs/PROJECT_PLAN.md` to
-review the phase queue, then run `/design-review` for a
-post-onboarding sanity check before `/bootstrap`. `/deployment-plan`
-is deferrable — run it when test/prod planning is needed."
+End with: "Onboarding complete. Read `docs/PRODUCT_VISION.md` for the
+strategy and `docs/PROJECT_PLAN.md` for the phase queue, then run
+`/design-review` for a post-onboard sanity check before `/bootstrap`.
+`/deployment-plan` is deferrable — run it when test/prod planning is
+needed."
+
+---
+
+# Decompose a later movement (subsequent PRD)
+
+Reached from Step 0 when an onboarded project has a newer undecomposed PRD
+from `/product-visioning`. This applies that PRD **without** the one-time
+first-PRD setup (no project identity, no `ONBOARD-FILL`, no `/bootstrap`). The
+target PRD is the newest `docs/design/PRD-<slug>-NNN.md`.
+
+## Step M1: Read the PRD and current state
+Read the target PRD in full — its scope (in / out / deferred), its proposed
+PRODUCT_VISION revisions, its decisions. Then read `docs/PRODUCT_VISION.md`,
+`docs/REQUIREMENTS.md`, `docs/ARCHITECTURE.md`, and the in-flight
+`docs/PROJECT_PLAN.md` (confirm its phases are `(COMPLETE)`; if not, surface it
+— opening a movement over unfinished work is unusual; confirm before
+proceeding). If the PRD still has unresolved scope (a section left as a
+placeholder), stop and point back to `/product-visioning` to finish it.
+
+## Step M2: Apply PRODUCT_VISION revisions
+Apply the PRD's "Proposed PRODUCT_VISION revisions" to
+`docs/PRODUCT_VISION.md`: evolve the personality & positioning section
+(append/refine, never rewrite history), add or re-order roadmap movements,
+update enablers. Edit the specific sections in place; state each edit as you
+make it.
+
+## Step M3: Apply REQUIREMENTS / ARCHITECTURE deltas
+For what this movement changes, edit `docs/REQUIREMENTS.md` and
+`docs/ARCHITECTURE.md` in place — append new FR/NFR (don't renumber existing),
+adjust the affected architecture sections. A movement may be **redirective**
+(a 2.x shift): revise the affected sections, not just append.
+
+## Step M4: Archive the prior movement's plan
+Move `docs/PROJECT_PLAN.md` → `docs/project-plans/project-plan-NNN.md` and
+`docs/CLAUDE_CODE_PROMPTS.md` → `docs/project-plans/claude-code-prompts-NNN.md`,
+where NNN is the **retiring** movement's ordinal (the in-flight plan's
+`movement:` header), zero-padded to 3 digits. Create `docs/project-plans/` if
+absent. Archived files are historical — never edited again.
+
+## Step M5: Author the new movement's plan + prompts
+Author fresh `docs/PROJECT_PLAN.md` and `docs/CLAUDE_CODE_PROMPTS.md` from the
+PRD's in-scope items, using the same shapes as the first-PRD versions (Step 4's
+`docs/PROJECT_PLAN.md` and `docs/CLAUDE_CODE_PROMPTS.md` sections):
+- PROJECT_PLAN frontmatter `movement: NNN` + `source-prd: PRD-<slug>-NNN`;
+  phases with goal / deliverables / falsifiable exit criteria; first-class
+  design-review phases where the movement needs them; the orientation paragraph.
+- One prompt per phase with the deviation-footer convention; a design-review
+  prompt for each design-review phase.
+
+The PRD's deferred / roadmap items do **not** go into this plan — they stay in
+PRODUCT_VISION's roadmap (or `docs/open-questions.md`).
+
+## Step M6: Activate the PRD; supersede the prior
+Flip the target PRD's frontmatter `status: DRAFT → ACTIVE` (if DRAFT), and mark
+the prior movement's PRD `status: ACTIVE → SUPERSEDED <date>`. The latest
+`ACTIVE` PRD is the definitive scope for the current movement.
+
+## Step M7: TODO, hand off, wind down
+Rewrite `TODO.txt`'s first entry: "Run `/design-review` to review the movement
+NNN decomposition before pasting Prompt <first> from
+`docs/CLAUDE_CODE_PROMPTS.md`." (No `/bootstrap` — the dev environment is
+already set up.) Then invoke `/wind-down` for the commit handoff (rule 7): the
+new plan + prompts, the archived pair, the updated PRODUCT_VISION / REQUIREMENTS
+/ ARCHITECTURE, and the PRD status flips land together. Report the movement
+opened, what was archived, and that `/design-review` is next.
+
+End with: "Movement NNN decomposed — PRODUCT_VISION updated, the prior plan
+archived to `docs/project-plans/`, and a fresh `docs/PROJECT_PLAN.md` +
+`docs/CLAUDE_CODE_PROMPTS.md` authored. Run `/design-review` to review it."
 
 ---
 
@@ -517,6 +664,14 @@ is deferrable — run it when test/prod planning is needed."
   source of truth. If `UNCONFIGURED` is still present, onboarding can
   safely re-run; if it's been flipped, treat the project as
   partially-configured and ask Jamie what state to recover to.
+- **Movement decompose, but the PRD's scope is unfinished** (a
+  placeholder section remains). Stop; point back to `/product-visioning`
+  to finish the PRD. Don't decompose a half-written PRD.
+- **Movement decompose, but the in-flight plan isn't all `(COMPLETE)`.**
+  Surface it and confirm before archiving — opening a movement over
+  unfinished phases is unusual (a deliberate pivot is possible).
+- **`COMPLETE` with no newer PRD.** Nothing to decompose; redirect to
+  `/product-visioning` (plan the next movement) or `/design-review`.
 
 ---
 
@@ -546,6 +701,12 @@ is deferrable — run it when test/prod planning is needed."
   never writes a checkpoint file at
   `docs/design/design-review-checkpoint-NNN.md` — that's
   `/design-review`'s domain.
+- Does not run the product-visioning conversation — `/product-visioning`
+  produces the PRD; `/onboard` decomposes it (first PRD or a later
+  movement), which is what writes/updates `docs/PRODUCT_VISION.md` and
+  authors the plan + prompts. `/onboard` does not author a PRD's *body*
+  (that comes from the design intake or `/product-visioning`); it records
+  the first PRD and flips PRD status as part of decomposing.
 - Does not author exit test plans — `/exit-test-plan` does.
   `/onboard` notes the recurring convention in
   `docs/PROJECT_PLAN.md`'s opening paragraph; it never creates

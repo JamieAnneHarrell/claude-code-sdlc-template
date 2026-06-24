@@ -1179,3 +1179,38 @@ the source-mode dogfood next session. `design-review.md` is pure-review,
 owned by Jamie via git. Recorded as Phase 2.2. Full model + invariants
 live in `CLAUDE.md` § "/product-visioning + PRD / product-vision
 artifacts" and the file-ownership list.
+
+---
+
+## Line endings: rely on `core.autocrlf`, not a committed `.gitattributes`
+
+**Decision.** This repo carries no `.gitattributes`. Line-ending handling
+is left to git's `core.autocrlf=true`: committed blobs are LF, the working
+tree is native CRLF on the maintainer's Windows machine. All tracked blobs
+are already LF-normalized.
+
+**Why.** The repo is markdown-only and the maintainer edits/reviews on
+native Windows, so CRLF in the working tree is the intended experience and
+git normalizes to LF on commit. A *raw* `diff` between root and
+`cc-template/` can report whole files as changed when one side's
+working-tree copy is LF and the other CRLF — but that is a working-tree
+artifact, not a content difference: `git diff` masks it (blobs are LF on
+both sides), so it never reaches a commit. The working-tree patchwork
+(files written LF by `Copy-Item`/Write tooling vs. CRLF from checkout) is
+fixed by a one-time re-checkout (`git rm --cached -r .` then
+`git reset --hard`), not by renormalizing — `git add --renormalize` is a
+no-op here because the blobs are already LF.
+
+**Why not a committed `.gitattributes` with `* text=auto`.** It is what
+`rules/environment-rules.md` recommends and is right for *consumer*
+projects seeded from `cc-template/` (arbitrary languages). For this repo
+the maintainer declined it: it adds no normalization the already-LF blobs
+need, and `eol=lf` would force LF into the working tree — the opposite of
+native-Windows review. The shipped recommendation stands; this repo is a
+deliberate exception.
+
+**Scope note.** Applies to this source-of-truth repo only. Decided
+2026-06-24 while dogfooding `/refresh-from-repository` (whose `Copy-Item`
+of the LF dist into the CRLF root surfaced the patchwork). If raw
+root↔`cc-template/` comparisons get noisy again, the remedy is a
+re-checkout to uniform CRLF, not adding `.gitattributes`.

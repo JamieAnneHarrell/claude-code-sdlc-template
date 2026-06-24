@@ -154,10 +154,36 @@ If TODO.txt's first entry doesn't reflect the applicable case,
 warn Jamie and propose the corrected first entry. Same
 override-allowed posture as the design-review safety net.
 
-If both a design-review checkpoint and a test plan are in flight
-at once, surface both and ask Jamie which to prioritize as the
-first entry (the other becomes the second). Don't guess the
+**Product-visioning safety net.** Scan `docs/design/PRD-<slug>-*.md`
+for any whose frontmatter status is `DRAFT` — a `/product-visioning`
+session produced a PRD that hasn't been operationalized. If one exists,
+the first TODO.txt entry MUST be: "At the beginning of the next session,
+review `docs/design/PRD-<slug>-NNN.md`; re-run `/product-visioning` to
+refine it if needed, then run `/onboard` to decompose it." Same
+override-allowed posture as the other safety nets.
+
+If more than one of these is in flight at once (a checkpoint, a test
+plan, and/or a `DRAFT` PRD), surface all and ask Jamie which to
+prioritize as the first entry (the others follow). Don't guess the
 ordering.
+
+**Movement-complete suggestion.** If none of the three safety-net scans
+found anything in flight AND every non-roadmap phase header in
+`docs/PROJECT_PLAN.md` is `(COMPLETE)` (ignore `(roadmap)` /
+`(SUPERSEDED …)` phases), the current movement is landed. Surface — as a
+*suggestion*, not a forced first entry — a short menu of what could come
+next:
+
+- **Release** — execute `docs/DEPLOYMENT.md` (or run `/deployment-plan`
+  if it doesn't exist yet). Often out-of-band.
+- **Opportunistic / maintenance** — cleanup, bug fixes, small add-ons
+  not in the plan. Tactical, not a movement: a `fix/` branch or a small
+  appended phase, no PRD.
+- **Next movement** — run `/product-visioning` to plan the next
+  strategic chunk.
+
+Let Jamie pick. Don't run `/product-visioning`, and don't archive
+anything — archival is `/onboard`'s op when it decomposes the next PRD.
 
 **How to apply the rewrite.** State the intent in one short
 sentence ("I'll rewrite TODO.txt with the next-session entry
@@ -266,6 +292,19 @@ brief plan first.
   explicitly decides "land" after Jamie confirms there's no
   outstanding polish or fix-now work. Wind-down only reports
   state.
+
+### `docs/PRODUCT_VISION.md` and `docs/design/PRD-<slug>-*.md`
+- If `PRODUCT_VISION.md` changed, or a PRD changed status this session
+  (`DRAFT` → `ACTIVE`, `ACTIVE` → `SUPERSEDED`), note it in the recap.
+- **Do not edit these.** `/onboard` writes `PRODUCT_VISION.md` and flips
+  PRD status when it decomposes a PRD; `/product-visioning` authors the
+  DRAFT PRD; `/design-review` reads the active PRD. Wind-down reports
+  state only — decisions a PRD records reach `design-decisions.md` /
+  `open-questions.md` via the scans above when the movement is decomposed.
+
+### `docs/project-plans/` (archived movements)
+- **Do not edit.** Historical plan/prompt archives written by `/onboard`
+  when it opens a new movement. Report only.
 
 The goal: at session end, the repo's docs reflect reality. If they
 don't, surface the gap before closing — even if the fix is a
@@ -392,3 +431,8 @@ Tell Jamie:
   plan is `AWAITING-DISPOSITIONS` and TODO.txt doesn't reflect
   the right next-step (run the plan vs. land dispositions), but
   never edits the plan itself.
+- Does not edit `docs/PRODUCT_VISION.md`, `docs/design/PRD-<slug>-*.md`,
+  or `docs/project-plans/` archives. Those belong to `/onboard`
+  (PRODUCT_VISION + the archives) and `/product-visioning` (the PRD it
+  authors). Wind-down reports their state, surfaces the DRAFT-PRD safety
+  net and the movement-complete suggestion, but never edits them.

@@ -412,7 +412,7 @@ NFR-4) and close Phase 2.1 + 2.1.A.
 
 ---
 
-## Phase 2.2 — `/product-visioning` strategic-planning layer (COMPLETE; root sync pending dogfood)
+## Phase 2.2 — `/product-visioning` strategic-planning layer (COMPLETE)
 
 **Goal.** Add the strategic-planning front-end the tactical SDLC loop
 lacked: an interactive `/product-visioning` that authors the next PRD,
@@ -421,12 +421,16 @@ movement) and `/design-review` reverted to pure review. Built
 out-of-band ahead of the roadmap because a downstream project needed the
 movement workflow first.
 
-**Status (2026-06-22): COMPLETE in `cc-template/`; root sync deferred.**
-The command set, the PRD / `PRODUCT_VISION` artifact model, and the
-supporting doc edits landed in `cc-template/` and the source-only docs.
-The source-mode dogfood that propagates the command set + the `CLAUDE.md`
-`reading-order` convention-check nudge to root is the **next session**
-(split out for a clean, separately-reviewed refresh).
+**Status (2026-06-24): COMPLETE.** The command set, the PRD /
+`PRODUCT_VISION` artifact model, and supporting doc edits landed in
+`cc-template/` and the source-only docs (2026-06-22). The source-mode
+root-sync dogfood ran 2026-06-24: `/refresh-from-repository` added
+`product-visioning.md`, updated `onboard` / `wind-down` /
+`refresh-from-repository` at root, and took-upstream on the `CLAUDE.md`
+`reading-order` convention-check nudge; the forked `briefing-rule` block
+was un-forked back to template-owned. An optional confirming refresh and a
+one-time working-tree line-ending re-checkout remain as housekeeping
+(carried in TODO.txt).
 
 **Deliverables.**
 - `cc-template/.claude/commands/product-visioning.md` authored
