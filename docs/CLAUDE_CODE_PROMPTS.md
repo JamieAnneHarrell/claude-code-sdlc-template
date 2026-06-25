@@ -737,6 +737,198 @@ satisfied; surviving 002 decisions intact.
   per checkpoint 002 R5 (retire the gate-assertion/next-session-
   reminder conflated pattern; rely on PROJECT_PLAN.md first-class
   checkpoint entries instead).
+- 2026-06-25 — Command shipped as `/write-documentation` (renamed
+  from `/write-user-documentation`); Block 1 (core skill + craft
+  doctrine) built. Checkpoint 005 settled render/build ownership
+  (Option A: writing + delivery recipe here, build at
+  `/deployment-plan`). Follow-on work is Prompts 2.4–2.7; this
+  prompt's body is the Block 1 record and is not rewritten.
+
+---
+
+## Prompt 2.4: Apply checkpoint 005 — render/build ownership
+
+**Read first.**
+- [`docs/design/design-review-checkpoint-005.md`](design/design-review-checkpoint-005.md)
+  — finding B1 (Option A, Accepted with caveats) and its
+  Disposition log row; the caveat on a product-type-**open**
+  delivery recipe is load-bearing.
+- [`docs/REQUIREMENTS.md`](REQUIREMENTS.md) FR-14 (already updated to
+  the recipe-handoff model) and NFR-6 / NFR-8.
+- [`docs/ARCHITECTURE.md`](ARCHITECTURE.md) manifest-shape and
+  "No language runtime" passages (already updated).
+- [`docs/design-decisions.md`](design-decisions.md) the
+  `/write-documentation` entry's "render architecture under review"
+  scope note (L1256–1263 at authoring) — the note to rewrite.
+
+**Scope.**
+1. Reshape `cc-template/.claude/commands/write-documentation.md`:
+   remove the `--render` argument and Step S2.5 "Render"; convert the
+   manifest's "Render configuration" section into a product-type-open
+   **"Delivery recipe"** — what well-delivered docs look like for this
+   product, where the skill researches or discovers the product type
+   at run time (real-time research and/or conversational discovery
+   with the developer), never a fixed type enum (SaaS / zip / library
+   are illustrations only); drop the "single source of truth for how
+   the project renders" claim; point render/build at `/deployment-plan`;
+   keep the release-readiness ledger as the handoff signal.
+2. Flip the root [`CLAUDE.md`](../CLAUDE.md) `/write-documentation`
+   load-bearing invariant: render is no longer single-owned by
+   `/write-documentation` — `/deployment-plan` owns the doc
+   render/build, consuming the delivery recipe + ledger; align the
+   render-single-owned and `/deployment-plan`-references-render lines
+   accordingly. Mirror to `cc-template/CLAUDE.md` if the invariant is
+   carried there.
+3. Rewrite the `design-decisions.md` "render architecture under
+   review" note to the surviving landed decision (Option A) — writing
+   here, build at `/deployment-plan`, no runtime prescribed. Do not
+   leave a "superseded" tombstone (the design-decisions ↔
+   abandoned-approaches hygiene rule).
+4. Correct the `open-questions.md` 2026-06-24 render story: remove the
+   false claim that ds-zip-tax wrote a render-to-HTML script (it is
+   single-target PDF), and the false assumption that this project
+   already has a Python runtime (it does not — that was ds-zip-tax's).
+   Migrate the now-resolved story to its home (a `design-decisions.md`
+   record, or rewrite to the chosen architecture).
+
+**Constraints (what NOT to do).**
+- Do NOT name a runtime, engine, or toolchain in the delivery recipe
+  or anywhere the template ships — NFR-6 forbids prescribing a runtime
+  downstream; the recipe describes *what* good delivery is, never *how*
+  to build it.
+- Do NOT hand-edit the root `.claude/commands/write-documentation.md`
+  copy — the reshaped command reaches root via the Phase 2.6
+  `/refresh-from-repository` source-mode dogfood, not a manual copy.
+- Do NOT alter already-run prompt or plan bodies — deviation notes
+  only (checkpoint 005 R1).
+
+**Exit criteria.**
+- `cc-template/.claude/commands/write-documentation.md` has no
+  `--render` and no Step S2.5, and its manifest section is a
+  product-type-open "Delivery recipe" naming no toolchain.
+- The root `CLAUDE.md` `/write-documentation` invariant reads
+  "`/deployment-plan` owns the doc render/build, consuming the
+  delivery recipe + ledger"; no doc still says
+  `/write-documentation` single-owns the render.
+- `design-decisions.md` records the landed Option A decision with no
+  tombstone; `open-questions.md`'s render story is corrected and
+  migrated.
+- The root command copy is intentionally still the old shape until
+  Phase 2.6 (refresh) propagates it.
+
+---
+
+## Prompt 2.5: Block 2 — ecosystem wiring
+
+**Read first.**
+- [`docs/design/design-review-checkpoint-005.md`](design/design-review-checkpoint-005.md)
+  B1 — the `/deployment-plan` piece grew from *referencing* a render
+  to *owning* the doc build.
+- The three sibling commands in `cc-template/.claude/commands/`:
+  `deployment-plan.md`, `wind-down.md`, `onboard.md`.
+- Root [`CLAUDE.md`](../CLAUDE.md) "Load-bearing invariants" — the
+  ownership map (NFR-8) the wiring must keep non-overlapping.
+
+**Scope.** Edit the three sibling commands in `cc-template/` (root
+copies follow in Phase 2.6):
+1. `deployment-plan.md` — gains ownership of the doc render/build:
+   when authoring `DEPLOYMENT.md`'s release procedure and a doc
+   manifest exists, read its delivery recipe + ledger and code the
+   render targets against the environment's runtime at release time;
+   add a pre-release **doc-gate** (docs CURRENT + no OPEN conformance
+   gaps + no unfilled required visuals); ship the built docs. It owns
+   the build outright — there is no parallel render defined elsewhere.
+2. `wind-down.md` — its coherence sweep respects
+   `/write-documentation`'s README / CONTRIBUTING section ownership
+   (route user-facing drift to the owner, never clobber inline), and
+   surfaces stale docs / OPEN ledger items at session close.
+3. `onboard.md` — when it decomposes a new movement, add a one-line
+   reminder that user docs are now stale for the new movement → run
+   `/write-documentation`.
+
+**Constraints (what NOT to do).**
+- Do NOT let `/deployment-plan` and `/write-documentation` both define
+  a render — `/write-documentation` writes the recipe, `/deployment-plan`
+  owns the build; keep ownership non-overlapping (NFR-8).
+- Do NOT hand-edit root command copies — they arrive via Phase 2.6.
+- Edit only the three sibling commands; `/product-visioning` needs no
+  change.
+
+**Exit criteria.**
+- `deployment-plan.md` owns the doc build (reads recipe + ledger,
+  codes targets at release time, gates the release); no doc claims a
+  second render owner.
+- `wind-down.md` routes user-facing-doc drift to `/write-documentation`
+  and surfaces stale-doc / OPEN-ledger state at close.
+- `onboard.md` reminds about stale docs on movement decomposition.
+- The ownership map in root `CLAUDE.md` stays coherent (each file one
+  owner).
+
+---
+
+## Prompt 2.6: Dogfood `/refresh-from-repository` (source mode)
+
+**Read first.**
+- [`.claude/commands/refresh-from-repository.md`](../.claude/commands/refresh-from-repository.md)
+  — source-mode behavior.
+- [`docs/PROJECT_PLAN.md`](PROJECT_PLAN.md) Phases 2.4–2.5 (the command
+  changes to propagate).
+
+**Scope.**
+1. Run `/refresh-from-repository` in source mode to propagate the
+   Phase 2.4 / 2.5 command changes from `cc-template/.claude/commands/`
+   to root `.claude/commands/` — the reshaped `write-documentation.md`
+   plus the three reshaped siblings.
+2. Review the download/diff before applying (the command's own
+   fetch→review→apply discipline).
+3. Run a second refresh and confirm it is quiet (no diffs).
+
+**Constraints (what NOT to do).**
+- Do NOT hand-copy files — the dogfood IS the propagation mechanism,
+  and exercising it is part of the validation.
+
+**Exit criteria.**
+- Root `.claude/commands/` copies of `write-documentation.md`,
+  `deployment-plan.md`, `wind-down.md`, `onboard.md` match
+  `cc-template/`.
+- A second refresh reports no changes.
+- `/write-documentation` (reshaped) is now runnable at root — the
+  precondition for Phase 2.7.
+
+---
+
+## Prompt 2.7: Dogfood `/write-documentation` + close
+
+**Read first.**
+- [`.claude/commands/write-documentation.md`](../.claude/commands/write-documentation.md)
+  — now present at root via Phase 2.6.
+- [`docs/PROJECT_PLAN.md`](PROJECT_PLAN.md) Phase 2.7.
+
+**Scope.**
+1. Run `/write-documentation` on this template (the source-of-truth
+   project) to produce `docs/published/` — the numbered manifest, the
+   audience-facing markdown sources, the delivery recipe, and the
+   release-readiness ledger — documenting the template itself for its
+   consumers.
+2. Close out the write-documentation work in `PROJECT_PLAN.md` and
+   `CLAUDE_CODE_PROMPTS.md`.
+
+**Constraints (what NOT to do).**
+- Do NOT build or render the docs here — this project has no runtime
+  and `/deployment-plan` is `UNCONFIGURED`; markdown is the
+  deliverable, and the build (when a project wants one) is
+  `/deployment-plan`'s. The dogfood validates the *writing*.
+- Do NOT invent install / topology sections — `DEPLOYMENT.md` does not
+  exist here; stub or skip them (rule 8).
+
+**Exit criteria.**
+- `docs/published/` holds an `ACTIVE` manifest plus audience-facing
+  markdown that reads as written for the template's consumers, with a
+  product-type-open delivery recipe recorded.
+- The write-documentation work is marked closed in the tracking docs.
+- A sandbox-style dry-read confirms a consumer could use the output
+  without the internal docs (`/exit-test-plan` is not used here per
+  NFR-6).
 
 ---
 

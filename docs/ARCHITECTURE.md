@@ -255,9 +255,10 @@ detection.
 `docs/published/documentation-plan-NNN.md` (`/write-documentation`):
 - Frontmatter `documentation-plan` / `project` / `created` /
   `status: AWAITING-APPROVAL | ACTIVE | SUPERSEDED <date>` (newest governs) /
-  `documented-through` (a `{ movement, phase }` tuple) / `renderer`.
+  `documented-through` (a `{ movement, phase }` tuple).
 - A proposed-doc-set section with one `DOC DECISION — JAH:` block per doc, an
-  audience×feature matrix, the render-config, a release-readiness ledger
+  audience×feature matrix, a product-type-aware **delivery recipe** (consumed by
+  `/deployment-plan`, which owns the render/build), a release-readiness ledger
   (stale / unfilled visual / conformance gap), and an append-only authoring
   log. Markdown sources + `images/` live alongside under `docs/published/`.
 - Currency is **movement-aware**: a re-run is STALE when the active movement
@@ -352,9 +353,10 @@ The full rationale lives in
 ## What this architecture explicitly does NOT include
 
 - **No language runtime.** Markdown only. No interpreter,
-  compiler, or build step. (`/write-documentation`'s optional PDF render is an
-  *environment-side* build a project may add — it ships nothing, and the
-  authored deliverable stays markdown.)
+  compiler, or build step. (`/write-documentation` writes markdown + a delivery
+  recipe and owns no renderer; `/deployment-plan` builds the delivered docs
+  against the environment's runtime at release time — the template ships nothing
+  and prescribes no runtime.)
 - **No GUI, no web service, no API.** The deliverable is the file
   tree.
 - **No traditional test suite.** Validation is the live-test

@@ -165,8 +165,14 @@ or reconciles the markdown sources under `docs/published/` (the user-facing
 README sections, quick-start, guides, reference, troubleshooting) applying an
 embedded documentation-craft doctrine (Diátaxis modes; per-audience voice
 profiles; CLI-reference, readability, and anti-pattern rules). Markdown is the
-deliverable; PDF rendering is an opt-in, environment-side build via a
-per-project-recorded toolchain (NFR-6 unaffected). Currency is **derived and
+deliverable. `/write-documentation` owns *writing* — the markdown sources, a
+product-type-aware **delivery recipe** (what well-delivered docs look like for
+this product; it researches or discovers the product type at run time, not from
+a fixed list), and the release-readiness ledger — and owns no renderer.
+Rendering and building the delivered docs is owned by `/deployment-plan`, which
+codes the targets against the environment's runtime at release time, consuming
+the recipe and the ledger (NFR-6 unaffected — the template prescribes no
+runtime). Currency is **derived and
 movement-aware**: the manifest stamps `documented-through { movement, phase }`,
 and a re-run is STALE when the active movement differs or a later phase shipped
 in the same movement. The manifest's release-readiness ledger (stale docs /

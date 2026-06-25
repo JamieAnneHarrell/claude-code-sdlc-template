@@ -472,6 +472,20 @@ used in the source-of-truth project to document itself, and used
 in downstream projects by consumers to create their product
 documentation.
 
+**Status (2026-06-25): Block 1 landed; renamed and reshaped.** The
+command shipped as `/write-documentation` (not
+`/write-user-documentation`) with its full spec and embedded craft
+doctrine — the Phase 2.3 design session is settled, not deferred.
+Checkpoint 005 (2026-06-25) landed the render/build ownership
+decision: `/write-documentation` owns *writing* + a product-type-open
+delivery recipe + the release-readiness ledger; `/deployment-plan`
+owns rendering/building the delivered docs (Option A). The remaining
+work is Phases 2.4–2.7 (apply checkpoint 005 → ecosystem wiring →
+refresh dogfood → write-doc dogfood + close); Block 2's
+`/deployment-plan` piece grew from *referencing* a render to *owning*
+the doc build. The deliverables and exit criteria below are the
+Block 1 record and are not rewritten (checkpoint 005 R1).
+
 **Deliverables.**
 - `cc-template/.claude/commands/write-user-documentation.md`
   written. Spec deferred to Phase 2.3 design session.
@@ -485,6 +499,89 @@ supplementary docs the consumer requested. Output style is
 consistent with the project's documentation conventions. Sandbox
 re-read against the dist command spec is the validation
 (`/exit-test-plan` is not used in this project per NFR-6).
+
+---
+
+## Phase 2.4 — Apply checkpoint 005 (render/build ownership)
+
+**Goal.** Reshape `/write-documentation` and the load-bearing
+invariants to Option A: writing + a product-type-open delivery recipe
+here, render/build owned by `/deployment-plan`.
+
+**Deliverables.**
+- `cc-template/.claude/commands/write-documentation.md` reshaped:
+  `--render` + Step S2.5 removed; manifest "Render configuration" →
+  product-type-open "Delivery recipe"; "single render owner" claim
+  dropped; build pointed at `/deployment-plan`; ledger kept as the
+  handoff signal.
+- Root `CLAUDE.md` `/write-documentation` invariant flipped to
+  "`/deployment-plan` owns the doc render/build, consuming the
+  delivery recipe + ledger."
+- `docs/design-decisions.md` "render under review" note rewritten to
+  the landed Option A decision (no tombstone).
+- `docs/open-questions.md` render story corrected (false ds-zip-tax
+  HTML-script claim; false "this project has a runtime" assumption)
+  and migrated.
+
+**Exit criteria.** The command names no renderer/toolchain and has a
+product-type-open delivery recipe; the root invariant, design
+decisions, and open questions all reflect Option A; nothing prescribes
+a runtime. The root command copy is intentionally still the old shape
+until Phase 2.6 propagates it.
+
+---
+
+## Phase 2.5 — Block 2: ecosystem wiring
+
+**Goal.** Wire the three sibling commands to the doc-ownership model.
+
+**Deliverables (in `cc-template/.claude/commands/`).**
+- `deployment-plan.md` — owns the doc render/build: reads the delivery
+  recipe + ledger, codes the render targets against the environment
+  runtime at release time, adds a pre-release doc-gate (docs CURRENT +
+  no OPEN conformance gaps + no unfilled required visuals), ships the
+  built docs.
+- `wind-down.md` — coherence sweep respects `/write-documentation`'s
+  README / CONTRIBUTING section ownership and surfaces stale docs /
+  OPEN ledger items at session close.
+- `onboard.md` — one-line stale-docs reminder on movement decomposition.
+
+**Exit criteria.** Each sibling edited in `cc-template/`; ownership
+stays non-overlapping (NFR-8); `/deployment-plan` owns the build with
+no parallel render defined elsewhere.
+
+---
+
+## Phase 2.6 — Dogfood `/refresh-from-repository` (source mode)
+
+**Goal.** Propagate the Phase 2.4 / 2.5 command changes from
+`cc-template/` to root.
+
+**Deliverables.** A source-mode refresh run (review-before-apply);
+root copies of `write-documentation.md` + the three siblings updated;
+a second refresh verified quiet.
+
+**Exit criteria.** Root commands match `cc-template/`; the second
+refresh is quiet. This is the step that makes the reshaped
+`/write-documentation` runnable at root — it must precede Phase 2.7.
+
+---
+
+## Phase 2.7 — Dogfood `/write-documentation` + close
+
+**Goal.** Run `/write-documentation` on this template, produce
+`docs/published/`, and close the write-documentation work.
+
+**Deliverables.** `docs/published/` for the template itself (numbered
+manifest + audience-facing markdown + delivery recipe + ledger);
+write-documentation work marked closed in the tracking docs.
+
+**Exit criteria.** The manifest is `ACTIVE` and the markdown reads as
+audience-facing, with a product-type-open delivery recipe recorded.
+No build/render is produced — this project has no runtime and
+`/deployment-plan` is `UNCONFIGURED`; markdown is the deliverable. A
+sandbox dry-read confirms a consumer could use the output without the
+internal docs.
 
 ---
 
