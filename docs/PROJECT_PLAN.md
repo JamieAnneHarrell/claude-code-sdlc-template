@@ -603,7 +603,11 @@ against the reshaped layout).
 
 ---
 
-## Phase 2.8 — Reshape the `/write-documentation` skill spec (cc-template)
+## Phase 2.8 — Reshape the `/write-documentation` skill spec (cc-template) (COMPLETE)
+
+**Status (2026-06-26): COMPLETE.** The four skill files + the new skeleton edited
+in `cc-template/`; DOC DECISION placeholder intact; ownership non-overlapping.
+Root copies stay the old shape until Step 2.9 propagates them.
 
 **Goal.** Reshape the four skill files and add the documentation-guidance
 skeleton in `cc-template/`, per [checkpoint 006](design/design-review-checkpoint-006.md)
