@@ -1002,8 +1002,10 @@ copies follow in Phase 2.6):
 
 **Scope.**
 1. Run `/refresh-from-repository` (source mode, review-before-apply) to propagate
-   Step 2.8's reshaped skill files + the skeleton from `cc-template/` to root;
-   run a second refresh and confirm it is quiet.
+   Step 2.8's reshaped skill files from `cc-template/` to root. The refresh logic
+   version bumped (2 → 3), so the first run restages commands-only and asks for a
+   re-invoke; the second run delivers the `documentation-guidance.md` skeleton (new
+   Step 4b) and merges; confirm a third run is quiet.
 2. Update the root `CLAUDE.md` Load-bearing invariants (source-only; not
    refreshed): the `/write-documentation` lifecycle block (glob, guidance-store
    bullet, audience-folder bullet, three Stage-2 modes), the Cross-cutting
@@ -1017,7 +1019,8 @@ copies follow in Phase 2.6):
   Load-bearing-invariants section.
 
 **Exit criteria.**
-- Root `.claude/commands/` copies match `cc-template/`; the second refresh is quiet.
+- Root `.claude/commands/` copies match `cc-template/`; `docs/documentation-guidance.md`
+  was delivered to root by the refresh; a final refresh is quiet.
 - The root invariants reflect the reshape.
 
 **Revisions since this prompt ran:**
@@ -1038,7 +1041,8 @@ copies follow in Phase 2.6):
 **Scope.**
 1. `git mv` `docs/published/` → `docs/user/` + `docs/maintainer/` +
    `docs/documentation-plans/` per each doc's Primary audience; remove the empty
-   `docs/published/`. Create `docs/documentation-guidance.md` (the skeleton).
+   `docs/published/`. (The `documentation-guidance.md` skeleton is delivered by
+   Step 2.9's refresh, not created here.)
 2. Re-stamp `documentation-plan-001` (paths + an authoring-log migration row);
    fix intra-doc relative links and the root `README.md` links.
 3. Run a `/write-documentation` **reconciliation** pass to refresh the migrated

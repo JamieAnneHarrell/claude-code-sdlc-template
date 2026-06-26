@@ -1362,3 +1362,36 @@ a `/product-visioning` trigger.
 
 **Scope note.** Encoded in FR-18 and the `/write-documentation` revise-mode spec
 (Steps 2.8–2.10). From checkpoint 006 R2-A1.
+
+---
+
+## Refresh delivers template-shipped doc skeletons
+
+**Decision.** Template-shipped doc skeletons (`cc-template/docs/*.md` —
+`documentation-guidance.md`, `design-decisions.md`, `open-questions.md`) reach
+downstream consumers through `/refresh-from-repository` (new Step 4b:
+add-when-absent, never overwrite), not by self-healing in the skills that read or
+write them. Adding the class bumped the refresh logic version (2 → 3).
+
+**Why.** Refresh is the single upstream-pull chokepoint with the Step 2 security
+review. A project onboarded before a skeleton shipped never received it, and
+refresh is already where missing template files are reconciled — so delivery
+belongs there. Centralizing it gives one trust boundary and one delivery rule for
+every future skill that ships a skeleton.
+
+**Why not self-heal in the consuming skill.** `/write-documentation` (or
+`/wind-down`) materializing the skeleton on first use would force the skill to
+carry the skeleton text — duplicating the file's own format header and inviting
+drift between skill and skeleton — or to pull from upstream itself, duplicating
+refresh's security review.
+
+**Why not leave refresh out of `docs/`.** Refresh's "commands + rules/CLAUDE.md
+only" scope was never a deliberate exclusion of docs — no template-shipped
+skeleton existed to deliver until `/write-documentation` introduced one.
+Discoverability (a refreshed consumer should *see* the file arrive, announced in
+refresh's Step 7 report) tipped a write-target into proactive delivery.
+
+**Scope note.** No file-level tombstone: a skeleton a consumer deliberately
+deletes reappears empty on the next refresh (an empty skeleton loses nothing).
+Refresh stays transport, not an author — the ownership model is unchanged
+(`/onboard` creates/seeds, `/wind-down` captures, `/write-documentation` reads).

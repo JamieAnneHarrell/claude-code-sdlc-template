@@ -641,7 +641,9 @@ then update the root `CLAUDE.md` invariants (source-only; not refreshed).
 
 **Deliverables.**
 - `/refresh-from-repository` (source mode, review-before-apply) propagates the
-  four reshaped skill files + the skeleton to root; a second refresh verifies
+  four reshaped skill files to root. The 2 → 3 logic-version bump makes the first
+  run restage commands-only (re-invoke), the second deliver the
+  `documentation-guidance.md` skeleton (Step 4b) + merge; a third run verifies
   quiet.
 - Root `CLAUDE.md` Load-bearing invariants: the `/write-documentation` lifecycle
   block (glob, guidance-store bullet, audience-folder bullet, three Stage-2
@@ -650,8 +652,9 @@ then update the root `CLAUDE.md` invariants (source-only; not refreshed).
   (`/onboard` creates guidance; `/wind-down` captures; `/write-documentation`
   reads/applies).
 
-**Exit criteria.** Root commands match `cc-template/`; the second refresh is
-quiet; the root invariants reflect the reshape.
+**Exit criteria.** Root commands match `cc-template/`; `documentation-guidance.md`
+was delivered to root by the refresh; a final refresh is quiet; the root
+invariants reflect the reshape.
 
 ---
 
@@ -663,8 +666,8 @@ write-documentation work — absorbing Phase 2.7's pending NFR-6 dry-read.
 
 **Deliverables.**
 - `git mv` `docs/published/` → `docs/user/` + `docs/maintainer/` +
-  `docs/documentation-plans/`; create `docs/documentation-guidance.md` (the
-  skeleton, as `/onboard` would).
+  `docs/documentation-plans/`. (The `documentation-guidance.md` skeleton is
+  delivered by Phase 2.9's refresh, not created here.)
 - Re-stamp `documentation-plan-001` (paths + an authoring-log migration row);
   fix relative links + the root `README.md` links.
 - A `/write-documentation` **reconciliation** pass refreshing the migrated docs

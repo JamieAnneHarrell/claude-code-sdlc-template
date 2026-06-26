@@ -352,7 +352,8 @@ single-stage by default. It replaces the command files wholesale,
 then reconciles `rules/*.md` + `CLAUDE.md` against the downstream's
 current state using the CC-TEMPLATE-BLOCK marker-state model above
 (two-way compare + ask-once; the executing session merges,
-preserving `ONBOARD-FILL` regions). When a downstream's loaded
+preserving `ONBOARD-FILL` regions), and delivers any template-shipped
+doc skeleton (`cc-template/docs/*.md`) the downstream lacks. When a downstream's loaded
 refresh logic is behind upstream, it self-modifies: pulls the
 commands skills-only first, then asks the consumer to re-invoke so
 the new logic runs the merge. Built in Phase 2.1; the Option A

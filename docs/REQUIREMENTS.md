@@ -111,7 +111,11 @@ single-stage command shipped in the dist that pulls latest
 using **stateless marker-state reconciliation** (adopted by
 [checkpoint 004](design/design-review-checkpoint-004.md) B1,
 replacing checkpoint 002's Option D hash/baseline/state-file
-mechanism — now an abandoned approach). Template-managed regions
+mechanism — now an abandoned approach). It also **delivers
+template-shipped doc skeletons** (`cc-template/docs/*.md`) the
+downstream lacks — add-when-absent, never overwritten (the
+`documentation-guidance.md` class was added at refresh logic
+version 3). Template-managed regions
 are wrapped in `CC-TEMPLATE-BLOCK` markers that carry per-block
 state: `template-owned` (normal, tracks upstream), `forked`
 (consumer-owned, set by asking once), and `removed` (a tombstone
