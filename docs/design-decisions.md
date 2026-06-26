@@ -1233,8 +1233,8 @@ movement differs or a later phase shipped in the same movement. The command
 embeds a documentation-craft doctrine (Diátaxis modes; per-audience voice
 profiles; CLI-reference / readability / anti-pattern rules) and surfaces
 doc/code conformance gaps without editing product code (rule 8). Markdown is
-the deliverable; rendering is environment-side. Full spec: FR-14 and the
-shipped command file.
+the deliverable; the render/build is `/deployment-plan`'s (see the render/build
+ownership note below). Full spec: FR-14 and the shipped command file.
 
 **Why.** Every other command operates on SDLC artifacts of fixed shape; this
 one's output depends on an arbitrary product the template never envisioned, so
@@ -1253,11 +1253,17 @@ requirement needs persisted memory to reconcile against; the numbered manifest
 is the cheapest thing that is at once the sign-off gate, the
 `documented-through` anchor, the audience map, and the ownership record.
 
-**Scope note.** Built in `cc-template/` only this session (root arrives via the
-`/refresh-from-repository` source-mode dogfood). The **render architecture is
-under review** — as first built the command renders in-session (`--render`) with
-the recipe in the manifest, but that likely belongs in a scaffolded
-multi-target build script run at release time; see `open-questions.md`
-§ Deferred User Stories. A light Phase 2.3 `/design-review` validates the
-invariant ownership and resolves the render story before Block 2 (sibling
-wiring) and the dog-foods.
+**Render/build ownership (checkpoint 005, B1).** `/write-documentation` owns
+*writing*, not rendering: the markdown sources, a product-type-aware **delivery
+recipe** in the manifest (what well-delivered docs look like for this kind of
+product — the skill researches or discovers the product type at run time, never
+from a fixed enum), and the release-readiness ledger. It owns no renderer,
+render script, or toolchain. `/deployment-plan` owns building the deliverable —
+it reads the recipe + ledger and codes the render targets against whatever
+runtime exists at release time. This keeps the build concern with the
+template's existing deliverable owner, serves the real release path (a build
+step / CI, which can't invoke a slash command), and prescribes no runtime
+(NFR-6): the "runtime-neutral render" tension dissolves because nothing is
+pre-baked — rendering becomes a session coding task done when needed, true to
+"AI is session work, not a heuristic engine." The release-readiness ledger is
+the primary `/write-documentation` → `/deployment-plan` handoff signal.

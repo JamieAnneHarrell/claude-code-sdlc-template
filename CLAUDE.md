@@ -267,8 +267,10 @@ onboard's job, not design-review's.**
   Changing it breaks Step 0.
 - **Release-readiness ledger** (stale / unfilled visual / conformance gap) is a
   signal a release process consumes; the command surfaces conformance gaps but
-  never edits product code (rule 8). Render is single-owned (recipe in the
-  manifest); `/deployment-plan` references it, never re-defines it.
+  never edits product code (rule 8). Render/build is **not** owned here:
+  `/write-documentation` writes markdown + a product-type-open **delivery
+  recipe**; `/deployment-plan` owns the doc render/build, consuming that recipe
+  + the ledger and coding the targets against the runtime at release time.
 
 ### Cross-cutting
 
@@ -303,7 +305,8 @@ onboard's job, not design-review's.**
   tactical docs on its review-land path). `/exit-test-plan`: `phase-*-exit.md`.
   `/write-documentation`: `docs/published/` (the `documentation-plan-NNN.md`
   manifest, doc sources, images), the user-facing README sections +
-  `CONTRIBUTING.md` by offer, and the doc render recipe.
+  `CONTRIBUTING.md` by offer, and the delivery recipe (render/build itself is
+  `/deployment-plan`'s).
   A skill never writes a file it doesn't own; audit this list when adding a
   responsibility.
 

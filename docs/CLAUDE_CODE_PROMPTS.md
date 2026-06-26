@@ -816,6 +816,12 @@ satisfied; surviving 002 decisions intact.
 - The root command copy is intentionally still the old shape until
   Phase 2.6 (refresh) propagates it.
 
+**Revisions since this prompt ran:**
+
+- LANDED 2026-06-25. Clean execution. Deviation: scope item 2's
+  "mirror to `cc-template/CLAUDE.md`" was a no-op — that file does not
+  carry the `/write-documentation` invariant.
+
 ---
 
 ## Prompt 2.5: Block 2 — ecosystem wiring
@@ -863,6 +869,15 @@ copies follow in Phase 2.6):
 - `onboard.md` reminds about stale docs on movement decomposition.
 - The ownership map in root `CLAUDE.md` stays coherent (each file one
   owner).
+
+**Revisions since this prompt ran:**
+
+- LANDED 2026-06-25. Beyond written scope (per Jamie mid-session):
+  added a one-line `/write-documentation` pointer to onboard's
+  PROJECT_PLAN orientation paragraph (Step 4, inherited by the
+  later-movement path), and queued a Deferred User Story in
+  `open-questions.md` on `/onboard` capturing documentation intent so
+  `/design-review` can review it.
 
 ---
 

@@ -502,7 +502,11 @@ re-read against the dist command spec is the validation
 
 ---
 
-## Phase 2.4 — Apply checkpoint 005 (render/build ownership)
+## Phase 2.4 — Apply checkpoint 005 (render/build ownership) (COMPLETE)
+
+**Status (2026-06-25): COMPLETE.** All four deliverables landed in
+`cc-template/` + the supporting docs; the root command copy stays the
+old shape until Phase 2.6 propagates it.
 
 **Goal.** Reshape `/write-documentation` and the load-bearing
 invariants to Option A: writing + a product-type-open delivery recipe
@@ -531,7 +535,13 @@ until Phase 2.6 propagates it.
 
 ---
 
-## Phase 2.5 — Block 2: ecosystem wiring
+## Phase 2.5 — Block 2: ecosystem wiring (COMPLETE)
+
+**Status (2026-06-25): COMPLETE.** The three siblings wired in
+`cc-template/`. Beyond plan: added a `/write-documentation` pointer to
+onboard's PROJECT_PLAN orientation paragraph and queued a Deferred User
+Story on `/onboard` capturing documentation intent (see
+`open-questions.md`).
 
 **Goal.** Wire the three sibling commands to the doc-ownership model.
 

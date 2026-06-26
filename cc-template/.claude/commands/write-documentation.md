@@ -1,5 +1,5 @@
 ---
-description: Author and maintain audience-facing product documentation. Stage 1 surveys the project and proposes a documentation plan for sign-off; stage 2 writes or reconciles the docs (README, quick-start, guides, reference, troubleshooting) applying a documentation-craft doctrine, with optional PDF render.
+description: Author and maintain audience-facing product documentation. Stage 1 surveys the project and proposes a documentation plan for sign-off; stage 2 writes or reconciles the docs (README, quick-start, guides, reference, troubleshooting) applying a documentation-craft doctrine. Writes markdown sources plus a product-type-aware delivery recipe; the render/build is owned by /deployment-plan.
 ---
 
 # /write-documentation
@@ -46,16 +46,17 @@ relative to it.
 - A numbered **documentation plan** (the manifest):
   `docs/published/documentation-plan-NNN.md`. Newest governs; it holds the
   doc-set definition, the audience map, the `documented-through` currency
-  stamp, the render configuration, and the release-readiness ledger.
+  stamp, the **delivery recipe**, and the release-readiness ledger.
 - The **doc sources**: markdown under `docs/published/`, plus images under
   `docs/published/images/` (real screenshots and labelled placeholders).
 - The **user-facing sections of `README.md`** (and `CONTRIBUTING.md` when the
   project takes contributors) — authored by offer, never clobbering sections
   another command owns.
-- Optionally, **rendered output** (e.g. PDF) under `docs/published/build/`,
-  produced by an environment-side tool the project chooses.
 
-Markdown is the deliverable; rendering is an opt-in, environment-side build.
+Markdown is the deliverable. Rendering or building the delivered docs is
+`/deployment-plan`'s job — it reads this command's delivery recipe + ledger and
+codes the render targets against whatever runtime exists at release time. This
+command owns no renderer.
 
 ### Arguments
 
@@ -66,8 +67,6 @@ Progressive disclosure — bare invocation handles the happy path.
   (regenerate or reconcile just that source).
 - `/write-documentation --audience "<role>"` — scope the proposed set to one
   audience.
-- `/write-documentation --render` — after authoring (or on an already-`ACTIVE`
-  current plan), render the doc set to the build dir.
 - `/write-documentation --new` — force Stage 1 (a fresh re-scoped plan) even if
   the current plan is `ACTIVE` and current. Rare.
 
@@ -132,8 +131,7 @@ markup and currency state signal readiness.
    - **Newest `ACTIVE`** → derive currency:
      - **CURRENT** (stamped movement/phase == current) → nothing to do. Report
        "documentation is current through movement `<id>` / phase `<id>`." If
-       `--doc` or `--render` was passed, do just that scoped work; `--new`
-       forces Stage 1.
+       `--doc` was passed, do just that scoped work; `--new` forces Stage 1.
      - **STALE, movement changed** → **Stage 1** (re-scope), `N = previous + 1`
        (the prior is superseded at Stage 2, once the new set is authored).
      - **STALE, same movement, phase advanced** → **Stage 2 reconcile**
@@ -337,10 +335,11 @@ manifest.
 State back a 4–6 bullet picture: the product type and how it's installed and
 run; the audiences you infer and why; the candidate doc set from the decision
 procedure (with anything you propose to *skip* and why — minimalism is
-visible); the product's voice/personality from PRODUCT_VISION; and the render
-toolchain (proposed or recorded). Ask Jamie to confirm or correct before you
-write the plan. Use `AskUserQuestion` for genuine forks (an ambiguous audience
-split, an uncertain product-type call).
+visible); the product's voice/personality from PRODUCT_VISION; and the
+**delivery recipe** you'll record — what well-delivered docs look like for this
+product type (researched or discovered at run time, not a fixed menu). Ask Jamie
+to confirm or correct before you write the plan. Use `AskUserQuestion` for
+genuine forks (an ambiguous audience split, an uncertain product-type call).
 
 ## Step S1.3: Write the manifest
 
@@ -357,7 +356,6 @@ status: AWAITING-APPROVAL
 documented-through:
   movement: <active PRD id, or "initial">
   phase: <latest completed phase in that movement, or "none">
-renderer: <unset, or the recorded command e.g. "pandoc --pdf-engine=typst">
 ---
 
 # Documentation Plan NNN — <project>
@@ -404,13 +402,28 @@ set. Mark each independently.
 <Matrix: feature (rows) × audience (columns); mark which audiences a feature
 is documented for. Features gated from an audience are not documented for it.>
 
-## Render configuration
+## Delivery recipe
 
-<The project's chosen render toolchain, or "unset". Records: tool + PDF
-engine, output path, whether build output is committed or gitignored, and the
-invocation. The template suggests `pandoc --pdf-engine=typst --toc`
-(cross-platform; typst is a single binary, no LaTeX) — but the choice is the
-project's; verify current versions before pinning (rule 10).>
+<What well-delivered docs look like *for this product* — the form the docs
+should reach their audiences in. This is for `/deployment-plan`, which owns the
+render/build: it reads this recipe and codes the targets against the runtime
+that exists at release time.
+
+Research or discover the product type at run time — from the specs, the
+implementation, and (when it's genuinely unclear) by asking the developer. Do
+**not** pick from a fixed menu; SaaS / downloadable zip / library are only
+illustrations of how delivery form follows product type:
+
+- a **SaaS / web app** → in-app or hosted HTML help, versioned with the app;
+- a **downloadable tool** → a README + quick-start that travel in the package,
+  maybe a single rendered document;
+- a **library / API** → a generated reference site next to the package.
+
+Describe *what* good delivery is here — the target forms, where they live, what
+ships in a release, whether build output is committed or gitignored. Name **no**
+toolchain, engine, or runtime: NFR-6 keeps the template runtime-free, and the
+*how* is `/deployment-plan`'s to code at build time. If the product type is
+still unsettled, say so and record what's known.>
 
 ## Release-readiness ledger
 
@@ -536,23 +549,7 @@ Edit the manifest (the file this command owns):
    was a re-scope (a new manifest number) and a prior manifest is still
    `ACTIVE`, flip the prior to `SUPERSEDED <date>` — newest governs.
 
-## Step S2.5: Render (only if requested)
-
-Skip unless `--render` was passed or Jamie asks. Read the manifest's render
-configuration. If it is `unset`, establish it with Jamie — propose
-`pandoc --pdf-engine=typst --toc` (verify current versions, rule 10), confirm
-the output path and whether build output is committed or gitignored, and
-record the choice in the manifest. Check the tools are on `PATH`; if not,
-refuse clearly, naming the tools and where to install them — do not partially
-render. Render the approved docs to the build dir; report what was written.
-
-Rendering is environment-side and opt-in; it never changes that markdown is
-the deliverable. This render recipe (the manifest's render-config) is the
-**single source of truth** for how this project renders docs — a release
-process such as `/deployment-plan` *references* this render rather than
-defining its own.
-
-## Step S2.6: Cross-doc surfacing, TODO, report
+## Step S2.5: Cross-doc surfacing, TODO, report
 
 - If this pass created a doc that ships in releases, surface a TODO:
   "`docs/DEPLOYMENT.md`'s shipped-artifacts list may need `<doc>` — that's
@@ -588,8 +585,6 @@ zero).
 - **`DEPLOYMENT.md` is absent or deployment is UNCONFIGURED.** Stub or skip
   install/ops sections; note them as pending the deployment plan; don't invent
   topology.
-- **The render tools aren't on `PATH`.** Refuse the render step, name the
-  tools and where to get them; leave the markdown sources intact.
 - **Frontmatter `status:` or `documented-through:` is unexpected**
   (hand-edited, missing). Surface and ask how to recover.
 - **A version needs pinning into a doc.** Flag it as possibly-stale, offer to
@@ -611,6 +606,8 @@ zero).
 - Does not clobber README sections owned by `/bootstrap` (Developer setup) or
   `/deployment-plan` (Deployment); it writes only the user-facing sections,
   by offer.
+- Does not render or build the delivered docs — it writes the markdown and a
+  product-type-aware delivery recipe; `/deployment-plan` owns the render/build.
 - Does not run a release or gate one — it maintains the release-readiness
   ledger; a release process consumes it.
 - Does not author doc sources in Stage 1 — the sign-off gate precedes the

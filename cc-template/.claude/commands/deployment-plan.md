@@ -20,6 +20,12 @@ and produces:
   one-paragraph summary and a link to `docs/DEPLOYMENT.md`.
 - A `DEPLOYMENT-PLAN-STATUS: COMPLETE <date>` (or `DEFERRED <date>`)
   flip in `CLAUDE.md`.
+- When a `docs/published/` documentation manifest exists, the
+  **documentation build** within `docs/DEPLOYMENT.md`: the render
+  targets — coded against this environment's runtime from
+  `/write-documentation`'s **delivery recipe** — plus a pre-release
+  doc-gate. `/deployment-plan` owns building the delivered docs;
+  `/write-documentation` owns the doc *content* and the recipe.
 
 This command is **deferrable**. Ideally it runs after some dev
 experience has accumulated — typically after Phase 0, or once dev
@@ -75,6 +81,10 @@ Load these in order:
    actually runs in dev
 6. `rules/environment-rules.md` — the project-specific section
    filled by `/bootstrap`
+7. `docs/published/documentation-plan-*.md` (newest), if it exists —
+   `/write-documentation`'s manifest. Its **delivery recipe** and
+   **release-readiness ledger** drive the documentation build and the
+   pre-release doc-gate (Step 5).
 
 If a non-stub `docs/DEPLOYMENT.md` already exists (re-run case),
 read it too and treat the existing structure as a starting point.
@@ -209,6 +219,30 @@ sections, in this order:
    auto-deploy where it applies, where manual gates exist.
 6. **Rollback** — procedure per environment, constraints (DB
    migrations etc.).
+7. **Documentation build** *(only when a `docs/published/`
+   documentation manifest exists)* — how the shipped docs are built
+   and gated at release time (see below).
+
+**Documentation build (Section 7).** Include this section only when
+`/write-documentation` has produced a `docs/published/` manifest.
+`/deployment-plan` **owns building the delivered docs** — there is no
+parallel render defined elsewhere. From the manifest's **delivery
+recipe** (it names the target *forms*, never a toolchain) and the
+runtime this deployment actually has, write:
+
+- **Render targets** — the concrete build commands that turn the
+  markdown sources into the delivered forms the recipe calls for (e.g.
+  an HTML help site, a PDF in the release bundle), coded against this
+  environment's runtime. The recipe prescribes no toolchain; you choose
+  and pin one here, verifying current versions per **Rule 10** before it
+  lands in the file.
+- **Where built docs ship** — the output path and whether built output
+  is committed, gitignored, or attached to the release artifact.
+- **Pre-release doc-gate** — the release does not proceed unless the
+  manifest is **CURRENT** (its `documented-through` matches the active
+  movement/phase), the ledger has **no OPEN conformance gaps**, and **no
+  required visual is unfilled**. A failing gate blocks the release and
+  routes back to `/write-documentation`.
 
 **If deferred:** write a single-page stub:
 
@@ -351,6 +385,11 @@ End with one of:
 - Does not modify `rules/environment-rules.md` — that's
   `/bootstrap`'s domain. If a deployment decision implies a
   change to dev environment, surface it; don't reach across.
+- Does not write documentation *content* or edit the
+  `docs/published/` manifest and sources — `/write-documentation`
+  owns those. `/deployment-plan` reads the delivery recipe + ledger
+  and owns only the *build* of the delivered docs and the pre-release
+  doc-gate (NFR-8 — one owner each).
 - Does not run any git commands (rule 7).
 - Does not run any tests (rule 8).
 - Does not push to remotes.
