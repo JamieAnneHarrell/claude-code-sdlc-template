@@ -577,44 +577,101 @@ refresh is quiet. This is the step that makes the reshaped
 
 ---
 
-## Phase 2.7 — Dogfood `/write-documentation` + close
+## Phase 2.7 — Dogfood `/write-documentation` (dogfood COMPLETE; close folded into Step 2.10)
 
-**Goal.** Run `/write-documentation` on this template, produce
-`docs/published/`, and close the write-documentation work.
+**Status (2026-06-26).** The dogfood ran — the template's own doc set was
+produced (manifest `documentation-plan-001` `ACTIVE` + audience-facing markdown
++ delivery recipe + ledger). Checkpoint 006 then reshaped the doc layout
+(`docs/published/` → audience-named folders; manifest → `docs/documentation-plans/`),
+so this phase's pending **NFR-6 dry-read + close fold into Step 2.10**, which
+runs the dry-read against the new `docs/user/` + `docs/maintainer/` layout. The
+deliverables / exit-criteria below are the original dogfood record.
 
-**Deliverables.** `docs/published/` for the template itself (numbered
-manifest + audience-facing markdown + delivery recipe + ledger);
-write-documentation work marked closed in the tracking docs.
+**Goal.** Run `/write-documentation` on this template, produce the
+audience-facing doc set, and close the write-documentation work.
+
+**Deliverables.** The template's own doc set (numbered manifest +
+audience-facing markdown + delivery recipe + ledger); write-documentation work
+marked closed in the tracking docs.
 
 **Exit criteria.** The manifest is `ACTIVE` and the markdown reads as
-audience-facing, with a product-type-open delivery recipe recorded.
-No build/render is produced — this project has no runtime and
-`/deployment-plan` is `UNCONFIGURED`; markdown is the deliverable. A
-sandbox dry-read confirms a consumer could use the output without the
-internal docs.
+audience-facing, with a product-type-open delivery recipe recorded. No
+build/render is produced — this project has no runtime and `/deployment-plan`
+is `UNCONFIGURED`; markdown is the deliverable. A sandbox dry-read confirms a
+consumer could use the output without the internal docs (now run in Step 2.10
+against the reshaped layout).
 
 ---
 
-## Phase 3 — Regression-test automation (roadmap)
+## Phase 2.8 — Reshape the `/write-documentation` skill spec (cc-template)
 
-**Goal.** Scripted check that diffs the current `cc-template/`
-dist against a tagged baseline and flags invariant-breaking
-changes — status comment renames, `ONBOARD-FILL` marker drift,
-zero-pad-width changes in `checkpoint-NNN` / `phase-NNN-exit`
-filenames, stage-detection placeholder text drift.
+**Goal.** Reshape the four skill files and add the documentation-guidance
+skeleton in `cc-template/`, per [checkpoint 006](design/design-review-checkpoint-006.md)
+(B1/B2/B3/R1 + R2-A1). Edited in `cc-template/` only; root propagates in Step 2.9.
+
+**Deliverables (in `cc-template/`).**
+- `.claude/commands/write-documentation.md`: Step-0 glob →
+  `docs/documentation-plans/`; read `docs/documentation-guidance.md` before
+  routing; audience-folder derivation rule (`docs/<audience-slug>/`, no
+  `docs/guides/`); the three Stage-2 modes incl. interactive **revise**; a
+  documentation-guidance subsection (FR-18) with the downstream-of-behavior
+  strategic boundary; an "After Stage 2 — who owns the docs / how to iterate"
+  section.
+- `.claude/commands/deployment-plan.md` / `wind-down.md` / `onboard.md`:
+  manifest glob → `docs/documentation-plans/`; doc-source refs → audience
+  folders; `wind-down` gains guidance capture + retirement; `onboard` gains the
+  guidance-skeleton seeding + skeleton-overwrite-safe entry.
+- `docs/documentation-guidance.md`: new shipped skeleton (purpose header +
+  entry format + legend; no entries).
+
+**Exit criteria.** The four skill files + skeleton edited in `cc-template/`;
+ownership stays non-overlapping (NFR-8); root copies stay the old shape until
+Step 2.9 propagates.
+
+---
+
+## Phase 2.9 — Propagate to root + root invariants
+
+**Goal.** Land Step 2.8's command changes at root via the source-mode refresh,
+then update the root `CLAUDE.md` invariants (source-only; not refreshed).
 
 **Deliverables.**
-- A small source-only script (`scripts/regression-check.ps1` or
-  equivalent) that runs diff against a tagged baseline.
-- A baseline tag in git history (e.g. `dist-baseline-v0.1`).
-- Documentation in root `CLAUDE.md` Testing section: how to run
-  the check before tagging a new dist release.
+- `/refresh-from-repository` (source mode, review-before-apply) propagates the
+  four reshaped skill files + the skeleton to root; a second refresh verifies
+  quiet.
+- Root `CLAUDE.md` Load-bearing invariants: the `/write-documentation` lifecycle
+  block (glob, guidance-store bullet, audience-folder bullet, three Stage-2
+  modes), the Cross-cutting filename block (manifest path; `documentation-guidance.md`
+  durable-global, NOT in the zero-pad-N list), and the File-ownership list
+  (`/onboard` creates guidance; `/wind-down` captures; `/write-documentation`
+  reads/applies).
 
-**Exit criteria.** Running the check against the current dist
-exits 0; intentionally breaking an invariant (e.g. renaming
-`ONBOARD-STATUS` to `ONBOARD_STATUS`) causes the check to exit
-non-zero and report the violation. Specifics still TBD until a
-real regression motivates the work.
+**Exit criteria.** Root commands match `cc-template/`; the second refresh is
+quiet; the root invariants reflect the reshape.
+
+---
+
+## Phase 2.10 — Migrate live docs + reconcile + close
+
+**Goal.** Migrate this project's existing `docs/published/` set to the audience
+layout, create the guidance file, reconcile the now-stale docs, and close the
+write-documentation work — absorbing Phase 2.7's pending NFR-6 dry-read.
+
+**Deliverables.**
+- `git mv` `docs/published/` → `docs/user/` + `docs/maintainer/` +
+  `docs/documentation-plans/`; create `docs/documentation-guidance.md` (the
+  skeleton, as `/onboard` would).
+- Re-stamp `documentation-plan-001` (paths + an authoring-log migration row);
+  fix relative links + the root `README.md` links.
+- A `/write-documentation` **reconciliation** pass refreshing the migrated docs
+  (incl. the content-stale command-docs, N1) to the reshaped skill behavior +
+  phase/step terminology (R3/R4/N1 caveat).
+- NFR-6 sandbox dry-read against the new `docs/user/` + `docs/maintainer/`
+  layout; mark the write-documentation work closed in the tracking docs.
+
+**Exit criteria.** No `docs/published/` references remain (except the frozen
+`design-review-checkpoint-005.md`); the audience layout reads as audience-facing;
+the dry-read confirms a consumer could use it without the internal docs.
 
 ---
 

@@ -988,6 +988,90 @@ phase, or does it stay currency-driven/opt-in? Should `/design-review`
 gain a "documentation planned?" checklist item? How does any of this
 avoid re-prescribing a doc structure?
 
+#### Document the out-of-band "in-movement enhancement" lane (plan → /design-review → decompose → wind-down)
+
+*Context.* Not every non-trivial change is a movement. This session reshaped
+`/write-documentation` (audience folders, manifest relocation, guidance store) —
+bigger than a tactical bug fix, smaller than a movement — without
+`/product-visioning`. The working flow that emerged: a plan-mode design session
+settles the design; `/design-review` opens a checkpoint that ratifies it and (on
+land) decomposes it into new `PROJECT_PLAN` phases + `CLAUDE_CODE_PROMPTS`
+prompts *within the current movement*; then implementation + `/wind-down`. This
+is a third lane beside the two CLAUDE.md names ("movement" = `/product-visioning`
+→ PRD → `/onboard` → `/design-review`; "tactical" = bug fix / cleanup, no PRD).
+It's undocumented, so it gets re-derived each time — this session re-derived it
+with a wrong turn through `/product-visioning` first. Surfaced 2026-06-26.
+
+*Proposed approach.* Document the lane: same-session plan → `/design-review`
+(Stage 1 findings carry the settled design as recommendations; Stage 2 land
+writes the phases + prompts) → implement → `/wind-down`. Name when it applies (a
+feature/fix too large to inline but not a new movement; touches
+REQUIREMENTS/ARCHITECTURE/invariants). Codify in CLAUDE.md's "Movement vs.
+tactical" framing (→ "Movement vs. in-movement enhancement vs. tactical") and
+surface it in the user-facing SDLC docs so adopters know the lane exists.
+
+*Open sub-questions.* Does this need any new skill affordance, or is it purely
+documenting existing skills composing? Should `/design-review` note that
+"ratify-and-decompose a planned reshape" is a valid trigger (distinct from
+"review an existing design for problems")? Is the checkpoint the durable record,
+or does the ephemeral plan-file artifact need a durable home?
+
+#### Backlog-cleanup /design-review near the end of a large phase or a movement
+
+*Context.* Movements and major phases accumulate user stories and open questions
+over their life (this session alone added several). Without a deliberate triage
+point the backlog grows unbounded and stale items linger. Surfaced 2026-06-26.
+
+*Proposed approach.* Plans should include a **backlog-cleanup `/design-review`**
+toward the end of a very large phase and at the end of a movement: a checkpoint
+whose findings walk the accumulated `open-questions.md` Deferred User Stories /
+Open Questions, dispositioning each (promote to a phase/movement, keep deferred,
+or drop). Codify it as a convention `/onboard` plants when it decomposes a
+movement (a checkpoint marker near the movement's end) and/or a `/wind-down`
+movement-complete menu item.
+
+*Open sub-questions.* A `/design-review` trigger type, or a lighter dedicated
+ritual? At what size does a "very large phase" warrant its own backlog review vs.
+waiting for movement end? Does the backlog review edit `open-questions.md`
+directly (currently `/wind-down`-captured) or surface dispositions for
+`/wind-down` to apply? This story is itself a candidate for the first such
+review.
+
+#### Regression-test automation — declassified from Phase 3
+
+*Context.* A scripted check that diffs the current `cc-template/` dist against a
+tagged baseline and flags invariant-breaking changes (status-comment renames,
+`ONBOARD-FILL` marker drift, zero-pad-width changes in `checkpoint-NNN` /
+`phase-NNN-exit` filenames, stage-detection placeholder drift). Was Phase 3 /
+Prompt 3; checkpoint 006 R5 declassified it — it does not belong to this movement
+and isn't motivated by a real regression yet. FR-16 now frames it as an
+unscheduled candidate. Surfaced 2026-06-26.
+
+*Proposed approach.* A small source-only script (`scripts/regression-check.ps1`
+or equivalent) + a baseline git tag (e.g. `dist-baseline-v0.1`) + a root-`CLAUDE.md`
+note on when to run it (before tagging a dist release). Detect / report /
+exit-nonzero; never auto-fix. Pull into a movement when a real regression
+motivates the work.
+
+*Open sub-questions.* CI vs local-only before a dist release? Cross-platform
+(PowerShell vs bash vs a both-OK tool)?
+
+#### Document the file-lifecycle patterns in the user-facing SDLC docs
+
+*Context.* Checkpoint 006 R3 recorded the three file-lifecycle patterns
+(durable-global / movement-archived / numbered-artifact) as internal rationale in
+`design-decisions.md` + `ARCHITECTURE.md`. The patterns are also user-facing — a
+consumer needs to know which of their files archive on a movement and which stay
+durable. That write-up is out of scope for the current movement. Surfaced
+2026-06-26.
+
+*Proposed approach.* A future `/write-documentation` pass adds the patterns to
+the user-facing SDLC docs (lifecycle / maintainer track), in the audience-named
+layout. No action this movement beyond recording the story.
+
+*Open sub-questions.* Which audience track — user, maintainer, or both? Folded
+into the lifecycle doc or stand-alone?
+
 ---
 
 ### Abandoned Approaches
@@ -1158,4 +1242,39 @@ behavioral guardrail earns its place preemptively as cheap insurance
 against a foreseeable mistake. If it lands, the natural home is
 `CLAUDE.md` § Load-bearing invariants as a single tripwire line, not
 an encoding block.
+
+#### Internal project manifest — record the purpose of internal artifacts so sessions stop thrashing the directory tree
+
+*Context.* Planning and design-review sessions repeatedly thrash the directory
+structure to locate internal artifacts (e.g. `find … -type d -name "*plan*"`),
+re-deriving what each `-NNN.md` file and folder is for. Should the repo carry an
+internal manifest recording the *purpose* of internal artifacts (design-review
+checkpoints, documentation plans, test plans, PRDs, project-plan archives — not
+user-facing docs), so a session reads intent instead of globbing? And if so, what
+skill owns it without violating NFR-8 (file-ownership non-overlap)? Surfaced
+2026-06-26.
+
+*What we know so far.* There's a working precedent — `docs/design/REVIEWS.md` is
+a one-line-per-checkpoint index owned by `/design-review`. Three shapes:
+- **(A) Generalize the per-folder-index pattern (leading).** Each artifact folder
+  carries its own index, owned by the skill that owns the folder: `REVIEWS.md`
+  (`/design-review`) already does checkpoints; add equivalents for `docs/test-plans/`
+  (`/exit-test-plan`), `docs/documentation-plans/` (`/write-documentation`),
+  `docs/project-plans/` (`/onboard`). No single cross-owned file; NFR-8 preserved;
+  each index updates as a natural step of its owning skill. Cost: a session still
+  opens several indexes — but they're predictable and named.
+- **(B) One `docs/MANIFEST.md` maintained by `/wind-down`'s coherence sweep.** A
+  single registry of every internal artifact + its purpose, reconciled each
+  session by the one skill that already runs a repo-wide coherence sweep. Single
+  file to read, single owner. Cost: it must be kept coherent with reality (drift
+  risk) and centralizes knowledge the folders/naming already half-encode.
+- **(C) Do nothing.** The zero-padded-NNN naming + purpose-named folders +
+  per-file frontmatter already encode most intent; the "thrash" is a search-habit
+  issue (glob the conventions, don't hunt). The KISS default.
+
+*What would unblock an answer.* A decision on whether the recurring thrash is
+costly enough to warrant maintained indexes (A/B) over the existing conventions
+(C). If yes, **A** fits the established ownership model with least drift; **B**
+trades drift risk for single-file convenience. Worth pairing with the
+backlog-cleanup-review story above, which would consume such an index.
 

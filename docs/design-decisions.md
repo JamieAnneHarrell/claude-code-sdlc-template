@@ -1270,32 +1270,95 @@ the primary `/write-documentation` → `/deployment-plan` handoff signal.
 
 ---
 
-## This project's audience-facing docs: `docs/published/` canonical, both READMEs managed by `/write-documentation`
+## This project's audience-facing docs: audience-named folders, separated manifest, `/write-documentation`-managed READMEs
 
-**Decision.** Dogfooding `/write-documentation` on the template
-(`documentation-plan-001`, movement `initial`, 2026-06-25) set this project's doc
-architecture: `docs/published/` holds the canonical, detailed audience-facing set
-(adopter + maintainer tracks, including the per-command reference and the
-end-to-end lifecycle doc), and **both** the root `README.md` and the shipping
+**Decision.** `/write-documentation` writes this project's audience-facing docs
+into **audience-named folders** (`docs/user/`, `docs/maintainer/`) — derived
+per-doc from its Primary audience — with the numbered plan separated into
+`docs/documentation-plans/` and a durable `docs/documentation-guidance.md` store
+holding standing doc directives. **Both** the root `README.md` and the shipping
 `cc-template/README.md` are managed by `/write-documentation` as orientation /
-routing surfaces. `/write-documentation` is the freshness gate on both READMEs
-even though `/wind-down` may also edit them. Delivering the source-only
-`docs/published/` set to adopters is deferred to `/deployment-plan`.
+routing surfaces (it is the freshness gate on both, even though `/wind-down` may
+also edit them). Delivering the source-only doc set to adopters is deferred to
+`/deployment-plan`. (Reshaped from the original single `docs/published/` bucket
+by checkpoint 006.)
 
-**Why.** The command's authoring home (`docs/published/`) is source-only (FR-12)
-and never copies into `cc-template/`, while the surface that travels to adopters
-is `cc-template/README.md`. Separating "canonical authored set" (authored and
-freshness-gated in one place) from "what ships" (a `/deployment-plan` concern)
-lets the depth live somewhere stable without forcing a delivery decision before
-one is needed.
+**Why.** "Published" implied packaging the skill doesn't do, and a single bucket
+gave a multi-audience product no filing signal while mixing the planning artifact
+with its subject. Audience-named folders match the repo's purpose/audience-named
+convention; the separated `docs/documentation-plans/` mirrors `docs/test-plans/`
+/ `docs/project-plans/`; the durable guidance store gives standing doc directives
+a home that survives across numbered plans.
+
+**Why not keep the single `docs/published/` bucket.** It reads as "packaged for
+distribution," is incoherent with the other purpose/audience-named doc folders,
+and gives no per-audience filing signal — the three dogfood rough edges.
 
 **Why not author the adopter docs directly in `cc-template/`.** `cc-template/`
-travels without `docs/published/`, and `cc-template/README.md` is rewritten by
+travels without the doc set, and `cc-template/README.md` is rewritten by
 `/onboard` the moment a project is seeded — so it can't host the canonical set
 and can't relative-link into it without the links breaking on seed.
 
-**Scope note.** Fulfils the former "Dedicated end-to-end command-lifecycle doc"
-deferred story (now `docs/published/lifecycle.md`). Two delivery questions remain
-open for `/deployment-plan` — see `open-questions.md` § Open Questions. The stale
-"lifecycle is two commands" line in the frozen `cc-template-product-spec.md`
-intake is left as history.
+**Scope note.** Implemented by Steps 2.8–2.10 (checkpoint 006). The authoring
+home is source-only (FR-12). Two delivery questions remain open for
+`/deployment-plan` — see `open-questions.md` § Open Questions. The file-lifecycle
+patterns and the downstream-of-behavior principle this introduces are recorded
+separately below.
+
+---
+
+## File-lifecycle patterns: durable-global vs movement-archived vs numbered-artifact
+
+**Decision.** Project files follow one of three lifecycle patterns: (1)
+**durable-global, reconciled in place** — `design-decisions.md`,
+`open-questions.md`, `documentation-guidance.md`; accumulate or stay current,
+never archived per movement; (2) **movement-scoped, archived on movement open**
+— `PROJECT_PLAN.md`, `CLAUDE_CODE_PROMPTS.md` → `docs/project-plans/`; (3)
+**numbered artifacts** — PRDs, design-review checkpoints, test-plans,
+documentation-plans; newest / per-key governs, priors `SUPERSEDED` / `LANDED`,
+never deleted.
+
+**Why.** Siting `documentation-guidance.md` raised "where does this kind of file
+go, and does it archive on a new movement?" with no written answer. Naming the
+patterns gives the next such question a home: durable-global is for current truth
+that must survive every movement (so it must not be copy-pasted into each
+numbered plan); movement-archived is for per-movement working docs; numbered is
+the append-only artifact log.
+
+**Why not make `documentation-guidance.md` movement-scoped.** Standing doc
+directives must survive across documentation plans; trapping them in a
+per-movement file would force copy-paste into each new one — the exact problem
+the durable-global store removes.
+
+**Scope note.** The structural list lives in `ARCHITECTURE.md` § File-lifecycle
+patterns; this entry is the *why*. From checkpoint 006 R3.
+
+---
+
+## Documentation is downstream of behavior
+
+**Decision.** Documentation reflects behavior that has already landed; it never
+drives a behavior change or opens a movement. A documentation request (reframe /
+re-emphasis) is handled by `/write-documentation` revise mode + a
+`documentation-guidance.md` directive. A request that actually needs a behavior
+change is redirected to the behavior process (an in-movement enhancement: plan →
+`/design-review` → decompose), and docs reconcile *after* that behavior lands.
+New movements arise only at a finished movement's end via `/product-visioning`.
+The guidance store never writes `PRODUCT_VISION.md`.
+
+**Why.** Documentation gates deployment — a doc reframe can't precede the
+behavior it documents. Treating doc-feedback as a product-decision backdoor, or
+routing it to `/product-visioning`, mis-orders the pipeline and over-routes the
+common case (a doc emphasis reframe is a revise-mode session, not a movement).
+Anchoring on "downstream of behavior" keeps the lightweight path lightweight and
+reserves `/product-visioning` for genuinely new movements.
+
+**Why not route strategic doc-feedback to `/product-visioning`** (checkpoint 006
+R2, rejected). `/product-visioning` is exclusively for planning a new movement /
+writing a new PRD; a mid-movement product/feature addition (e.g. promoting
+`/product-visioning` as the new-project entry point) is an in-movement
+enhancement, and its documentation follows after the behavior lands — neither is
+a `/product-visioning` trigger.
+
+**Scope note.** Encoded in FR-18 and the `/write-documentation` revise-mode spec
+(Steps 2.8–2.10). From checkpoint 006 R2-A1.

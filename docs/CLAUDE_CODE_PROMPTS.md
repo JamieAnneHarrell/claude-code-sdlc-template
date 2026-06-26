@@ -951,55 +951,114 @@ copies follow in Phase 2.6):
 
 ---
 
-## Prompt 3: Regression-test automation
+## Prompt 2.8: Reshape the `/write-documentation` skill spec (cc-template)
 
 **Read first.**
-- [`docs/REQUIREMENTS.md`](REQUIREMENTS.md) FR-16
-- [`docs/PROJECT_PLAN.md`](PROJECT_PLAN.md) Phase 3
-- Root [`CLAUDE.md`](../CLAUDE.md) "Load-bearing invariants"
-  section — the script's job is to detect drift in exactly these.
-- [`rules/environment-rules.md`](../rules/environment-rules.md)
-  "Project-specific environment" section — tooling for the script
-  has to be consistent with what's documented there.
+- [`docs/design/design-review-checkpoint-006.md`](design/design-review-checkpoint-006.md)
+  — the reshape's findings + dispositions (B1/B2/B3/R1/R2-A1).
+- [`docs/PROJECT_PLAN.md`](PROJECT_PLAN.md) Phase 2.8.
+- [`docs/REQUIREMENTS.md`](REQUIREMENTS.md) FR-14, FR-18.
 
-**Scope.**
-1. Pick a baseline tag. Likely `dist-baseline-v0.1` capturing the
-   current `cc-template/` state immediately after Phase 1's
-   onboarding closes.
-2. Author a small source-only script
-   (`scripts/regression-check.ps1` or equivalent) that diffs
-   current `cc-template/` against the baseline tag and flags:
-   - Status comment renames (`ONBOARD-STATUS` → anything else)
-   - `ONBOARD-FILL` marker drift
-   - Zero-pad-width changes in `checkpoint-NNN` /
-     `phase-NNN-exit` filenames or globs
-   - Stage-detection placeholder text drift (`[PENDING]`,
-     `> _[UNMARKED — ...]_`)
-3. Document the check in root `CLAUDE.md` "Testing template
-   changes" section as level 4 above the manual walkthrough.
-4. Decide whether the script runs in CI or only locally before
-   tagging a new dist release. (Open question until Phase 3
-   starts — see PROJECT_PLAN.md scope note.)
+**Scope.** Edit in `cc-template/` only (root propagates in Step 2.9):
+1. `.claude/commands/write-documentation.md` — Step-0 glob →
+   `docs/documentation-plans/`; read `docs/documentation-guidance.md` before
+   routing; add the audience-folder derivation rule (`docs/<audience-slug>/`,
+   slug per the voice-profile audiences, no `docs/guides/`); add the three
+   Stage-2 modes incl. interactive **revise**; add the documentation-guidance
+   subsection (FR-18, downstream-of-behavior boundary); add the "After Stage 2 —
+   who owns the docs / how to iterate" section.
+2. `.claude/commands/deployment-plan.md`, `wind-down.md`, `onboard.md` — manifest
+   glob → `docs/documentation-plans/`; doc-source refs → audience folders;
+   `wind-down` gains guidance capture + retirement; `onboard` gains the
+   `docs/documentation-guidance.md` skeleton seeding + skeleton-overwrite-safe
+   entry.
+3. `cc-template/docs/documentation-guidance.md` — new shipped skeleton (purpose
+   header + entry format + legend; no entries).
 
 **Constraints (what NOT to do).**
-- Do NOT introduce a language runtime as a hard requirement —
-  PowerShell is acceptable as it's the documented shell; pure
-  bash is acceptable as Linux is supported; cross-platform either
-  via parallel scripts or a tool that works on both.
-- Do NOT extend the script to fix violations automatically.
-  Detect, report, exit non-zero — let humans decide what to do.
+- Do NOT edit the root copies — Step 2.9's source-mode refresh propagates them.
+- Do NOT move the render/build boundary (checkpoint 005): `/write-documentation`
+  writes markdown + delivery recipe; `/deployment-plan` builds.
+- Keep the DOC DECISION placeholder string unchanged (NFR-4 stage detection).
 
 **Exit criteria.**
-- Running the check against current dist exits 0.
-- Intentionally introducing each violation in a sandbox copy
-  causes the check to exit non-zero with a clear message naming
-  the violation.
-- Documentation in root `CLAUDE.md` describes when to run it
-  (before tagging a new dist release, at minimum).
+- The four skill files + the skeleton are edited in `cc-template/`.
+- The DOC DECISION placeholder is intact; ownership stays non-overlapping (NFR-8).
 
 **Revisions since this prompt ran:**
 
-- 2026-05-26 — Removed "Before running this prompt" header-block
-  per checkpoint 002 R5 (retire the gate-assertion/next-session-
-  reminder conflated pattern; rely on PROJECT_PLAN.md first-class
-  checkpoint entries instead).
+- (none yet)
+
+---
+
+## Prompt 2.9: Propagate to root + root invariants
+
+**Read first.**
+- [`.claude/commands/refresh-from-repository.md`](../.claude/commands/refresh-from-repository.md)
+  — source-mode behavior.
+- [`docs/PROJECT_PLAN.md`](PROJECT_PLAN.md) Phase 2.9.
+- Root [`CLAUDE.md`](../CLAUDE.md) "Load-bearing invariants" — the
+  `/write-documentation` block, Cross-cutting filename block, File-ownership list.
+
+**Scope.**
+1. Run `/refresh-from-repository` (source mode, review-before-apply) to propagate
+   Step 2.8's reshaped skill files + the skeleton from `cc-template/` to root;
+   run a second refresh and confirm it is quiet.
+2. Update the root `CLAUDE.md` Load-bearing invariants (source-only; not
+   refreshed): the `/write-documentation` lifecycle block (glob, guidance-store
+   bullet, audience-folder bullet, three Stage-2 modes), the Cross-cutting
+   filename block (manifest path; `documentation-guidance.md` durable-global, not
+   zero-pad-N), the File-ownership list (`/onboard` creates guidance; `/wind-down`
+   captures; `/write-documentation` reads/applies).
+
+**Constraints (what NOT to do).**
+- Do NOT hand-copy the command files — the source-mode refresh IS the propagation.
+- Do NOT add a `cc-template/CLAUDE.md` invariant block — it carries no parallel
+  Load-bearing-invariants section.
+
+**Exit criteria.**
+- Root `.claude/commands/` copies match `cc-template/`; the second refresh is quiet.
+- The root invariants reflect the reshape.
+
+**Revisions since this prompt ran:**
+
+- (none yet)
+
+---
+
+## Prompt 2.10: Migrate live docs + reconcile + close
+
+**Read first.**
+- [`.claude/commands/write-documentation.md`](../.claude/commands/write-documentation.md)
+  — reshaped at root via Step 2.9 (reconcile + revise modes).
+- [`docs/PROJECT_PLAN.md`](PROJECT_PLAN.md) Phase 2.10 + Phase 2.7.
+- [`docs/design/design-review-checkpoint-006.md`](design/design-review-checkpoint-006.md)
+  Disposition log (R3/R4/N1 reconciliation caveat).
+
+**Scope.**
+1. `git mv` `docs/published/` → `docs/user/` + `docs/maintainer/` +
+   `docs/documentation-plans/` per each doc's Primary audience; remove the empty
+   `docs/published/`. Create `docs/documentation-guidance.md` (the skeleton).
+2. Re-stamp `documentation-plan-001` (paths + an authoring-log migration row);
+   fix intra-doc relative links and the root `README.md` links.
+3. Run a `/write-documentation` **reconciliation** pass to refresh the migrated
+   docs (incl. the content-stale command-docs) to the reshaped skill behavior +
+   phase/step terminology.
+4. NFR-6 sandbox dry-read against the new `docs/user/` + `docs/maintainer/`
+   layout; mark the write-documentation work closed in `PROJECT_PLAN.md` (Phase
+   2.7 + 2.8–2.10) and this file.
+
+**Constraints (what NOT to do).**
+- Do NOT build/render — markdown is the deliverable; `/deployment-plan` is
+  `UNCONFIGURED` (rule 8 / NFR-6).
+- Do NOT leave any `docs/published/` reference except the frozen
+  `design-review-checkpoint-005.md`.
+
+**Exit criteria.**
+- No stray `docs/published/` references; the audience layout reads as
+  audience-facing.
+- The dry-read confirms a consumer could use it without the internal docs.
+
+**Revisions since this prompt ran:**
+
+- (none yet)

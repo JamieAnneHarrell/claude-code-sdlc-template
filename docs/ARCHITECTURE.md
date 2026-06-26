@@ -47,7 +47,9 @@ claude-code-sdlc-template/                ← repo root (source-of-truth)
 │   ├── design/                           ← design intake + /design-review checkpoints + PRD-<slug>-NNN.md movement PRDs
 │   ├── project-plans/                    ← archived movement plans + prompts (created when a 2nd movement opens)
 │   ├── test-plans/                       ← /exit-test-plan artifacts (created on demand)
-│   └── published/                        ← /write-documentation sources + manifest (created on demand)
+│   ├── documentation-plans/             ← /write-documentation manifests (created on demand)
+│   ├── documentation-guidance.md        ← durable-global doc-guidance store (current-truth)
+│   └── <audience>/                       ← /write-documentation sources by audience: user/, maintainer/, … (created on demand)
 ├── .claude/commands/                     ← live commands the source uses on itself
 └── cc-template/                          ← THE DISTRIBUTABLE
     ├── CLAUDE.md                         ← new-project session-start (with status comments)
@@ -85,8 +87,10 @@ claude-code-sdlc-template/                ← repo root (source-of-truth)
   exist)
 - `docs/test-plans/` (this project's `/exit-test-plan` artifacts
   when they exist)
-- `docs/published/` (this project's `/write-documentation` sources,
-  images, and documentation-plan manifest when they exist)
+- `docs/<audience>/` (this project's `/write-documentation` sources +
+  images by audience — e.g. `docs/user/`, `docs/maintainer/` — when they
+  exist), `docs/documentation-plans/` (the numbered manifests), and
+  `docs/documentation-guidance.md` (the durable-global doc-guidance store)
 - `docs/design-decisions.md`, `docs/open-questions.md`
 - `README.md` at repo root (the "this is the source-of-truth"
   README)
@@ -192,9 +196,10 @@ refresh and upstream's is handled separately by the command file's
 - `docs/project-plans/project-plan-NNN.md` +
   `docs/project-plans/claude-code-prompts-NNN.md` — the archived
   (landed) movement plan + prompts, same pad width.
-- `docs/published/documentation-plan-NNN.md` — the numbered
+- `docs/documentation-plans/documentation-plan-NNN.md` — the numbered
   `/write-documentation` plan (manifest); newest governs. Same pad
-  width; its own counter (not the movement counter).
+  width; its own counter (not the movement counter). The doc sources it
+  governs live under audience-named folders (`docs/<audience-slug>/`).
 
 Pad width is fixed at 3 so files sort lexicographically as numeric
 order through 999. PRD and plan-archive share one **movement
@@ -204,6 +209,20 @@ documentation-plan counter is independent (it advances on a doc-set
 re-scope, not on a movement). Multiple commands (`/design-review`,
 `/exit-test-plan`, `/product-visioning`, `/wind-down`,
 `/write-documentation`) depend on these glob shapes.
+
+### File-lifecycle patterns
+
+Three patterns govern where project files live and whether they archive on a
+new movement (rationale in [`design-decisions.md`](design-decisions.md)):
+
+- **Durable-global, reconciled in place** — `design-decisions.md`,
+  `open-questions.md`, `documentation-guidance.md`. Accumulate / are kept
+  current; **never archived** per movement.
+- **Movement-scoped, archived on movement open** — `PROJECT_PLAN.md`,
+  `CLAUDE_CODE_PROMPTS.md` → `docs/project-plans/`.
+- **Numbered artifacts** — PRDs, design-review checkpoints, test-plans,
+  documentation-plans; newest / per-key governs, priors `SUPERSEDED` /
+  `LANDED`, never deleted.
 
 ### Stage-detection placeholders
 
@@ -252,7 +271,7 @@ detection.
   and the foreclosure-watch enablers. Written by `/onboard`, which applies
   each PRD's proposed vision revisions when it decomposes.
 
-`docs/published/documentation-plan-NNN.md` (`/write-documentation`):
+`docs/documentation-plans/documentation-plan-NNN.md` (`/write-documentation`):
 - Frontmatter `documentation-plan` / `project` / `created` /
   `status: AWAITING-APPROVAL | ACTIVE | SUPERSEDED <date>` (newest governs) /
   `documented-through` (a `{ movement, phase }` tuple).
@@ -260,10 +279,25 @@ detection.
   audience×feature matrix, a product-type-aware **delivery recipe** (consumed by
   `/deployment-plan`, which owns the render/build), a release-readiness ledger
   (stale / unfilled visual / conformance gap), and an append-only authoring
-  log. Markdown sources + `images/` live alongside under `docs/published/`.
+  log (rounds: Original / Reconcile N / Revise N). Markdown sources + `images/`
+  live under audience-named folders (`docs/<audience-slug>/`, e.g. `docs/user/`,
+  `docs/maintainer/`), keyed by each doc's recorded Primary audience.
 - Currency is **movement-aware**: a re-run is STALE when the active movement
   differs from `documented-through.movement`, or a later phase shipped in the
   same movement (phase numbers compared only within one movement).
+
+`docs/documentation-guidance.md` (`/write-documentation` reads; `/onboard`
+creates; `/wind-down` captures):
+- A durable-global, no-frontmatter, **current-truth** store of standing
+  documentation directives, parallel to `design-decisions.md` /
+  `open-questions.md`. Binding doctrine on every authoring / reconcile / revise
+  pass. Superseded entries are removed (not archived); the *why* of a change
+  becomes a `design-decisions.md` entry. No per-entry status markers.
+- The strategic boundary is **downstream-of-behavior**: documentation reflects
+  what has already landed — doc-feedback routes to revise mode + a guidance
+  directive; a request that needs a behavior change is redirected to the
+  in-movement lane and docs reconcile *after* it lands; the store never opens a
+  movement or writes `PRODUCT_VISION.md` (FR-18).
 
 ### `PROJECT_PLAN` movement header & phase-status token
 
@@ -277,6 +311,10 @@ detection.
   it to detect a fully-landed movement (every non-roadmap phase
   `(COMPLETE)`, ignoring `(roadmap)` / `(SUPERSEDED …)`). Don't rename
   the token without auditing `/wind-down` and `/design-review`.
+- **Phase vs. step terminology:** a *phase* is a top-level integer (Phase 1,
+  Phase 2, Phase 3); a *step* is a dot-numbered entry within a phase (2.7, 2.8).
+  The plan currently labels dot-numbered entries "Phase 2.x"; "Phase 2.x" and
+  "Step 2.x" are used interchangeably for now (checkpoint 006 R4).
 
 ## Runtime / data flow
 

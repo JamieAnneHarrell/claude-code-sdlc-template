@@ -159,12 +159,17 @@ project to document itself and by downstream consumers to document their
 products. It is a *reasoning* command. Stage 1 surveys the project (internal
 docs **and** the real implementation), infers the product type and audiences,
 and writes a numbered sign-off manifest
-`docs/published/documentation-plan-NNN.md` (status
-`AWAITING-APPROVAL` → `ACTIVE` → `SUPERSEDED`, newest governs). Stage 2 authors
-or reconciles the markdown sources under `docs/published/` (the user-facing
-README sections, quick-start, guides, reference, troubleshooting) applying an
-embedded documentation-craft doctrine (Diátaxis modes; per-audience voice
-profiles; CLI-reference, readability, and anti-pattern rules). Markdown is the
+`docs/documentation-plans/documentation-plan-NNN.md` (status
+`AWAITING-APPROVAL` → `ACTIVE` → `SUPERSEDED`, newest governs). Stage 2 has three
+non-gated modes — **author** (the approved set), **reconcile** (mechanical
+doc-rot refresh on a same-movement phase advance), and **revise** (an interactive
+natural-language pass that applies a themed change across the affected docs) —
+writing the markdown sources under audience-named folders (`docs/<audience-slug>/`,
+e.g. `docs/user/`, `docs/maintainer/`; the user-facing README sections,
+quick-start, guides, reference, troubleshooting) applying an embedded
+documentation-craft doctrine (Diátaxis modes; per-audience voice profiles;
+CLI-reference, readability, and anti-pattern rules). Stage 1's plan-set sign-off
+(the DOC DECISION markup on the manifest) is unchanged. Markdown is the
 deliverable. `/write-documentation` owns *writing* — the markdown sources, a
 product-type-aware **delivery recipe** (what well-delivered docs look like for
 this product; it researches or discovers the product type at run time, not from
@@ -191,12 +196,14 @@ can continue. Blocked items remain in the record as blocked at the
 time; the blocked component is re-tested in the next plan
 addendum.
 
-**FR-16: Regression-test automation is a Phase 3 deliverable.** A
+**FR-16: Regression-test automation is an unscheduled candidate.** A
 scripted check that diffs the current `cc-template/` dist against
 a tagged baseline and flags invariant-breaking changes (status
 comment renames, `ONBOARD-FILL` marker drift, zero-pad-width
-changes in `checkpoint-NNN` / `phase-NNN-exit` filenames).
-Specifics deferred until a real regression motivates the work.
+changes in `checkpoint-NNN` / `phase-NNN-exit` filenames). Not
+attached to a planned phase — declassified to a Deferred User Story
+in `docs/open-questions.md` (checkpoint 006 R5); pull it into a
+movement when a real regression motivates the work.
 
 **FR-17: `/product-visioning` is an interactive session that produces the
 next PRD.** First PRD or n-th, its single output is a stand-alone `DRAFT`
@@ -206,6 +213,26 @@ Routing happens in dialogue (no inline mark-up step). It never edits
 `PRODUCT_VISION.md`, `PROJECT_PLAN.md`, `CLAUDE_CODE_PROMPTS.md`, or other
 docs — `/onboard` decomposes the PRD (FR-3), which is what writes those and
 flips the PRD to `ACTIVE`.
+
+**FR-18: `/write-documentation` keeps a durable documentation-guidance store.**
+`docs/documentation-guidance.md` is a durable-global, no-frontmatter,
+current-truth file (parallel to `docs/design-decisions.md` /
+`docs/open-questions.md`): standing directives for how this project's docs should
+read, binding on every authoring / reconcile / revise pass. Superseded guidance
+is removed (the notable *why* of a change becomes a `design-decisions.md` entry);
+it is never archived per movement and carries no per-entry status markers.
+Ownership preserves NFR-8: **`/onboard` creates it** from a template-shipped
+skeleton (as it does the other two durable-global files); **`/wind-down` captures
+and retires** entries; **`/write-documentation` only reads** it (binding
+doctrine) and applies it. **Strategic boundary — documentation is downstream of
+behavior:** it reflects what has already landed and never drives a behavior
+change or opens a movement. A documentation request (reframe / re-emphasis) is a
+documentation job → revise mode + a guidance directive. A request that actually
+needs a behavior change is redirected to the behavior process (an in-movement
+enhancement: plan → `/design-review` → decompose), and docs reconcile *after*
+that behavior lands — never before. New movements arise only at a finished
+movement's end via `/product-visioning` → PRD → `/onboard`. The store never
+writes `PRODUCT_VISION.md`.
 
 ## Non-functional requirements
 
