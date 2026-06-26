@@ -1,9 +1,9 @@
 # cc-template
 
-Template seed for new `ds-*` projects. Provides a working
-collaboration agreement (the 10 rules), design-philosophy guidance,
-slash commands for onboarding and wind-down, and the directory
-structure each new project starts from.
+Template seed for new software projects built with Claude Code. Provides a
+working collaboration agreement (the 10 rules), design-philosophy guidance,
+slash commands for the full development lifecycle, and the directory structure
+each new project starts from.
 
 ## How to use
 
@@ -12,7 +12,7 @@ walkable checklist and session handoff — follow them in order:
 
 1. **Copy the template** to a new project directory:
    ```
-   cp -r cc-template ds-<project-name>
+   cp -r cc-template <project-name>
    ```
    (or use the file explorer — copy the folder, rename it.)
 

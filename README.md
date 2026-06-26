@@ -62,6 +62,27 @@ cd C:\path\to\new-project
 (Or use the file explorer — copy `cc-template/`, rename the
 destination, open in Claude Code, run `/onboard`.)
 
+For the full walkthrough — including reading the rules first — see the
+[quick-start](docs/published/quick-start.md).
+
+## Documentation
+
+Full audience-facing documentation lives in
+[`docs/published/`](docs/published/):
+
+- **[Quick-start](docs/published/quick-start.md)** — seed a project and get into
+  the loop.
+- **[The SDLC lifecycle](docs/published/lifecycle.md)** — the workflow and why
+  it's shaped this way.
+- **[Command reference](docs/published/commands/README.md)** — every slash
+  command, one page each.
+- **[Keeping the template up to date](docs/published/keeping-up-to-date.md)** —
+  pulling upstream improvements with `/refresh-from-repository`.
+- **[Troubleshooting](docs/published/troubleshooting.md)** — refusals and common
+  drifts.
+- **[Maintaining the template](docs/published/maintaining-the-template.md)** —
+  working on this repository itself.
+
 ## Working on the template itself
 
 Edits to shipping content go in [`cc-template/`](cc-template/).

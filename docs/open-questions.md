@@ -46,29 +46,6 @@ would unblock an answer.
 
 ### Deferred User Stories
 
-#### Dedicated end-to-end command-lifecycle doc
-
-*Context.* No single doc narrates the full command lifecycle (setup →
-first movement → tactical loop → next movement). The pieces are
-scattered: `cc-template/README.md` "How to use" (setup), root `CLAUDE.md`
-load-bearing invariants (per-command mechanics), and the command files
-(their own handoffs). The 2026-06-22 `/product-visioning` reshape added a
-strategic layer and widened the gap; `cc-template/README.md` now carries
-a brief "After setup: the recurring lifecycle" section as the minimal
-fix. Surfaced 2026-06-22.
-
-*Proposed approach.* If the README section proves insufficient, author a
-standalone lifecycle doc (one diagram + prose). Weigh against the
-project's "don't add a doc without strong justification" bar — build it
-only when a reader genuinely can't reconstruct the loop from README +
-invariants.
-
-*Open sub-questions.* Where it lives (`docs/` source-only vs.
-`cc-template/docs/` shipped); whether it ships to consumers; and the
-stale "lifecycle is two commands" line in
-`docs/design/cc-template-product-spec.md` (historical intake doc) — fix
-in place or leave as history.
-
 #### Sweep local Claude-memory items that are really project guidance into checked-in docs
 
 *Context.* Project-level guidance (how to write / maintain this template)
@@ -1080,6 +1057,27 @@ session with no markers in the files.
 ---
 
 ### Open Questions
+
+#### How the source-only `docs/published/` set reaches adopters
+
+*Context.* Surfaced 2026-06-25 dogfooding `/write-documentation` on the template.
+The command authors its canonical set under `docs/published/`, but that path is
+source-only (FR-12) and never copies into `cc-template/`, so adopters who seed a
+project never receive it. The surface that *does* travel — `cc-template/README.md`
+— is rewritten by `/onboard` the moment a project is seeded. Two consequences:
+(1) the detailed docs have no delivery path to adopters yet, and (2) the shipping
+README can't relative-link into `docs/published/` without the links breaking on
+seed, so deep-doc routing for adopters is unresolved.
+
+*What we know so far.* `/write-documentation` owns content + a product-type-open
+delivery recipe; `/deployment-plan` owns the render/build and delivery. The recipe
+in `docs/published/documentation-plan-001.md` records the target forms and these
+questions. No `docs/DEPLOYMENT.md` exists yet (`/deployment-plan` is UNCONFIGURED).
+
+*What would unblock an answer.* A `/deployment-plan` pass that decides how (and
+which subset of) `docs/published/` reaches adopters — a rendered/hosted form, a
+shipped subset mirrored into `cc-template/`, or an upstream-URL pointer — and how
+that interacts with `/onboard` rewriting `cc-template/README.md`.
 
 #### Portability audit — what makes *this* project work better than a freshly-seeded one?
 

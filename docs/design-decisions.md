@@ -1267,3 +1267,35 @@ step / CI, which can't invoke a slash command), and prescribes no runtime
 pre-baked — rendering becomes a session coding task done when needed, true to
 "AI is session work, not a heuristic engine." The release-readiness ledger is
 the primary `/write-documentation` → `/deployment-plan` handoff signal.
+
+---
+
+## This project's audience-facing docs: `docs/published/` canonical, both READMEs managed by `/write-documentation`
+
+**Decision.** Dogfooding `/write-documentation` on the template
+(`documentation-plan-001`, movement `initial`, 2026-06-25) set this project's doc
+architecture: `docs/published/` holds the canonical, detailed audience-facing set
+(adopter + maintainer tracks, including the per-command reference and the
+end-to-end lifecycle doc), and **both** the root `README.md` and the shipping
+`cc-template/README.md` are managed by `/write-documentation` as orientation /
+routing surfaces. `/write-documentation` is the freshness gate on both READMEs
+even though `/wind-down` may also edit them. Delivering the source-only
+`docs/published/` set to adopters is deferred to `/deployment-plan`.
+
+**Why.** The command's authoring home (`docs/published/`) is source-only (FR-12)
+and never copies into `cc-template/`, while the surface that travels to adopters
+is `cc-template/README.md`. Separating "canonical authored set" (authored and
+freshness-gated in one place) from "what ships" (a `/deployment-plan` concern)
+lets the depth live somewhere stable without forcing a delivery decision before
+one is needed.
+
+**Why not author the adopter docs directly in `cc-template/`.** `cc-template/`
+travels without `docs/published/`, and `cc-template/README.md` is rewritten by
+`/onboard` the moment a project is seeded — so it can't host the canonical set
+and can't relative-link into it without the links breaking on seed.
+
+**Scope note.** Fulfils the former "Dedicated end-to-end command-lifecycle doc"
+deferred story (now `docs/published/lifecycle.md`). Two delivery questions remain
+open for `/deployment-plan` — see `open-questions.md` § Open Questions. The stale
+"lifecycle is two commands" line in the frozen `cc-template-product-spec.md`
+intake is left as history.
