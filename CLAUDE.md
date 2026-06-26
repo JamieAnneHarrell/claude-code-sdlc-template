@@ -252,11 +252,18 @@ onboard's job, not design-review's.**
 
 ### `/write-documentation` lifecycle
 
-- **Two stages, auto-detected** from `docs/published/documentation-plan-*.md`
-  (newest governs). Stage 1 writes a numbered manifest for sign-off
-  (`AWAITING-APPROVAL`); Stage 2 authors the marked set or **reconciles** the
-  current set for a same-movement phase advance, then `ACTIVE`. A re-scope
-  supersedes the prior (`SUPERSEDED`). No CLAUDE.md status comment.
+- **Two stages, auto-detected** from
+  `docs/documentation-plans/documentation-plan-*.md` (newest governs). Stage 1
+  writes a numbered manifest for sign-off (`AWAITING-APPROVAL`); Stage 2 has
+  three non-gated modes — **author** the marked set, **reconcile** the current
+  set for a same-movement phase advance, or **revise** the living docs from a
+  described change — then `ACTIVE`. A re-scope supersedes the prior
+  (`SUPERSEDED`). No CLAUDE.md status comment.
+- **Doc sources file by audience.** Each doc lands at
+  `docs/<audience-slug>/<file>.md` keyed to its Primary audience (canonical
+  slugs `end-user` / `power-user` / `admin` / `support` / `developer` /
+  `maintainer`, or the project's own); images per folder under `images/`. No
+  `docs/guides/` escape hatch — filing is not a voice decision.
 - **Currency is derived and movement-aware.** The manifest stamps
   `documented-through { movement, phase }`; a re-run is STALE when the active
   movement (newest `ACTIVE` PRD, or `initial`) differs from the stamp, or a
@@ -265,6 +272,11 @@ onboard's job, not design-review's.**
 - **DOC DECISION placeholder is load-bearing.** Stage detection parses the exact
   `> _[UNMARKED — approve / adjust: <note> / drop, per the legend above]_`.
   Changing it breaks Step 0.
+- **`docs/documentation-guidance.md` is binding doctrine, read-only here.** The
+  command reads and applies every entry on each pass and never writes it.
+  Documentation is downstream of behavior — revise reflects shipped behavior,
+  never drives a change; a behavior request routes to the in-movement
+  enhancement lane and docs reconcile after it lands.
 - **Release-readiness ledger** (stale / unfilled visual / conformance gap) is a
   signal a release process consumes; the command surfaces conformance gaps but
   never edits product code (rule 8). Render/build is **not** owned here:
@@ -278,9 +290,11 @@ onboard's job, not design-review's.**
   `docs/design/design-review-checkpoint-NNN.md`,
   `docs/test-plans/phase-NNN-exit.md`, `docs/design/PRD-<slug>-NNN.md`,
   `docs/project-plans/{project-plan,claude-code-prompts}-NNN.md`,
-  `docs/published/documentation-plan-NNN.md`. PRD + plan-archive share the
-  **movement counter** (movement N → `PRD-<slug>-N`; opening N archives N−1 as
-  `project-plan-(N-1)`); the documentation-plan counter is independent.
+  `docs/documentation-plans/documentation-plan-NNN.md`. PRD + plan-archive share
+  the **movement counter** (movement N → `PRD-<slug>-N`; opening N archives N−1
+  as `project-plan-(N-1)`); the documentation-plan counter is independent.
+  `docs/documentation-guidance.md` is durable-global (like `design-decisions.md`
+  / `open-questions.md`) — current-truth, unnumbered, never archived.
 - **README section names, exact spelling**: `Developer setup`
   (stub by `/onboard`, replaced by `/bootstrap`) and `Deployment`
   (stub by `/onboard`, replaced by `/deployment-plan`). Don't
@@ -299,14 +313,17 @@ onboard's job, not design-review's.**
   downstream refresh.
 - **File ownership doesn't overlap.** `/onboard`: `PRODUCT_VISION.md`, the
   in-flight `PROJECT_PLAN.md` / `CLAUDE_CODE_PROMPTS.md`, their
-  `docs/project-plans/` archives, and PRD status transitions.
+  `docs/project-plans/` archives, PRD status transitions, and the
+  `docs/documentation-guidance.md` skeleton (creates it).
   `/product-visioning`: authors `docs/design/PRD-<slug>-*.md` (DRAFT).
   `/design-review`: `design-review-checkpoint-*.md`, `REVIEWS.md` (and edits the
   tactical docs on its review-land path). `/exit-test-plan`: `phase-*-exit.md`.
-  `/write-documentation`: `docs/published/` (the `documentation-plan-NNN.md`
-  manifest, doc sources, images), the user-facing README sections +
+  `/wind-down`: captures + retires `docs/documentation-guidance.md` entries.
+  `/write-documentation`: the
+  `docs/documentation-plans/documentation-plan-NNN.md` manifest, doc sources +
+  images under `docs/<audience-slug>/`, the user-facing README sections +
   `CONTRIBUTING.md` by offer, and the delivery recipe (render/build itself is
-  `/deployment-plan`'s).
+  `/deployment-plan`'s); reads (never writes) `docs/documentation-guidance.md`.
   A skill never writes a file it doesn't own; audit this list when adding a
   responsibility.
 

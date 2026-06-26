@@ -1,5 +1,5 @@
 ---
-description: Author and maintain audience-facing product documentation. Stage 1 surveys the project and proposes a documentation plan for sign-off; stage 2 writes or reconciles the docs (README, quick-start, guides, reference, troubleshooting) applying a documentation-craft doctrine. Writes markdown sources plus a product-type-aware delivery recipe; the render/build is owned by /deployment-plan.
+description: Author and maintain audience-facing product documentation. Stage 1 surveys the project and proposes a documentation plan for sign-off; stage 2 writes, reconciles, or revises the docs (README, quick-start, guides, reference, troubleshooting) applying a documentation-craft doctrine and the project's standing documentation guidance. Writes markdown sources plus a product-type-aware delivery recipe; the render/build is owned by /deployment-plan.
 ---
 
 # /write-documentation
@@ -20,9 +20,12 @@ a template; it reasons one out per project and confirms it.
 It is also an **ecosystem citizen**. It exposes a machine-readable currency
 signal and a release-readiness ledger that `/deployment-plan`'s release
 procedure can gate on; it owns the user-facing sections of `README.md`
-(which `/wind-down` then routes around rather than clobbering); and it reads
+(which `/wind-down` then routes around rather than clobbering); it reads
 `/product-visioning`'s PRDs to know which *movement* the docs are current
-through.
+through; and it reads `docs/documentation-guidance.md` — the project's durable,
+standing doc directives — as binding doctrine on every pass (`/onboard` creates
+that file; `/wind-down` captures and retires entries; this command only reads
+and applies them).
 
 This command runs in the current working directory and writes files
 relative to it.
@@ -44,14 +47,20 @@ relative to it.
 ## What it produces
 
 - A numbered **documentation plan** (the manifest):
-  `docs/published/documentation-plan-NNN.md`. Newest governs; it holds the
-  doc-set definition, the audience map, the `documented-through` currency
+  `docs/documentation-plans/documentation-plan-NNN.md`. Newest governs; it holds
+  the doc-set definition, the audience map, the `documented-through` currency
   stamp, the **delivery recipe**, and the release-readiness ledger.
-- The **doc sources**: markdown under `docs/published/`, plus images under
-  `docs/published/images/` (real screenshots and labelled placeholders).
+- The **doc sources**: markdown filed in **audience-named folders**
+  (`docs/<audience-slug>/<file>.md` — see the derivation rule in Stage 1), plus
+  images per folder under `docs/<audience-slug>/images/` (real screenshots and
+  labelled placeholders).
 - The **user-facing sections of `README.md`** (and `CONTRIBUTING.md` when the
   project takes contributors) — authored by offer, never clobbering sections
   another command owns.
+
+It **reads** (never writes) `docs/documentation-guidance.md` — the project's
+standing documentation guidance — and applies every entry to the docs it
+authors, reconciles, or revises.
 
 Markdown is the deliverable. Rendering or building the delivered docs is
 `/deployment-plan`'s job — it reads this command's delivery recipe + ledger and
@@ -63,6 +72,9 @@ command owns no renderer.
 Progressive disclosure — bare invocation handles the happy path.
 
 - `/write-documentation` — auto-detect stage per Step 0.
+- `/write-documentation <describe a change>` — Stage 2 **revise**: an
+  interactive, natural-language pass over the living docs (e.g.
+  `/write-documentation open every how-to with when/why before the steps`).
 - `/write-documentation --doc "<name>"` — scope a Stage 2 pass to one doc
   (regenerate or reconcile just that source).
 - `/write-documentation --audience "<role>"` — scope the proposed set to one
@@ -81,7 +93,7 @@ Progressive disclosure — bare invocation handles the happy path.
   doc sources yet (the sign-off gate precedes expensive prose). Runs on the
   **first** documentation pass and on a **re-scope** — a new movement changed
   which docs/audiences exist.
-- **Stage 2 — Author/Update.** Two entry modes:
+- **Stage 2 — Author/Update.** Three non-gated entry modes (they can co-occur):
   - **Author** — the latest manifest's proposed docs are all marked: write the
     approved sources applying the writing doctrine, fill the release-readiness
     ledger, stamp `documented-through`, flip the manifest to `ACTIVE`.
@@ -90,6 +102,15 @@ Progressive disclosure — bare invocation handles the happy path.
     changed, append an authoring-log round, re-stamp. No new sign-off — the
     doc set was already approved. (If the change needs *new* docs or audiences,
     it's a re-scope — route to Stage 1.)
+  - **Revise** — an interactive, natural-language change to the living docs: you
+    describe a thematic or strategic change, the skill proposes how it lands
+    across the affected docs, you discuss, it applies. No markup, no
+    placeholders, no sign-off artifact — Stage 1's plan-set sign-off scopes the
+    *set*, not doc content. Like any coding session it stamps the authoring log
+    (a `Revise N` round); the durable directive is captured at `/wind-down` into
+    `docs/documentation-guidance.md`. **Documentation is downstream of behavior**
+    — revise reflects what already shipped; it never drives a behavior change
+    (see the guidance-store section).
 
 **No "LANDED" — currency is derived, and movement-aware.** Docs track a moving
 product. The stamp is a tuple: `documented-through: { movement, phase }`.
@@ -119,8 +140,15 @@ markup and currency state signal readiness.
    the current movement id; `initial` if there are no PRDs. Read
    `docs/PROJECT_PLAN.md` for the latest completed phase within that movement.
 
-2. **Find the governing manifest.** Glob `docs/published/documentation-plan-*.md`
-   (zero-padded NNN sorts numerically through 999). The newest governs.
+2. **Read the standing guidance.** Read `docs/documentation-guidance.md` if it
+   exists — every entry is **binding doctrine** on whatever this run authors,
+   reconciles, or revises. Note the most recent entry's date for the revise-offer
+   check below. (This command never edits this file — `/wind-down` owns capture
+   and retirement.)
+
+3. **Find the governing manifest.** Glob
+   `docs/documentation-plans/documentation-plan-*.md` (zero-padded NNN sorts
+   numerically through 999). The newest governs.
    - **No manifest** → **Stage 1**, `N = 001`.
    - **Newest `AWAITING-APPROVAL`**:
      - Any proposed doc in the latest round is still the unmarked placeholder
@@ -128,15 +156,26 @@ markup and currency state signal readiness.
        the plan, then re-run."
      - Every proposed doc in the latest round is marked → **Stage 2** (author
        the marked set).
-   - **Newest `ACTIVE`** → derive currency:
-     - **CURRENT** (stamped movement/phase == current) → nothing to do. Report
-       "documentation is current through movement `<id>` / phase `<id>`." If
-       `--doc` was passed, do just that scoped work; `--new` forces Stage 1.
-     - **STALE, movement changed** → **Stage 1** (re-scope), `N = previous + 1`
-       (the prior is superseded at Stage 2, once the new set is authored).
-     - **STALE, same movement, phase advanced** → **Stage 2 reconcile**
-       (refresh the affected docs in the current manifest; no new sign-off).
+   - **Newest `ACTIVE`**:
+     - The operator described a change in the invocation → **Stage 2 revise**
+       (apply the described change across the affected docs; currency is
+       irrelevant — revise changes content, not the stamp).
+     - Otherwise derive currency:
+       - **CURRENT** (stamped movement/phase == current) → nothing to author.
+         **If `docs/documentation-guidance.md` has an entry dated after this
+         manifest's last authoring round, offer** an interactive revise pass to
+         sweep that guidance across the set (offer, never gate). Else report
+         "documentation is current through movement `<id>` / phase `<id>`." If
+         `--doc` was passed, do just that scoped work; `--new` forces Stage 1.
+       - **STALE, movement changed** → **Stage 1** (re-scope), `N = previous + 1`
+         (the prior is superseded at Stage 2, once the new set is authored).
+       - **STALE, same movement, phase advanced** → **Stage 2 reconcile**
+         (refresh the affected docs in the current manifest; no new sign-off).
    - **Newest any other status** → unexpected; surface and ask.
+
+Revise needs an `ACTIVE` manifest (it edits living docs). If the operator
+describes a change with no `ACTIVE` manifest, route them first: no manifest →
+Stage 1; `AWAITING-APPROVAL` → mark and author.
 
 The placeholder line that distinguishes an unmarked proposed doc is exactly:
 
@@ -146,6 +185,50 @@ The placeholder line that distinguishes an unmarked proposed doc is exactly:
 
 Any DOC DECISION block whose body is still that line counts as unmarked.
 Anything else (`approve`, `adjust: …`, `drop`) counts as marked.
+
+---
+
+# Documentation guidance store
+
+`docs/documentation-guidance.md` is the project's **durable, standing
+documentation guidance** — a current-truth file parallel to
+`docs/design-decisions.md` / `docs/open-questions.md`. It holds directives for
+how *this project's* docs should read ("every how-to opens with when/why before
+the steps", "address admins in the second person"), binding on **every**
+authoring, reconcile, and revise pass.
+
+- **This command only reads it** and applies it. It does **not** write it.
+  `/onboard` creates it from the shipped skeleton; `/wind-down` captures new
+  directives and retires superseded ones (current-truth, so superseded guidance
+  is removed, not struck through). Read the file's own format header before
+  reasoning about an entry — don't infer the shape from memory.
+- It carries **no per-entry status markers** (no OPEN/APPLIED) — that would force
+  this command to write a file `/wind-down` owns, and is unneeded once guidance
+  is current-truth and the sweep is idempotent.
+
+## Strategic boundary — documentation is downstream of behavior
+
+Documentation **reflects what has already landed**; it never drives a behavior
+change and never opens a movement. Route doc feedback accordingly:
+
+1. A **documentation request** (a reframe, a re-emphasis, a restructure of how
+   existing behavior is described) is a documentation job. Apply it in **revise
+   mode** across the affected docs; the standing directive is recorded in
+   `docs/documentation-guidance.md` (at `/wind-down`), and the *why* lands as a
+   `docs/design-decisions.md` entry. No `/design-review`, no `/product-visioning`
+   — the behavior already exists, so this is pure description.
+2. A request arriving *as* "doc feedback" that actually asks for a **behavior or
+   workflow change** is **not** documentation. This command never edits product
+   behavior (rule 8); redirect it to the behavior process — an **in-movement
+   enhancement** (plan → `/design-review` → decompose into steps + prompts).
+   Documentation then **reconciles or revises after** that behavior lands, never
+   before.
+3. **New movements** are never introduced by documentation. They arise only at a
+   finished movement's end, through the normal `/product-visioning` → PRD →
+   `/onboard` flow.
+
+The store **never writes `docs/PRODUCT_VISION.md`** — that is `/onboard` /
+`/product-visioning` territory.
 
 ---
 
@@ -343,9 +426,25 @@ genuine forks (an ambiguous audience split, an uncertain product-type call).
 
 ## Step S1.3: Write the manifest
 
-Filename `docs/published/documentation-plan-NNN.md`, zero-padded 3-digit.
-Status `AWAITING-APPROVAL`. One DOC DECISION block per proposed doc. Use this
-template:
+Filename `docs/documentation-plans/documentation-plan-NNN.md`, zero-padded
+3-digit. Status `AWAITING-APPROVAL`. One DOC DECISION block per proposed doc.
+
+**Audience-folder derivation rule.** Each doc files under a folder named for its
+**Primary audience**: `docs/<audience-slug>/<file>.md`. The slug comes from the
+doc's recorded Primary audience (a voice-profile audience), confirmed at sign-off.
+Canonical slugs for the six voice-profile audiences: End user → `end-user`,
+Power user → `power-user`, IT admin/installer → `admin`, Support rep → `support`,
+Developer → `developer`, Maintainer/contributor → `maintainer`. A project may use
+its own audience labels slugified instead. A `commands/` (or similar) reference
+nests under its audience (`docs/<audience-slug>/commands/`); images live per
+folder (`docs/<audience-slug>/images/`).
+
+**No `docs/guides/` escape hatch.** Choosing a folder is a *filing* decision, not
+a voice decision — every real doc takes one Primary audience, so the
+average-across-audiences anti-pattern doesn't apply. The only audience-neutral
+artifact is the router, which is the README's job.
+
+Use this template:
 
 ````markdown
 ---
@@ -384,9 +483,9 @@ set. Mark each independently.
 
 | Doc | Path | Primary audience | Mode(s) |
 |-----|------|------------------|---------|
-| <name> | docs/published/<file>.md | <audience> | <modes> |
+| <name> | docs/<audience-slug>/<file>.md | <audience> | <modes> |
 
-### <doc name> — `docs/published/<file>.md`
+### <doc name> — `docs/<audience-slug>/<file>.md`
 
 - **Primary audience:** <audience> (voice profile applied)
 - **Diátaxis mode(s):** <tutorial / how-to / reference / explanation>
@@ -451,9 +550,9 @@ precedes the prose).
 Rewrite `TODO.txt` so the first entry under "What's next" is:
 
 ```
-- Mark up docs/published/documentation-plan-NNN.md (approve / adjust / drop
-  each proposed doc per the legend), then re-run /write-documentation. Stage 2
-  authors the approved set.
+- Mark up docs/documentation-plans/documentation-plan-NNN.md (approve / adjust /
+  drop each proposed doc per the legend), then re-run /write-documentation.
+  Stage 2 authors the approved set.
 ```
 
 Carryovers preserved below. Report: the manifest path, the proposed doc count
@@ -468,9 +567,10 @@ re-run `/write-documentation` to author them."
 
 # Stage 2 — Author / Update
 
-Two entry modes (per Step 0): **author** the approved set, or **reconcile** the
-current set for a same-movement phase advance. Both apply the doctrine and
-update the manifest.
+Three entry modes (per Step 0): **author** the approved set, **reconcile** the
+current set for a same-movement phase advance, or **revise** the living docs from
+a described change. All apply the doctrine **and the standing guidance**
+(`docs/documentation-guidance.md`) and update the manifest.
 
 ## Step S2.1: Settle the set to author
 
@@ -487,21 +587,35 @@ list the docs to refresh. If the change needs a *new* doc or audience (not just
 content), stop and route to Stage 1 (a re-scope); reconcile is for the approved
 set only.
 
-Either mode: state back the set you will author/refresh and confirm before
+**Revise mode** (`ACTIVE` + a described change, or an accepted revise-offer):
+this is an interactive coding session whose language is prose. Read the
+described change (and the standing guidance that prompted it), then **propose how
+it lands** — which docs change, which sections, what the new shape is — and
+discuss it with Jamie before writing. The change must describe **already-shipped
+behavior** (documentation is downstream of behavior); if it actually needs a
+behavior or workflow change, **stop and redirect** to the in-movement enhancement
+lane (plan → `/design-review` → decompose) — never edit product behavior here
+(rule 8). No markup, no placeholders, no sign-off artifact; the durable directive
+is captured at `/wind-down`.
+
+Any mode: state back the set you will author/refresh/revise and confirm before
 writing.
 
-## Step S2.2: Author or reconcile each approved doc
+## Step S2.2: Author, reconcile, or revise each affected doc
 
-For each approved doc, apply the doctrine:
+For each doc, apply the doctrine:
 
+- **Apply the standing guidance.** Every entry in
+  `docs/documentation-guidance.md` is binding — hold each directive across the
+  doc as you write.
 - **Classify every section** into exactly one Diátaxis mode; never blend.
 - **Hold the audience's voice profile** for the whole document.
 - Apply the writing and readability rules. For a CLI, build the reference from
   the **real implementation**, documenting every option (what / why-or-when /
   default).
-- On an **update** (the source already exists), reconcile rather than rewrite:
-  refresh what the doc-rot signals flagged, and leave human-edited prose whose
-  scope is unchanged intact.
+- On an **update or revise** (the source already exists), reconcile rather than
+  rewrite: refresh what the doc-rot signals or the described change call for, and
+  leave human-edited prose whose scope is unchanged intact.
 - **Screenshot placeholders.** Where a visual earns its place (decorative
   test), write an inline reference and a greppable placeholder so the
   maintainer has a shoot-list and unfilled images are caught before release:
@@ -512,12 +626,14 @@ For each approved doc, apply the doctrine:
        Caption: "<caption>". Why it earns its place: <what text alone can't show>. -->
   ```
 
-  If the image already exists in `docs/published/images/`, the reference
-  renders it; the placeholder comment is removed once filled. The image's
-  information must also be present in the prose.
+  If the image already exists in the doc's `images/` folder
+  (`docs/<audience-slug>/images/`), the reference renders it; the placeholder
+  comment is removed once filled. The image's information must also be present in
+  the prose.
 
-Write sources under `docs/published/` per the manifest's recorded paths
-(create `docs/published/images/` as needed).
+Write sources at each doc's manifest-recorded path
+(`docs/<audience-slug>/<file>.md`), creating that audience folder and its
+`images/` subfolder as needed.
 
 ## Step S2.3: README / CONTRIBUTING (by offer)
 
@@ -541,13 +657,15 @@ Edit the manifest (the file this command owns):
      with the real CLI). Describe the gap and the change it implies; **do not
      edit the product** (rule 8). These queue as coding tasks.
    - Mark a prior OPEN item RESOLVED when this pass closed it.
-2. **Authoring log** — append one row: round (Original / Reconcile N), date,
-   the new `documented-through`, the docs touched, notes.
+2. **Authoring log** — append one row: round (Original / Reconcile N / Revise N),
+   date, the new `documented-through`, the docs touched, notes.
 3. **`documented-through`** — re-stamp to the current `{ movement, phase }`.
+   (A revise pass leaves the stamp where it is unless a phase also advanced — it
+   changes content, not currency.)
 4. **Frontmatter status & supersession** — in author mode, flip
-   `AWAITING-APPROVAL` → `ACTIVE`; in reconcile mode it stays `ACTIVE`. If this
-   was a re-scope (a new manifest number) and a prior manifest is still
-   `ACTIVE`, flip the prior to `SUPERSEDED <date>` — newest governs.
+   `AWAITING-APPROVAL` → `ACTIVE`; in reconcile and revise modes it stays
+   `ACTIVE`. If this was a re-scope (a new manifest number) and a prior manifest
+   is still `ACTIVE`, flip the prior to `SUPERSEDED <date>` — newest governs.
 
 ## Step S2.5: Cross-doc surfacing, TODO, report
 
@@ -570,10 +688,36 @@ zero).
 
 ---
 
+# After Stage 2 — who owns the docs and how to iterate
+
+Once a manifest is `ACTIVE`, the docs are **living**. They belong to the project;
+this command maintains them, it doesn't freeze them.
+
+- **Hand-edits are welcome.** Edit the published markdown directly when a wording
+  fix or a small correction is faster than a pass. A later reconcile/revise
+  refreshes around human-edited prose whose scope is unchanged — it reconciles,
+  it does not clobber.
+- **Iterate through the three modes:**
+  - a **phase shipped** in the current movement → **reconcile** (mechanical
+    doc-rot refresh).
+  - a **thematic or strategic change** to how existing behavior reads → **revise**
+    (describe it; the skill sweeps it across the affected docs and the directive
+    is captured into `docs/documentation-guidance.md` at `/wind-down`).
+  - a **new movement, or new docs/audiences** → **re-scope** (Stage 1 writes a
+    fresh manifest for sign-off). Revise is for *content of the approved set*;
+    a change to the *set* is a re-scope.
+- **Behavior changes are never doc work.** If iterating surfaces a needed
+  behavior/workflow change, it leaves this command for the in-movement
+  enhancement lane (plan → `/design-review` → decompose); the docs reconcile
+  **after** it lands. Documentation is downstream of behavior.
+
+---
+
 ## Failure modes
 
-- **No `docs/published/` and no implementation to read.** Refuse: the command
-  documents a product; there must be something built to document.
+- **No audience-doc folders (`docs/<audience-slug>/`) and no implementation to
+  read.** Refuse: the command documents a product; there must be something built
+  to document.
 - **A proposed doc is left unmarked.** Refuse Stage 2; list the unmarked docs
   and the legend; do not author a partially-approved set.
 - **A marking is malformed** (not `approve` / `adjust:` / `drop`). Surface and
@@ -601,6 +745,13 @@ zero).
   conformance gaps and surfaced as coding tasks (rule 8).
 - Does not edit the internal SDLC docs (REQUIREMENTS / ARCHITECTURE /
   PROJECT_PLAN / CLAUDE_CODE_PROMPTS / design intake / PRDs) — it reads them.
+- Does not write `docs/documentation-guidance.md` — it **reads** it as binding
+  doctrine and applies it. `/onboard` creates that file; `/wind-down` captures
+  and retires entries.
+- Does not edit `docs/PRODUCT_VISION.md` or open a movement — documentation is
+  downstream of behavior; a behavior/workflow change routes to the in-movement
+  enhancement lane, and a new movement runs through `/product-visioning` →
+  `/onboard`.
 - Does not edit `docs/DEPLOYMENT.md` — it reads it for install/ops docs and
   surfaces release-bundle changes for `/deployment-plan` to land.
 - Does not clobber README sections owned by `/bootstrap` (Developer setup) or

@@ -634,7 +634,7 @@ Step 2.9 propagates.
 
 ---
 
-## Phase 2.9 — Propagate to root + root invariants
+## Phase 2.9 — Propagate to root + root invariants (COMPLETE)
 
 **Goal.** Land Step 2.8's command changes at root via the source-mode refresh,
 then update the root `CLAUDE.md` invariants (source-only; not refreshed).

@@ -31,16 +31,18 @@ Two relationships use the same code path:
   trusted the heavyweight security review is replaced by a plain
   change summary.
 
-<!-- Refresh logic version: 2 -->
-**Refresh logic version: 2**
+<!-- Refresh logic version: 3 -->
+**Refresh logic version: 3**
 
 > The integer above is the drift stamp (read by Step 3). Bump it only
 > when a change would make an *older* locally-installed copy of this
 > command mis-handle a *newer* upstream: the `CC-TEMPLATE-BLOCK` marker
 > open/close strings change, the marker state vocabulary
 > (`template-owned` / `forked` / `removed`) or its `state=` encoding
-> changes, or the reconciliation algorithm (Step 5) changes behavior.
-> Cosmetic prose edits do **not** bump it.
+> changes, the reconciliation algorithm (Step 5) changes behavior, or
+> the set of files refresh delivers changes (e.g. the template-shipped
+> doc-skeleton class added in version 3). Cosmetic prose edits do
+> **not** bump it.
 
 **Required reading before Step 0:** read
 `rules/coding-session-rules.md` and `rules/design-philosophy-rules.md`
@@ -52,7 +54,7 @@ commit through `/wind-down`.
 
 ## What gets refreshed, and what never does
 
-Refresh manages two kinds of file:
+Refresh manages three kinds of file:
 
 1. **Slash commands** (`.claude/commands/*.md`) — wholesale-replaced
    from upstream every run. Commands carry no markers; they are not
@@ -64,6 +66,11 @@ Refresh manages two kinds of file:
    `<!-- /CC-TEMPLATE-BLOCK -->` pair is template-owned and eligible
    for merge. Everything else is a **free region** refresh never
    touches.
+3. **Template-shipped doc skeletons** (`cc-template/docs/*.md` →
+   `docs/*.md`) — starter docs an owning skill later accumulates
+   content into. Delivered **only when absent** downstream and **never
+   overwritten** (Step 4b). They carry no markers; their presence *is*
+   the memory that they were delivered.
 
 There is **no state file**. The template files are their own memory:
 each block records its own state in its marker (below). Refresh never
@@ -222,9 +229,10 @@ require an explicit affirmative).
    not a string-matching heuristic.
 2. **Change summary.** Report what *would* change if the consumer
    proceeds: which `.claude/commands/*.md` differ from the live copies,
-   and which `CC-TEMPLATE-BLOCK` ids in the rules / `CLAUDE.md` would
-   be added, updated, or surfaced for a decision in Step 5. This is a
-   read-only preview; it applies nothing.
+   which `CC-TEMPLATE-BLOCK` ids in the rules / `CLAUDE.md` would
+   be added, updated, or surfaced for a decision in Step 5, and which
+   template-shipped doc skeletons are absent downstream and would be
+   delivered (Step 4b). This is a read-only preview; it applies nothing.
 3. **Surface findings and ask for an explicit go/no-go.** Lead with any
    security findings. If anything looks malicious, say so plainly and
    recommend declining. On **no**: delete the staging area, touch
@@ -273,8 +281,36 @@ stop here and report.
 
 Commands carry no markers and are not reconciled block-by-block — they
 are replaced wholesale, having passed the Step 2 review. This is the
-**only** place refresh replaces whole files; rules and `CLAUDE.md` are
-never copied or force-overwritten wholesale (Step 5).
+**only** place refresh *replaces* whole files; Step 4b *adds* absent
+doc skeletons but never replaces a present one, and rules and
+`CLAUDE.md` are never copied or force-overwritten wholesale (Step 5).
+
+---
+
+## Step 4b — Deliver template-shipped doc skeletons
+
+Some skills ship a starter doc the consumer accumulates content into —
+`docs/documentation-guidance.md`, `docs/design-decisions.md`,
+`docs/open-questions.md`. Upstream carries each as a header-only
+skeleton under `cc-template/docs/`. A project seeded before a given
+skeleton existed never received it, so refresh delivers it here.
+
+For each `*.md` under upstream `cc-template/docs/` (the staging clone in
+public mode, the local `./cc-template/docs/` in source mode):
+
+- **Downstream file absent** → copy the skeleton in verbatim. The
+  consumer now has the starter its owning skill (`/onboard`,
+  `/wind-down`, `/write-documentation`) reads and writes.
+- **Downstream file present** → leave it untouched. It holds the
+  consumer's accumulated entries; these files carry no markers, so
+  refresh never compares, merges, or overwrites them.
+
+Delivery is **add-when-absent, never-clobber** — the inverse of Step
+4's wholesale command replace. There is no file-level tombstone: a
+skeleton the consumer deliberately deleted reappears empty on the next
+refresh, which loses nothing (an empty skeleton holds no entries).
+Skipped under `--refresh-skills-only` and the Step 3 restage (both are
+commands-only).
 
 ---
 
@@ -408,11 +444,11 @@ result.
 
 ## Step 7 — Report
 
-1. **Report** to Jamie: commands replaced; blocks in sync / updated /
-   hand-merged / newly forked / added / tombstoned; existing
-   `forked` and `removed` blocks respected; any unknown local blocks;
-   whether `CLAUDE.md` was included; and, for public mode, the outcome
-   of the Step 2 security review.
+1. **Report** to Jamie: commands replaced; doc skeletons delivered;
+   blocks in sync / updated / hand-merged / newly forked / added /
+   tombstoned; existing `forked` and `removed` blocks respected; any
+   unknown local blocks; whether `CLAUDE.md` was included; and, for
+   public mode, the outcome of the Step 2 security review.
 2. **Clean up.** In public mode, delete the staging clone.
 3. **Do not commit.** Leave the working tree for Jamie to review and
    route the commit through `/wind-down` (rule 7). If this refresh was
@@ -468,9 +504,11 @@ nothing else to write.
   blocks merge; `--no-claudemd` skips `CLAUDE.md` entirely.
 - Does not copy or force-overwrite rules files or `CLAUDE.md` wholesale
   — they are mutated in place, block by block. The only whole-file
-  replacement is Step 4's commands. A forced clobber (`Copy-Item
-  -Force` / `cp -f`) of these personalized files is off limits per
-  `rules/environment-rules.md` ("Jamie runs all destructive commands").
+  *replacement* is Step 4's commands; Step 4b *adds* absent doc
+  skeletons but never overwrites a present one. A forced clobber
+  (`Copy-Item -Force` / `cp -f`) of these personalized files is off
+  limits per `rules/environment-rules.md` ("Jamie runs all destructive
+  commands").
 - Does not re-add a block the consumer tombstoned (`state=removed`) or
   change a `forked` block.
 - Does not scan other consumer files for relocated blocks — it works

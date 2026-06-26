@@ -991,7 +991,7 @@ copies follow in Phase 2.6):
 
 ---
 
-## Prompt 2.9: Propagate to root + root invariants
+## Prompt 2.9: Propagate to root + root invariants (LANDED 2026-06-26)
 
 **Read first.**
 - [`.claude/commands/refresh-from-repository.md`](../.claude/commands/refresh-from-repository.md)
@@ -1025,7 +1025,9 @@ copies follow in Phase 2.6):
 
 **Revisions since this prompt ran:**
 
-- (none yet)
+- LANDED 2026-06-26. Clean execution — the source-mode refresh ran the
+  predicted restage → deliver+merge → quiet choreography across three
+  invocations; root invariants updated across the three named blocks.
 
 ---
 

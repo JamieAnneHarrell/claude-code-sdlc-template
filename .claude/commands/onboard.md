@@ -166,8 +166,8 @@ no DB and no credential storage, skip — don't add the NFR.
 Generate each file. **If a file already exists with non-template
 content, do not overwrite — surface a diff and ask Jamie.** The
 template-shipped skeletons (`docs/design-decisions.md`,
-`docs/open-questions.md`) are safe to overwrite if they're still the
-shipped headers.
+`docs/open-questions.md`, `docs/documentation-guidance.md`) are safe to
+overwrite if they're still the shipped headers.
 
 ### `docs/REQUIREMENTS.md`
 Extract from the design doc(s). Format as numbered functional
@@ -406,6 +406,15 @@ from the design doc that need answering before or during MVP work.
 Categories: Deferred User Stories / Known Limitations / Abandoned
 Approaches.
 
+### `docs/documentation-guidance.md`
+Already exists as a header skeleton — the durable-global, current-truth
+store of standing documentation directives that `/write-documentation`
+applies on every pass (`/wind-down` captures and retires entries later).
+If the design intake stated how the project's docs should read (a house
+voice, a required structure, an audience emphasis), seed a first entry in
+the file's own format; otherwise leave the shipped header. Safe to
+overwrite while it's still the shipped skeleton.
+
 ### `rules/multi-agent-rules.md`
 Replace the placeholder with the variant Jamie chose:
 
@@ -639,9 +648,10 @@ the prior movement's PRD `status: ACTIVE → SUPERSEDED <date>`. The latest
 Rewrite `TODO.txt`'s first entry: "Run `/design-review` to review the movement
 NNN decomposition before pasting Prompt <first> from
 `docs/CLAUDE_CODE_PROMPTS.md`." (No `/bootstrap` — the dev environment is
-already set up.) If `docs/published/` holds a documentation manifest, add a
-one-line reminder below the first entry: "User docs are now stale for movement
-NNN — run `/write-documentation` once this movement's user-facing work ships."
+already set up.) If `docs/documentation-plans/` holds a documentation manifest,
+add a one-line reminder below the first entry: "User docs are now stale for
+movement NNN — run `/write-documentation` once this movement's user-facing work
+ships."
 (A reminder, not ahead of `/design-review`.) Then invoke `/wind-down` for the
 commit handoff (rule 7): the new plan + prompts, the archived pair, the updated
 PRODUCT_VISION / REQUIREMENTS / ARCHITECTURE, and the PRD status flips land

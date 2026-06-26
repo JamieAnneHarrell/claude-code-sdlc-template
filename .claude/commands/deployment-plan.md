@@ -20,7 +20,7 @@ and produces:
   one-paragraph summary and a link to `docs/DEPLOYMENT.md`.
 - A `DEPLOYMENT-PLAN-STATUS: COMPLETE <date>` (or `DEFERRED <date>`)
   flip in `CLAUDE.md`.
-- When a `docs/published/` documentation manifest exists, the
+- When a `docs/documentation-plans/` manifest exists, the
   **documentation build** within `docs/DEPLOYMENT.md`: the render
   targets — coded against this environment's runtime from
   `/write-documentation`'s **delivery recipe** — plus a pre-release
@@ -81,7 +81,7 @@ Load these in order:
    actually runs in dev
 6. `rules/environment-rules.md` — the project-specific section
    filled by `/bootstrap`
-7. `docs/published/documentation-plan-*.md` (newest), if it exists —
+7. `docs/documentation-plans/documentation-plan-*.md` (newest), if it exists —
    `/write-documentation`'s manifest. Its **delivery recipe** and
    **release-readiness ledger** drive the documentation build and the
    pre-release doc-gate (Step 5).
@@ -219,12 +219,12 @@ sections, in this order:
    auto-deploy where it applies, where manual gates exist.
 6. **Rollback** — procedure per environment, constraints (DB
    migrations etc.).
-7. **Documentation build** *(only when a `docs/published/`
-   documentation manifest exists)* — how the shipped docs are built
+7. **Documentation build** *(only when a `docs/documentation-plans/`
+   manifest exists)* — how the shipped docs are built
    and gated at release time (see below).
 
 **Documentation build (Section 7).** Include this section only when
-`/write-documentation` has produced a `docs/published/` manifest.
+`/write-documentation` has produced a `docs/documentation-plans/` manifest.
 `/deployment-plan` **owns building the delivered docs** — there is no
 parallel render defined elsewhere. From the manifest's **delivery
 recipe** (it names the target *forms*, never a toolchain) and the
@@ -385,9 +385,10 @@ End with one of:
 - Does not modify `rules/environment-rules.md` — that's
   `/bootstrap`'s domain. If a deployment decision implies a
   change to dev environment, surface it; don't reach across.
-- Does not write documentation *content* or edit the
-  `docs/published/` manifest and sources — `/write-documentation`
-  owns those. `/deployment-plan` reads the delivery recipe + ledger
+- Does not write documentation *content* or edit the documentation
+  manifest (`docs/documentation-plans/`) and the audience-folder doc
+  sources — `/write-documentation` owns those. `/deployment-plan` reads
+  the delivery recipe + ledger
   and owns only the *build* of the delivered docs and the pre-release
   doc-gate (NFR-8 — one owner each).
 - Does not run any git commands (rule 7).
