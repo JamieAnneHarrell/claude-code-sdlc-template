@@ -302,6 +302,23 @@ brief plan first.
   state only — decisions a PRD records reach `design-decisions.md` /
   `open-questions.md` via the scans above when the movement is decomposed.
 
+### `docs/published/*` and the user-facing `README` / `CONTRIBUTING` sections
+- If `/write-documentation` has produced a `docs/published/`
+  documentation manifest, derive its movement-aware currency and
+  report it: **CURRENT**, or **STALE** (the active movement differs
+  from `documented-through.movement`, or a later phase shipped in the
+  same movement). Also report any **OPEN** release-readiness ledger
+  items (stale docs / unfilled visuals / conformance gaps).
+- **Do not edit the manifest, the doc sources, or the user-facing
+  `README` / `CONTRIBUTING` sections** — `/write-documentation` owns
+  them. If this session's work drifted a user-facing doc (a changed
+  CLI surface, a renamed feature), route it: note that
+  `/write-documentation` should reconcile, never clobber that prose
+  inline here.
+- Report-and-route, like the review / test-plan nets above — not a
+  forced first TODO entry. Docs trail the product by design; currency
+  is derived, not a blocker.
+
 ### `docs/project-plans/` (archived movements)
 - **Do not edit.** Historical plan/prompt archives written by `/onboard`
   when it opens a new movement. Report only.
@@ -436,3 +453,8 @@ Tell Jamie:
   (PRODUCT_VISION + the archives) and `/product-visioning` (the PRD it
   authors). Wind-down reports their state, surfaces the DRAFT-PRD safety
   net and the movement-complete suggestion, but never edits them.
+- Does not edit `docs/published/*` (the documentation manifest, doc
+  sources) or the user-facing `README` / `CONTRIBUTING` sections —
+  `/write-documentation` owns them. Wind-down reports doc currency and
+  OPEN ledger items and routes user-facing drift to the owner, but
+  never edits the docs itself.

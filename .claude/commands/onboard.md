@@ -250,7 +250,11 @@ that names the two recurring close-out commands:
 > the phase's exit criteria) when the phase ships user-observable
 > behavior. High-risk transitions get their own design-review
 > phase in the queue — a numbered phase whose deliverable is a
-> landed `docs/design/design-review-checkpoint-NNN.md`.
+> landed `docs/design/design-review-checkpoint-NNN.md`. User-facing
+> documentation is maintained by `/write-documentation` — run it when
+> a movement ships features users interact with; it surveys what
+> shipped and proposes the doc set, tracking currency per movement
+> rather than gating each phase.
 
 Phases that ship no user-observable surface (docs-only,
 pure-infrastructure, pure-refactor) can skip the manual
@@ -635,10 +639,15 @@ the prior movement's PRD `status: ACTIVE → SUPERSEDED <date>`. The latest
 Rewrite `TODO.txt`'s first entry: "Run `/design-review` to review the movement
 NNN decomposition before pasting Prompt <first> from
 `docs/CLAUDE_CODE_PROMPTS.md`." (No `/bootstrap` — the dev environment is
-already set up.) Then invoke `/wind-down` for the commit handoff (rule 7): the
-new plan + prompts, the archived pair, the updated PRODUCT_VISION / REQUIREMENTS
-/ ARCHITECTURE, and the PRD status flips land together. Report the movement
-opened, what was archived, and that `/design-review` is next.
+already set up.) If `docs/published/` holds a documentation manifest, add a
+one-line reminder below the first entry: "User docs are now stale for movement
+NNN — run `/write-documentation` once this movement's user-facing work ships."
+(A reminder, not ahead of `/design-review`.) Then invoke `/wind-down` for the
+commit handoff (rule 7): the new plan + prompts, the archived pair, the updated
+PRODUCT_VISION / REQUIREMENTS / ARCHITECTURE, and the PRD status flips land
+together. Report the movement opened, what was archived, that `/design-review`
+is next, and (if docs exist) that `/write-documentation` is due once the
+movement ships user-facing changes.
 
 End with: "Movement NNN decomposed — PRODUCT_VISION updated, the prior plan
 archived to `docs/project-plans/`, and a fresh `docs/PROJECT_PLAN.md` +

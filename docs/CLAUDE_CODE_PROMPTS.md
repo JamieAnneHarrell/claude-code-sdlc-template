@@ -910,6 +910,10 @@ copies follow in Phase 2.6):
 - `/write-documentation` (reshaped) is now runnable at root — the
   precondition for Phase 2.7.
 
+**Revisions since this prompt ran:**
+
+- LANDED 2026-06-25.
+
 ---
 
 ## Prompt 2.7: Dogfood `/write-documentation` + close

@@ -562,7 +562,7 @@ no parallel render defined elsewhere.
 
 ---
 
-## Phase 2.6 — Dogfood `/refresh-from-repository` (source mode)
+## Phase 2.6 — Dogfood `/refresh-from-repository` (source mode) (COMPLETE)
 
 **Goal.** Propagate the Phase 2.4 / 2.5 command changes from
 `cc-template/` to root.
