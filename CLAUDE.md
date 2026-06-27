@@ -92,6 +92,12 @@ The Load-bearing invariants section below complements REQUIREMENTS
 with "don't break this" warnings keyed to the conventions that
 stage detection and recurring lifecycles depend on.
 
+**Before dispatching any subagent** (Agent / Task tool), read
+[`rules/multi-agent-rules.md`](rules/multi-agent-rules.md) first — every time,
+not "when relevant." It governs tool choice (Explore vs Plan vs a direct
+deterministic pass) and carries the project-structure briefing every subagent
+needs; skipping it is how agents misread the source/dist split.
+
 ## Load-bearing invariants — do not break
 
 Changing one of these requires auditing the whole chain.

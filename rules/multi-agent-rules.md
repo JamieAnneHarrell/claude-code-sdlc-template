@@ -76,3 +76,26 @@ Brief it accordingly:
 Never delegate understanding. Don't write "based on your findings, fix
 the bug" — synthesis is the main thread's job.
 <!-- /CC-TEMPLATE-BLOCK -->
+
+---
+
+## Project-structure briefing (hand to every subagent that reads the tree)
+
+This repo has a non-obvious shape that subagents misread if not told — they
+will invent it and reach false conclusions. Include these facts in any
+read/audit/review delegation here:
+
+- **Two surfaces, one repo.** Source-of-truth at the root; the distributable
+  consumers copy is `cc-template/`. Universal content is duplicated and kept
+  identical between the two.
+- **The audience docs (`docs/user/`, `docs/maintainer/`) and the planning docs
+  (`docs/REQUIREMENTS.md`, etc.) are source-only.** They do NOT travel into
+  `cc-template/`; their absence from the seed is deliberate (delivery is an open
+  `/deployment-plan` question), never a bug.
+- **The repo runs its own commands on its own docs** — it is a downstream
+  consumer of itself.
+
+Don't have a subagent infer structure it can't see — give it the shape. And for
+exhaustive mechanical checks (link resolution, reference enumeration), prefer a
+deterministic pass (script / Grep) over any agent: Explore reads excerpts and
+misses occurrences past its window (see "Explore — don't use for").
