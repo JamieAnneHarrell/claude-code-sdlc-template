@@ -16,10 +16,11 @@ An interactive session that decides what to build next and writes the next PRD.
 
 ## When to run
 
-At a milestone — after an MVP ships, before a large feature, when you are
-planning the next version. It also runs on a brand-new project to produce the
-first PRD before [`/onboard`](onboard.md). A *movement* is a strategic chunk of
-work opened this way; bug fixes and cleanup are tactical and need no PRD.
+The recommended way to start a brand-new project: run it first to produce the
+first PRD that [`/onboard`](onboard.md) reads as the design intake. It also runs
+at every later milestone — after an MVP ships, before a large feature, when you
+are planning the next version. A *movement* is a strategic chunk of work opened
+this way; bug fixes and cleanup are tactical and need no PRD.
 
 ## What it does
 

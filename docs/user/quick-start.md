@@ -11,9 +11,11 @@ For why the workflow is shaped this way, see [The SDLC lifecycle](lifecycle.md).
 You need:
 
 - **Claude Code** — any distribution (IDE extension, desktop app, CLI, or web).
-- **A design intake** — a design document to build from, or the intent to write
-  one interactively in step 4. The richer the intake, the richer the plan the
-  template generates from it.
+- **A design intake** — the specification onboarding builds from. The
+  recommended way to create one is `/product-visioning`, an interactive session
+  you run in step 3; if you already have a design document, you'll drop it into
+  `docs/design/` instead. Either way, the richer the intake, the richer the plan
+  the template generates from it.
 
 ## 1. Copy the template into a new directory
 
@@ -44,14 +46,24 @@ them is expected. (Later, [`/refresh-from-repository`](commands/refresh-from-rep
 will respect any rule you have made your own — see
 [Keeping a project up to date](keeping-up-to-date.md).)
 
-## 3. Drop your design intake into `docs/design/`
+## 3. Open the project in Claude Code and create your design intake
 
-Put your design document into `docs/design/`. Markdown is preferred, and multiple
-files are fine. If you would rather build the first specification interactively,
-skip to step 4 and run `/product-visioning` first — it writes the first PRD,
-which onboarding then reads as the intake.
+Open the renamed directory in Claude Code, then run:
 
-## 4. Open the project in Claude Code and run `/onboard`
+```
+/product-visioning
+```
+
+This is the recommended way to start. `/product-visioning` is an interactive
+session that works through what you're building and why, then writes the first
+PRD (`docs/design/PRD-<slug>-001.md`) — the specification onboarding reads in the
+next step. Re-run it until the PRD says what you mean.
+
+**Already have a design document?** Drop it into `docs/design/` instead (markdown
+preferred, multiple files are fine) and continue to step 4 — onboarding reads a
+dropped design doc just as well as a generated PRD.
+
+## 4. Run `/onboard`
 
 ```
 /onboard

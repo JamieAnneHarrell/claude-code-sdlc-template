@@ -16,16 +16,7 @@ walkable checklist and session handoff — follow them in order:
    ```
    (or use the file explorer — copy the folder, rename it.)
 
-2. **Drop a design doc** into `docs/design/`. Markdown is preferred.
-   Multiple files are fine. A richer design produces a richer
-   generated PROJECT_PLAN; a one-paragraph design produces a thin
-   one. See `docs/design/README.md` for what good looks like.
-   (Prefer to build the first spec interactively? Run
-   `/product-visioning` instead — it authors the first PRD
-   `docs/design/PRD-<slug>-001.md`, which `/onboard` then treats as the
-   design intake.)
-
-3. **Review the rules.** Read each `rules/*.md` file and make sure it
+2. **Review the rules.** Read each `rules/*.md` file and make sure it
    matches your own collaboration philosophy — edit anything you
    disagree with. The rules are a starting agreement, not law; the
    template is meant to be customized per project. The universal rule
@@ -36,7 +27,21 @@ walkable checklist and session handoff — follow them in order:
    asked about again). You don't have to do anything special now to
    protect an edit. See "Keeping a project up to date" below.
 
-4. **Open the new directory in Claude Code** and run:
+3. **Open the new directory in Claude Code and create your design
+   intake.** The recommended path is to run:
+   ```
+   /product-visioning
+   ```
+   an interactive session that authors the first PRD
+   `docs/design/PRD-<slug>-001.md`, which `/onboard` then reads as the
+   design intake. (Already have a design document? **Drop it into
+   `docs/design/`** instead — markdown preferred, multiple files are
+   fine; `/onboard` reads a dropped doc just as well. A richer intake
+   produces a richer generated PROJECT_PLAN; a one-paragraph one
+   produces a thin plan. See `docs/design/README.md` for what good
+   looks like.)
+
+4. **Run `/onboard`:**
    ```
    /onboard
    ```

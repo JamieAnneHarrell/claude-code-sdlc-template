@@ -17,9 +17,9 @@ from the `ONBOARD-STATUS` comment in `CLAUDE.md`.
 ## When to run
 
 - **First PRD** — a new project where `/onboard` has never run
-  (`ONBOARD-STATUS: UNCONFIGURED`). The intake is either a design doc you dropped
-  into `docs/design/` or the first PRD that [`/product-visioning`](product-visioning.md)
-  wrote.
+  (`ONBOARD-STATUS: UNCONFIGURED`). The intake is the first PRD that
+  [`/product-visioning`](product-visioning.md) wrote — the recommended way to
+  start a project — or a design doc you dropped into `docs/design/`.
 - **Later movement** — an onboarded project (`ONBOARD-STATUS: COMPLETE`) that has
   a newer, undecomposed PRD whose movement number is higher than the current
   `PROJECT_PLAN.md`.

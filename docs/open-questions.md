@@ -383,6 +383,35 @@ paternalistic. Whether the seeded TODO.txt should be a sample
 users can rewrite freely vs. a structured artifact whose shape
 `/wind-down` preserves.
 
+#### Align `/onboard`-owned startup surfaces with the product-visioning-first framing
+
+*Context.* Surfaced 2026-06-27. The user-facing docs were revised to promote
+`/product-visioning` as the primary way to start a new project, with
+drop-a-design-doc demoted to an equal-but-secondary supported path (quick-start,
+both READMEs, the `/onboard` + `/product-visioning` command-reference docs;
+documentation-plan-001 Revise 1). But the surfaces `/onboard` and the seed own
+still lead with the design-doc path and are now inconsistent: the
+`cc-template/CLAUDE.md` unconfigured banner (step 1 "Confirm a design doc exists
+in `docs/design/`"), the seeded `cc-template/TODO.txt` checklist, and
+`/onboard`'s "No design doc in `docs/design/`" refusal copy. `/write-documentation`
+can't touch these (rule 8 / file ownership), so the framing inversion stopped at
+the doc boundary.
+
+*Proposed approach.* Through the in-movement enhancement lane (plan →
+`/design-review` → decompose), reword the `/onboard`-owned startup surfaces to
+lead with `/product-visioning` and present drop-a-design-doc as the secondary
+supported path: the `cc-template/CLAUDE.md` banner, the seeded `TODO.txt`
+checklist, and `/onboard`'s refusal copy (accept "have a PRD or a design doc"
+rather than design-doc-only). Resolve together with the "Seed `cc-template/TODO.txt`
+as the active onboarding checklist" story above — its proposed step 3 still reads
+"Drop a design doc," so the checklist should be reworked once, not twice. Mirror
+per NFR-9.
+
+*Open sub-questions.* Whether the banner/refusal change is purely framing or also
+touches `/onboard`'s detection (it already reads a PRD as intake, so likely
+framing-only). Whether this is a standalone enhancement or folds entirely into
+the seed-TODO story's build.
+
 #### `/design-review` Step S1.1 should read `docs/open-questions.md` (Abandoned Approaches especially)
 
 *Context.* Surfaced 2026-06-04 while authoring checkpoint 004's first

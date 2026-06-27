@@ -48,3 +48,18 @@ omit (or write "all docs") when unscoped.
 project's docs should read; otherwise this file stays header-only until
 /wind-down captures the first directive. New entries go below in chronological
 order; superseded ones are removed, not struck through. -->
+
+## Lead with `/product-visioning` as the primary way to start a new project
+
+**Guidance.** When documenting how to start a new project from the template,
+present `/product-visioning` as the primary, recommended path and
+dropping-a-design-doc-into-`docs/design/` as an equal-but-secondary supported
+alternative. Don't frame the design-doc drop as the default starting move.
+
+**Why.** Jamie's 2026-06-27 directive: `/product-visioning` is the first-class
+entry point; the dropped-design-doc path remains fully supported but is no longer
+the suggested default.
+
+**Scope note.** The startup / seeding sections of the user-facing docs
+(`docs/user/quick-start.md`, the `/onboard` + `/product-visioning` command
+references) and both READMEs.

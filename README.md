@@ -7,8 +7,9 @@ commands — `/onboard`, `/bootstrap`, `/deployment-plan`,
 `/design-review`, `/exit-test-plan`, `/product-visioning`,
 `/wind-down` — plus `/refresh-from-repository` and curated
 collaboration rules. Consumers copy `cc-template/` into a new
-project, drop a design doc into `docs/design/`, and run the
-configuration ritual. This repository is itself a downstream
+project, create a design intake — the recommended path is
+`/product-visioning`, or drop a design doc into `docs/design/` — and
+run the configuration ritual. This repository is itself a downstream
 consumer of its own template, so improvements are exercised on
 the source before they ship.
 
@@ -55,12 +56,14 @@ Copy the **dist subdirectory** (not the whole repo):
 ```
 Copy-Item -Recurse cc-template C:\path\to\new-project
 cd C:\path\to\new-project
-# Drop a design doc into docs/design/, then run:
+# Open in Claude Code, then create the intake and onboard:
+#   /product-visioning   (or drop a design doc into docs/design/)
 #   /onboard
 ```
 
 (Or use the file explorer — copy `cc-template/`, rename the
-destination, open in Claude Code, run `/onboard`.)
+destination, open in Claude Code, run `/product-visioning` then
+`/onboard`.)
 
 For the full walkthrough — including reading the rules first — see the
 [quick-start](docs/user/quick-start.md).
@@ -136,7 +139,7 @@ exercised here before they ship.
 **For everyone:**
 - **Claude Code** — any distribution (IDE extension, desktop app,
   CLI, or web). No version pin. Maintainers are recommended to use
-  **Opus 4.7** (current latest as of 2026-05-24) or the most recent
+  **Opus 4.8** (current latest as of 2026-07-27) or the most recent
   high-performance Claude model available.
 
 **Maintainers / contributors** also need:
