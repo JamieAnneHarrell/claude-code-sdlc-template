@@ -1101,6 +1101,59 @@ layout. No action this movement beyond recording the story.
 *Open sub-questions.* Which audience track — user, maintainer, or both? Folded
 into the lifecycle doc or stand-alone?
 
+#### Coalesce the planning vocabulary on Movement → Phase → Step, and pin where prompts fit
+
+*Context.* Surfaced 2026-06-27. The planning hierarchy is described with
+inconsistent language across the docs and the skills that manage them. The
+intended hierarchy is three nested levels: a **Movement** is an entire (usually
+multi-phase) project plan — an MVP, a minor release, or a large sprint, depending
+on the developer's framing; within a movement are **Phases**; within a phase are
+**Steps**, and each **prompt** in `docs/CLAUDE_CODE_PROMPTS.md` is exactly one
+step (prompt ≡ step). That prompt-to-plan relationship is nowhere stated, and
+"prompt", "phase", and "step" get used interchangeably. This project's own
+surfaces show the drift: TODO.txt calls "the write-documentation movement
+(Prompts 2.3-2.10)" a movement when it was a phase's worth of steps *inside* a
+movement — and was an in-movement enhancement, not a movement at all; the docs say
+"Phase 2.5" and "Prompt 2.5" for the same unit. Exit testing, by contrast, is
+already a phase-level activity — `/exit-test-plan` runs at the end of a phase
+(especially one that landed something a user touches), so its "phase exit" framing
+and `phase-NNN-exit.md` filename are correctly phase-grained and survive the
+settlement unchanged.
+
+*Proposed approach.* Codify the settled vocabulary everywhere — the docs **and**
+the skills that own the planning artifacts. The three levels: Movement = the
+project plan as a whole (the existing `movement:` counter is already this level and
+stays); Phase = a numbered group within the movement, and the granularity at which
+`/exit-test-plan` operates; Step = one prompt's worth of work (prompt ≡ step).
+State the prompt↔step relationship explicitly in CLAUDE.md and in `/onboard` (which
+authors `CLAUDE_CODE_PROMPTS.md`). The `phase-NNN-exit.md` `NNN` becomes a
+sequential counter independent of the phase number (matching the
+`design-review-checkpoint-NNN` and `documentation-plan-NNN` counters), not the
+phase-number tracker the current "for the target phase" framing implies. Sweep the
+remaining skills
+(`/product-visioning`, `/design-review`, `/exit-test-plan`, `/wind-down`,
+`/write-documentation`), the rules, and the live planning docs onto the agreed
+terms. This is doctrine spanning nearly every shipped `cc-template/` file and most
+source-only docs; it touches load-bearing invariants and the filename conventions,
+and it collides with existing names — so it is a `/design-review` checkpoint
+(plausibly its own movement or an in-movement enhancement), not an inline edit.
+Resolve alongside the in-movement-enhancement-lane story above — both rewrite
+CLAUDE.md's "Movement vs. tactical" framing, so the lane names and the
+Movement/Phase/Step hierarchy must land coherently. Frozen artifacts (LANDED
+checkpoints, archived plans, the design intake) keep their original wording as
+historical record, the same carve-out the hardcoded-counts story takes.
+
+*Open sub-questions.* The numbering, now that prompt ≡ step is settled: today's
+`2.5` notation is used for both the phase and the prompt, but a phase groups
+multiple steps — so does the scheme become `Phase 2 → Step 2.3 … 2.10` (rename
+only, numbers kept) or get genuinely renumbered? Whether "Product
+plan" vs "Project plan" is part of the same settlement — PRODUCT_VISION frames the
+movement, PROJECT_PLAN decomposes it into phases/steps — and whether the PRD /
+product-vision layer needs a named level above Movement. Which of the filename
+families (`project-plan-NNN`, `phase-NNN-exit`, `claude-code-prompts-NNN`) inherit
+the new words. Whether it lands as a movement, an in-movement enhancement, or
+doctrine codified through one `/design-review`.
+
 ---
 
 ### Abandoned Approaches
