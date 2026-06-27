@@ -36,8 +36,8 @@ flips `DEPLOYMENT-PLAN-STATUS` to `COMPLETE <date>`.
 appends those questions to `docs/open-questions.md`, notes the deferral in the
 README, and flips `DEPLOYMENT-PLAN-STATUS` to `DEFERRED <date>`.
 
-**Documentation build.** When a `docs/published/` documentation plan exists,
-`/deployment-plan` owns building the delivered docs: it reads the plan's delivery
+**Documentation build.** When a `docs/documentation-plans/` documentation plan
+exists, `/deployment-plan` owns building the delivered docs: it reads the plan's delivery
 recipe and release-readiness ledger, codes the render targets against this
 environment's runtime, and adds a pre-release doc gate. The doc *content* and the
 recipe belong to [`/write-documentation`](write-documentation.md); the build
@@ -47,8 +47,8 @@ belongs here.
 
 `CLAUDE.md` (all three status comments), `REQUIREMENTS.md`, `ARCHITECTURE.md`,
 `PROJECT_PLAN.md`, the design intake, the README (especially Developer setup),
-`rules/environment-rules.md`, and the newest `docs/published/documentation-plan-*.md`
-if one exists.
+`rules/environment-rules.md`, and the newest
+`docs/documentation-plans/documentation-plan-*.md` if one exists.
 
 ## Writes / owns
 

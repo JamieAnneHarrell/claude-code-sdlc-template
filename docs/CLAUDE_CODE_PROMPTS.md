@@ -1067,4 +1067,15 @@ copies follow in Phase 2.6):
 
 **Revisions since this prompt ran:**
 
-- (none yet)
+- LANDED 2026-06-26. Scope items 1–4 executed; the reconcile ran via
+  `/write-documentation` (Stage 2 reconcile). Deviations beyond written scope:
+  - Added a local subagent-briefing convention after agents misread the
+    source/dist structure mid-session: a "Project-structure briefing" section in
+    `rules/multi-agent-rules.md` (consumer-owned, outside the template block) and
+    a pre-dispatch pointer in `CLAUDE.md`'s Project-specific context. Orthogonal
+    to 2.10's doc scope.
+  - Swept two stale current-state `docs/published/` references the scope didn't
+    name — the `/write-documentation` entry in `design-decisions.md` and the
+    delivery story in `open-questions.md` — to satisfy the no-stray-references
+    exit criterion. Historical references (this plan/prompt's own bodies,
+    checkpoint-006, the manifest authoring log) left intact as record.

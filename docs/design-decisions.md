@@ -1224,9 +1224,10 @@ product documentation — for end users, admins, support, developers, and
 contributors — and ships for downstream consumers to document their own
 products. It is a *reasoning* command: Stage 1 surveys the project (internal
 docs **and** the real implementation), infers product type + audiences, and
-writes a numbered sign-off manifest `docs/published/documentation-plan-NNN.md`
+writes a numbered sign-off manifest `docs/documentation-plans/documentation-plan-NNN.md`
 (`AWAITING-APPROVAL` → `ACTIVE` → `SUPERSEDED`, newest governs); Stage 2 authors
-the marked set or reconciles the current set for a same-movement phase advance.
+the marked set, reconciles the current set for a same-movement phase advance, or
+revises the living docs from a described change.
 Currency is derived and **movement-aware** — the manifest stamps
 `documented-through { movement, phase }`; a re-run is STALE when the active
 movement differs or a later phase shipped in the same movement. The command

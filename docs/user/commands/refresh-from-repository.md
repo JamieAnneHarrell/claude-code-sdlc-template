@@ -88,4 +88,4 @@ status comment.
 ## See also
 
 [Keeping a project up to date](../keeping-up-to-date.md) ·
-[Maintaining the template](../maintaining-the-template.md)
+[Maintaining the template](../../maintainer/maintaining-the-template.md)

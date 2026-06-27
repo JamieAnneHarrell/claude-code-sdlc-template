@@ -5,7 +5,7 @@ created: 2026-06-25
 status: ACTIVE
 documented-through:
   movement: initial
-  phase: "2.6"
+  phase: "2.10"
 ---
 
 # Documentation Plan 001 — claude-code-sdlc-template
@@ -33,9 +33,10 @@ surface is the command set and the SDLC lifecycle those commands orchestrate.
   in the source-only `docs/REQUIREMENTS.md` / `docs/ARCHITECTURE.md` /
   `CLAUDE.md`, which it links rather than duplicates.
 
-**Documentation set this plan covers.** A canonical, detailed authored set under
-`docs/published/` (adopter track + one maintainer doc), plus in-place
-improvement of the two READMEs that orient and route into it:
+**Documentation set this plan covers.** A canonical, detailed authored set filed
+by audience — the adopter track under `docs/user/`, the one maintainer doc under
+`docs/maintainer/` — plus in-place improvement of the two READMEs that orient and
+route into it:
 - Root `README.md` — the source-of-truth orientation README (its user-facing
   sections only; the `/bootstrap`-owned **Developer setup** and
   `/deployment-plan`-owned **Deployment** sections are left untouched).
@@ -56,9 +57,9 @@ improvement of the two READMEs that orient and route into it:
   contributor doc. (Mark the maintainer-guide block `adjust` to add a
   `CONTRIBUTING.md` if that changes.)
 
-**Currency.** First documentation pass; movement `initial` (the project predates
-`/product-visioning`, so there are no PRDs and no `PRODUCT_VISION.md`), latest
-completed phase `2.6`.
+**Currency.** First documentation pass, reconciled through phase `2.10` after the
+audience-folder migration; movement `initial` (the project predates
+`/product-visioning`, so there are no PRDs and no `PRODUCT_VISION.md`).
 
 ## How to mark up this plan
 
@@ -78,23 +79,23 @@ Mark each independently.
 
 | Doc | Path | Primary audience | Mode(s) |
 |-----|------|------------------|---------|
-| Docs index / landing | docs/published/README.md | Adopter (+ maintainer) | orientation / routing |
-| Quick-start | docs/published/quick-start.md | Adopter (new) | how-to (tutorial-leaning) |
-| Command reference (per command) | docs/published/commands/ | Adopter (power user) | reference |
-| The SDLC lifecycle | docs/published/lifecycle.md | Adopter | explanation + how-to |
-| Keeping a project up to date | docs/published/keeping-up-to-date.md | Adopter (power user) | how-to |
-| Troubleshooting | docs/published/troubleshooting.md | Adopter | how-to + reference |
-| Maintaining the template | docs/published/maintaining-the-template.md | Maintainer / contributor | explanation + how-to |
+| Docs index / landing | docs/user/README.md | Adopter (+ maintainer) | orientation / routing |
+| Quick-start | docs/user/quick-start.md | Adopter (new) | how-to (tutorial-leaning) |
+| Command reference (per command) | docs/user/commands/ | Adopter (power user) | reference |
+| The SDLC lifecycle | docs/user/lifecycle.md | Adopter | explanation + how-to |
+| Keeping a project up to date | docs/user/keeping-up-to-date.md | Adopter (power user) | how-to |
+| Troubleshooting | docs/user/troubleshooting.md | Adopter | how-to + reference |
+| Maintaining the template | docs/maintainer/maintaining-the-template.md | Maintainer / contributor | explanation + how-to |
 | Root README (in place) | README.md | Maintainer + adopter orientation | orientation / routing |
 | Shipping README (in place) | cc-template/README.md | Adopter | orientation / routing + how-to |
 
-### Docs index / landing — `docs/published/README.md`
+### Docs index / landing — `docs/user/README.md`
 
 - **Primary audience:** Adopter, with a labelled maintainer pointer (voice:
   lean, peer-to-peer).
 - **Diátaxis mode(s):** orientation / routing (a landing page — names the
   audiences and routes to each doc; contains no deep content itself).
-- **Job served:** a reader who lands in `docs/published/` (browsing the repo)
+- **Job served:** a reader who lands in `docs/user/` (browsing the repo)
   needs to find the right doc for their job in one screen.
 - **Outline:**
   - One-paragraph "what this folder is" *(orientation)*
@@ -106,7 +107,7 @@ Mark each independently.
 > DOC DECISION — JAH:
 > _approved_
 
-### Quick-start — `docs/published/quick-start.md`
+### Quick-start — `docs/user/quick-start.md`
 
 - **Primary audience:** Adopter, first run (voice: warm-but-lean; guarantees a
   first success).
@@ -130,7 +131,7 @@ Mark each independently.
 > DOC DECISION — JAH:
 > _adjust: skim the rules before running any skills. User may not agree with my design philosophy, give them the opportunity to orient themselves first._
 
-### Command reference — `docs/published/commands/`
+### Command reference — `docs/user/commands/`
 
 - **Primary audience:** Adopter, power user (voice: austere, factual; consulted
   not read).
@@ -155,7 +156,7 @@ Mark each independently.
 > DOC DECISION — JAH:
 > _adjust: each command should have it's own document._
 
-### The SDLC lifecycle — `docs/published/lifecycle.md`
+### The SDLC lifecycle — `docs/user/lifecycle.md`
 
 - **Primary audience:** Adopter (voice: peer-to-peer, lightly opinionated).
 - **Diátaxis mode(s):** explanation (the model and the *why*) + how-to (the
@@ -179,7 +180,7 @@ Mark each independently.
 > DOC DECISION — JAH:
 > _adjust: This is a highly opinionated and structured SDLC. Provide a good introduction about WHY this exists and how it helps write good software. (Note the doc doesn't need to be highly opinionated, but it might help to intruduce the SDLC as such.)_
 
-### Keeping a project up to date — `docs/published/keeping-up-to-date.md`
+### Keeping a project up to date — `docs/user/keeping-up-to-date.md`
 
 - **Primary audience:** Adopter, power user (voice: lean, precise).
 - **Diátaxis mode(s):** how-to (the refresh task) + a thin reference slice (the
@@ -203,7 +204,7 @@ Mark each independently.
 > DOC DECISION — JAH:
 > _adjust: This is about keeping the SDLC *template* up to date. Frame as such._
 
-### Troubleshooting — `docs/published/troubleshooting.md`
+### Troubleshooting — `docs/user/troubleshooting.md`
 
 - **Primary audience:** Adopter (voice: terse, scannable).
 - **Diátaxis mode(s):** how-to + reference. Each entry is Symptom → Cause → Fix
@@ -224,7 +225,7 @@ Mark each independently.
 > DOC DECISION — JAH:
 > _adjust: include a section about common drifts such as logging what was done instead of deviations in claude code prompts, TODO becoming a log or holder of user stories that aren't really blockers, rediscovery of environment, etc._
 
-### Maintaining the template — `docs/published/maintaining-the-template.md`
+### Maintaining the template — `docs/maintainer/maintaining-the-template.md`
 
 - **Primary audience:** Maintainer / contributor (voice: candid peer; honest
   trade-offs).
@@ -260,7 +261,7 @@ Mark each independently.
   to the work and an adopter to the quick-start and the published set.
 - **Scope (edit in place, user-facing sections only):** overview, project shape,
   seeding, working-on-the-template, why-this-shape, usage, license, reference;
-  **add routing into `docs/published/`**. **Do not touch** the
+  **add routing into `docs/user/` + `docs/maintainer/`**. **Do not touch** the
   `/bootstrap`-owned *Developer setup* section or the `/deployment-plan`-owned
   *Deployment* section.
 - **Visuals:** none.
@@ -314,13 +315,13 @@ the audience it's hidden from.
 `/deployment-plan`, which owns the render/build and will code the targets against
 whatever runtime exists at release time. Names no toolchain or runtime (NFR-6).*
 
-- **Canonical detailed set** = the markdown under `docs/published/`. It is
-  authored and freshness-gated here, browsable as-is on the repo host. A future
-  `/deployment-plan` decides the *delivered* form and how `docs/published/`
-  travels into a distribution — `docs/published/` is **source-only** today
+- **Canonical detailed set** = the markdown under `docs/user/` and
+  `docs/maintainer/`. It is authored and freshness-gated here, browsable as-is on
+  the repo host. A future `/deployment-plan` decides the *delivered* form and how
+  the audience doc set travels into a distribution — it is **source-only** today
   (FR-12) and does not copy into `cc-template/`, so adopters do not receive it
   by default. **Open delivery question for `/deployment-plan`:** how (and which
-  subset of) the published set reaches adopters.
+  subset of) the audience doc set reaches adopters.
 - **Adopter-facing shipping surface** = `cc-template/README.md` (+
   `cc-template/docs/design/README.md`), which travels inside the copied
   directory. The root `README.md` is the source-of-truth orientation front door.
@@ -353,3 +354,4 @@ per-command reference was built from the real command files and agrees with them
 | Round | Date | documented-through | Docs touched | Notes |
 |-------|------|--------------------|--------------|-------|
 | Original | 2026-06-25 | initial / 2.6 | 16 sources under `docs/published/` (index, quick-start, lifecycle, keeping-up-to-date, troubleshooting, maintaining-the-template, `commands/` index + 9 per-command docs); root `README.md` (added Documentation routing); `cc-template/README.md` (self-contained, `ds-*` fix) | First pass. Command reference split into per-command docs per JAH adjust. Shipping README kept self-contained — relative links into source-only `docs/published/` would break on seed; delivery routing recorded for `/deployment-plan`. |
+| Reconcile 1 | 2026-06-26 | initial / 2.10 | Migrated the 16 sources from `docs/published/` to audience folders (`docs/user/`, `docs/user/commands/`, `docs/maintainer/`) and moved the manifest to `docs/documentation-plans/`; re-stamped all paths + currency. Refreshed the four reshaped command docs (`write-documentation`, `deployment-plan`, `wind-down`, `onboard`) to current behavior; fixed root `README.md` routing links. | Phase 2.10 reconcile after the Phase 2.8 skill reshape + Phase 2.9 root propagation: audience-folder filing, three Stage-2 modes (incl. revise), and `docs/documentation-guidance.md` ownership. Same movement — no new sign-off. |

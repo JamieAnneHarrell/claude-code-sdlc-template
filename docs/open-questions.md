@@ -1142,24 +1142,25 @@ session with no markers in the files.
 
 ### Open Questions
 
-#### How the source-only `docs/published/` set reaches adopters
+#### How the source-only `docs/user/` + `docs/maintainer/` doc set reaches adopters
 
 *Context.* Surfaced 2026-06-25 dogfooding `/write-documentation` on the template.
-The command authors its canonical set under `docs/published/`, but that path is
-source-only (FR-12) and never copies into `cc-template/`, so adopters who seed a
-project never receive it. The surface that *does* travel — `cc-template/README.md`
-— is rewritten by `/onboard` the moment a project is seeded. Two consequences:
-(1) the detailed docs have no delivery path to adopters yet, and (2) the shipping
-README can't relative-link into `docs/published/` without the links breaking on
-seed, so deep-doc routing for adopters is unresolved.
+The command authors its canonical set under `docs/user/` + `docs/maintainer/`, but
+those paths are source-only (FR-12) and never copy into `cc-template/`, so adopters
+who seed a project never receive it. The surface that *does* travel —
+`cc-template/README.md` — is rewritten by `/onboard` the moment a project is
+seeded. Two consequences: (1) the detailed docs have no delivery path to adopters
+yet, and (2) the shipping README can't relative-link into the published doc set
+without the links breaking on seed, so deep-doc routing for adopters is unresolved.
 
 *What we know so far.* `/write-documentation` owns content + a product-type-open
 delivery recipe; `/deployment-plan` owns the render/build and delivery. The recipe
-in `docs/published/documentation-plan-001.md` records the target forms and these
-questions. No `docs/DEPLOYMENT.md` exists yet (`/deployment-plan` is UNCONFIGURED).
+in `docs/documentation-plans/documentation-plan-001.md` records the target forms
+and these questions. No `docs/DEPLOYMENT.md` exists yet (`/deployment-plan` is
+UNCONFIGURED).
 
 *What would unblock an answer.* A `/deployment-plan` pass that decides how (and
-which subset of) `docs/published/` reaches adopters — a rendered/hosted form, a
+which subset of) the published doc set reaches adopters — a rendered/hosted form, a
 shipped subset mirrored into `cc-template/`, or an upstream-URL pointer — and how
 that interacts with `/onboard` rewriting `cc-template/README.md`.
 

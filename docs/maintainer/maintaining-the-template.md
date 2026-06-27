@@ -7,7 +7,7 @@ detail behind each topic, it routes you to the internal docs rather than repeati
 them.
 
 If you are *adopting* the template rather than maintaining it, you want the
-[Quick-start](quick-start.md) and the [command reference](commands/README.md)
+[Quick-start](../user/quick-start.md) and the [command reference](../user/commands/README.md)
 instead.
 
 ## The source/dist split
@@ -39,10 +39,10 @@ Two HTML-comment marker systems carry the reconciliation contract. They are
 inverses of each other:
 
 - `<!-- ONBOARD-FILL: <id> -->` wraps **consumer-owned** regions that a refresh
-  must never touch (filled by [`/onboard`](commands/onboard.md) and
-  [`/bootstrap`](commands/bootstrap.md)).
+  must never touch (filled by [`/onboard`](../user/commands/onboard.md) and
+  [`/bootstrap`](../user/commands/bootstrap.md)).
 - `<!-- CC-TEMPLATE-BLOCK: <id> -->` wraps **template-owned** regions that
-  [`/refresh-from-repository`](commands/refresh-from-repository.md) keeps in sync,
+  [`/refresh-from-repository`](../user/commands/refresh-from-repository.md) keeps in sync,
   each carrying a `template-owned` / `forked` / `removed` state.
 
 The marker syntax and the state encoding are load-bearing — stage detection and

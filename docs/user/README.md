@@ -24,7 +24,7 @@ itself:
 
 | Your goal | Read |
 |---|---|
-| Change the template safely without breaking an invariant | [Maintaining the template](maintaining-the-template.md) |
+| Change the template safely without breaking an invariant | [Maintaining the template](../maintainer/maintaining-the-template.md) |
 
 ## How this relates to the internal docs
 

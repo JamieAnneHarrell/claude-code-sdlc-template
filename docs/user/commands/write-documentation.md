@@ -9,17 +9,20 @@ auto-detected; currency is movement-aware.
 
 ```
 /write-documentation
+/write-documentation "<describe a change>"
 /write-documentation --doc "<name>"
 /write-documentation --audience "<role>"
 /write-documentation --new
 ```
 
+- `"<describe a change>"` — a Stage 2 *revise* pass: an interactive,
+  natural-language change to the living docs.
 - `--doc "<name>"` — scope a Stage 2 pass to one document.
 - `--audience "<role>"` — scope the proposed set to one audience.
 - `--new` — force a fresh plan (Stage 1) even when the current one is current.
 
 The command auto-detects its stage from the newest
-`docs/published/documentation-plan-*.md`.
+`docs/documentation-plans/documentation-plan-*.md`.
 
 ## When to run
 
@@ -37,12 +40,18 @@ documentation set — one `DOC DECISION` block per doc for you to mark `approve`
 `adjust: <note>`, or `drop`. It authors no prose yet; the sign-off gate comes
 first.
 
-**Stage 2 — author or reconcile.** In *author* mode it writes the marked set
-under `docs/published/`, applying a documentation-craft doctrine (Diátaxis modes,
-per-audience voice, CLI-reference and readability rules), fills the
-release-readiness ledger, stamps `documented-through`, and flips the manifest to
-`ACTIVE`. In *reconcile* mode it refreshes the existing set against what shipped
-since the last stamp, without a new sign-off.
+**Stage 2 — author, reconcile, or revise.** Three non-gated modes. In *author*
+mode it writes the marked set into audience-named folders (`docs/<audience-slug>/`
+— `docs/user/`, `docs/maintainer/`, and so on), applying a documentation-craft
+doctrine (Diátaxis modes, per-audience voice, CLI-reference and readability
+rules), fills the release-readiness ledger, stamps `documented-through`, and
+flips the manifest to `ACTIVE`. In *reconcile* mode it refreshes the existing set
+against what shipped since the last stamp, without a new sign-off. In *revise*
+mode it takes a natural-language change you describe, proposes how it lands across
+the affected docs, and applies it after you agree. Every mode applies the standing
+directives in `docs/documentation-guidance.md` as binding doctrine; documentation
+is downstream of behavior, so revise reflects what already shipped — it never
+drives a behavior change.
 
 Currency is **movement-aware**: the manifest records `documented-through:
 { movement, phase }`, and a re-run is stale when the active movement differs or a
@@ -52,13 +61,15 @@ derived.
 ## Reads
 
 The planning docs, the active PRD and `PRODUCT_VISION.md`, `DEPLOYMENT.md`,
-prior checkpoints and test plans, the real implementation, and any existing
-manifest, README, and `CONTRIBUTING.md`.
+`docs/documentation-guidance.md` (binding doctrine), prior checkpoints and test
+plans, the real implementation, and any existing manifest, README, and
+`CONTRIBUTING.md`.
 
 ## Writes / owns
 
-`docs/published/` — the manifest, the markdown sources, and `images/`. The
-user-facing sections of the README (by offer), and `CONTRIBUTING.md` when the
+The manifest at `docs/documentation-plans/documentation-plan-NNN.md`, and the
+doc sources and `images/` in their audience folders (`docs/<audience-slug>/`).
+The user-facing sections of the README (by offer), and `CONTRIBUTING.md` when the
 project takes contributors. It writes a product-type-aware **delivery recipe** but
 owns no renderer — building the delivered docs is
 [`/deployment-plan`](deployment-plan.md)'s. Manifest status values:
@@ -80,9 +91,11 @@ owns no renderer — building the delivered docs is
 ## Does not do
 
 Own a `CLAUDE.md` status comment, edit product source code or the internal
-planning docs, edit `DEPLOYMENT.md`, clobber the README's Developer setup or
-Deployment sections, render or build the docs, run a release, run git, or run
-tests.
+planning docs, write `docs/documentation-guidance.md` (it reads and applies that
+file; [`/wind-down`](wind-down.md) owns capture and retirement), edit
+`docs/PRODUCT_VISION.md` or open a movement, edit `DEPLOYMENT.md`, clobber the
+README's Developer setup or Deployment sections, render or build the docs, run a
+release, run git, or run tests.
 
 ## See also
 

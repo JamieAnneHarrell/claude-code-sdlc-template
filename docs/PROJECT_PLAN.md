@@ -577,14 +577,15 @@ refresh is quiet. This is the step that makes the reshaped
 
 ---
 
-## Phase 2.7 — Dogfood `/write-documentation` (dogfood COMPLETE; close folded into Step 2.10)
+## Phase 2.7 — Dogfood `/write-documentation` (COMPLETE)
 
-**Status (2026-06-26).** The dogfood ran — the template's own doc set was
-produced (manifest `documentation-plan-001` `ACTIVE` + audience-facing markdown
-+ delivery recipe + ledger). Checkpoint 006 then reshaped the doc layout
+**Status (2026-06-26): COMPLETE.** The dogfood ran — the template's own doc set
+was produced (manifest `documentation-plan-001` `ACTIVE` + audience-facing
+markdown + delivery recipe + ledger). Checkpoint 006 then reshaped the doc layout
 (`docs/published/` → audience-named folders; manifest → `docs/documentation-plans/`),
-so this phase's pending **NFR-6 dry-read + close fold into Step 2.10**, which
-runs the dry-read against the new `docs/user/` + `docs/maintainer/` layout. The
+so this phase's pending **NFR-6 dry-read + close folded into Step 2.10** — both
+landed there 2026-06-26 (the dry-read against the new `docs/user/` +
+`docs/maintainer/` layout confirmed the content stands alone). The
 deliverables / exit-criteria below are the original dogfood record.
 
 **Goal.** Run `/write-documentation` on this template, produce the
@@ -658,7 +659,15 @@ invariants reflect the reshape.
 
 ---
 
-## Phase 2.10 — Migrate live docs + reconcile + close
+## Phase 2.10 — Migrate live docs + reconcile + close (COMPLETE)
+
+**Status (2026-06-26): COMPLETE.** `git mv` migrated the 17 sources from
+`docs/published/` to `docs/user/` + `docs/maintainer/` + `docs/documentation-plans/`;
+the `/write-documentation` reconcile re-stamped the manifest (paths + currency
+`initial/2.10` + a migration authoring-log row), refreshed the four reshaped
+command docs, and fixed root `README.md` routing; all 159 relative links verified
+resolving; the NFR-6 dry-read confirmed the content stands alone. This closes the
+write-documentation work (Phases 2.7 + 2.8–2.10).
 
 **Goal.** Migrate this project's existing `docs/published/` set to the audience
 layout, create the guidance file, reconcile the now-stale docs, and close the

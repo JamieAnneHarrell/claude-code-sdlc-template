@@ -37,9 +37,11 @@ A five-step ritual:
 3. **Update tracking docs** — edits only docs with a real change:
    `CLAUDE_CODE_PROMPTS.md` deviation footers, `design-decisions.md`,
    `open-questions.md`, `REQUIREMENTS.md`, `ARCHITECTURE.md`, `PROJECT_PLAN.md`
-   phase status, the `CLAUDE.md` banner, and the currency of
-   `docs/published/` and the READMEs. It reports the status of files it does not
-   own rather than editing them.
+   phase status, and the `CLAUDE.md` banner. It captures new standing directives
+   into `docs/documentation-guidance.md` and retires superseded ones
+   (propose-and-confirm). For files it does not own it reports status rather than
+   editing — surfacing stale docs and OPEN release-readiness items, and routing
+   user-facing-doc drift to [`/write-documentation`](write-documentation.md).
 4. **Surface the commit handoff** — gives you the pre-commit sequence and a
    commit message (subject plus zero or one body sentence, body bullets citing
    doc IDs). It does not run the commit.
@@ -54,15 +56,18 @@ commands in `rules/environment-rules.md`.
 
 ## Writes / owns
 
-`TODO.txt` (rewritten), and the tracking docs in step 3 where they have a real
-diff. The commit handoff is surfaced as commands for you to review and paste —
-`/wind-down` owns the commit-handoff ritual but never runs it (rule 7).
+`TODO.txt` (rewritten), the tracking docs in step 3 where they have a real diff,
+and `docs/documentation-guidance.md` (it owns capturing and retiring the
+project's standing documentation directives). The commit handoff is surfaced as
+commands for you to review and paste — `/wind-down` owns the commit-handoff ritual
+but never runs it (rule 7).
 
 ## Refuses when
 
 It does not run `git commit`, push to remotes, or edit files it does not own —
 design-review checkpoints, test plans, PRDs, plan archives, `REVIEWS.md`, or the
-`docs/published/` set and user-facing README sections (it routes drift there to
+audience documentation set (`docs/<audience-slug>/`) and user-facing README
+sections (it routes drift there to
 [`/write-documentation`](write-documentation.md)). It surfaces a warning when
 `TODO.txt` doesn't reflect an open checkpoint or plan.
 

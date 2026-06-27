@@ -63,25 +63,27 @@ cd C:\path\to\new-project
 destination, open in Claude Code, run `/onboard`.)
 
 For the full walkthrough — including reading the rules first — see the
-[quick-start](docs/published/quick-start.md).
+[quick-start](docs/user/quick-start.md).
 
 ## Documentation
 
-Full audience-facing documentation lives in
-[`docs/published/`](docs/published/):
+Audience-facing documentation lives under `docs/`, filed by reader. Adopter
+docs are in [`docs/user/`](docs/user/):
 
-- **[Quick-start](docs/published/quick-start.md)** — seed a project and get into
+- **[Quick-start](docs/user/quick-start.md)** — seed a project and get into
   the loop.
-- **[The SDLC lifecycle](docs/published/lifecycle.md)** — the workflow and why
+- **[The SDLC lifecycle](docs/user/lifecycle.md)** — the workflow and why
   it's shaped this way.
-- **[Command reference](docs/published/commands/README.md)** — every slash
+- **[Command reference](docs/user/commands/README.md)** — every slash
   command, one page each.
-- **[Keeping the template up to date](docs/published/keeping-up-to-date.md)** —
+- **[Keeping the template up to date](docs/user/keeping-up-to-date.md)** —
   pulling upstream improvements with `/refresh-from-repository`.
-- **[Troubleshooting](docs/published/troubleshooting.md)** — refusals and common
+- **[Troubleshooting](docs/user/troubleshooting.md)** — refusals and common
   drifts.
-- **[Maintaining the template](docs/published/maintaining-the-template.md)** —
-  working on this repository itself.
+
+Working on the repository itself? See
+**[Maintaining the template](docs/maintainer/maintaining-the-template.md)** in
+[`docs/maintainer/`](docs/maintainer/).
 
 ## Working on the template itself
 

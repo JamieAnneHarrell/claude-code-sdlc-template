@@ -34,16 +34,20 @@ After either path, the next step is [`/design-review`](design-review.md).
 `docs/CLAUDE_CODE_PROMPTS.md`, and first entries in `docs/design-decisions.md`
 and `docs/open-questions.md`. It fills the project-scope block in
 `rules/project-rules.md`, rewrites `rules/multi-agent-rules.md` to your chosen
-mode, writes a README stub, creates `.gitignore` and `LICENSE` if absent, adopts
-the intake as `docs/design/PRD-<slug>-001.md` (`status: ACTIVE`), and flips
-`ONBOARD-STATUS` to `COMPLETE <date>`.
+mode, writes a README stub, creates `.gitignore` and `LICENSE` if absent, seeds
+the `docs/documentation-guidance.md` skeleton, adopts the intake as
+`docs/design/PRD-<slug>-001.md` (`status: ACTIVE`), and flips `ONBOARD-STATUS` to
+`COMPLETE <date>`.
 
 **Later movement.** Applies the new PRD without re-running setup: applies the
 PRD's `PRODUCT_VISION` revisions, archives the prior plan to
-`docs/project-plans/project-plan-NNN.md` and `claude-code-prompts-NNN.md`,
-authors a fresh `PROJECT_PLAN.md` and `CLAUDE_CODE_PROMPTS.md` for the new
-movement, and flips the target PRD `DRAFT → ACTIVE` while marking the prior
-`ACTIVE → SUPERSEDED <date>`.
+`docs/project-plans/project-plan-NNN.md` and
+`docs/project-plans/claude-code-prompts-NNN.md`, authors a fresh `PROJECT_PLAN.md`
+and `CLAUDE_CODE_PROMPTS.md` for the new movement, and flips the target PRD
+`DRAFT → ACTIVE` while marking the prior `ACTIVE → SUPERSEDED <date>`. If a
+documentation plan exists, it leaves a `TODO.txt` reminder that user docs are now
+stale for the new movement — run [`/write-documentation`](write-documentation.md)
+once the movement's user-facing work ships.
 
 ## Reads
 
@@ -54,9 +58,10 @@ movement, and flips the target PRD `DRAFT → ACTIVE` while marking the prior
 ## Writes / owns
 
 The planning docs above, `PRODUCT_VISION.md`, the in-flight `PROJECT_PLAN.md` and
-`CLAUDE_CODE_PROMPTS.md`, their `docs/project-plans/` archives, PRD status
-transitions, and the `ONBOARD-STATUS` comment (values `UNCONFIGURED`,
-`COMPLETE <date>`).
+`CLAUDE_CODE_PROMPTS.md`, their `docs/project-plans/` archives, the
+`docs/documentation-guidance.md` skeleton (its entries are then
+[`/wind-down`](wind-down.md)'s), PRD status transitions, and the `ONBOARD-STATUS`
+comment (values `UNCONFIGURED`, `COMPLETE <date>`).
 
 ## Refuses when
 
