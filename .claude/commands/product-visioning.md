@@ -188,9 +188,7 @@ Rewrite `TODO.txt` so the first entry under "What's next" is:
 ```
 
 Carryovers preserved below. Report: the PRD path, the movement name, and that
-`/onboard` next operationalizes it — the first PRD then routes through
-`/bootstrap` before `/design-review`; a later movement goes straight to
-`/design-review` after onboard. The DRAFT PRD is a created artifact —
+`/onboard` next operationalizes it. The DRAFT PRD is a created artifact —
 `/wind-down` owns the commit handoff (rule 7); don't surface git here.
 
 End with: "Movement NNN drafted in `docs/design/PRD-<slug>-NNN.md`. Review it;

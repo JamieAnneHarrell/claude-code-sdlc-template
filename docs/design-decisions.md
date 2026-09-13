@@ -827,6 +827,36 @@ adds spec wording without changing behavior.
 
 ---
 
+## Post-onboard routing is stated once, by `/onboard`
+
+**Decision.** What follows `/onboard` — `/design-review` then `/bootstrap`
+for the first PRD, `/design-review` alone for a later movement — is
+`/onboard`'s to state: in its description, its two paths, the `TODO.txt`
+it writes, and its final report. `/product-visioning` ends at "run
+`/onboard` to decompose it" and does not narrate the hops after that.
+Peer commands that touch the sequence (`/bootstrap`'s soft
+recommendation, `/design-review`'s "Post-onboarding sanity check" label)
+describe their own precondition, not the chain. The order itself was
+settled at checkpoint 001 R1.
+
+**Why.** The order is one fact with one owner. A copy in a command that
+runs *before* `/onboard` is read exactly once — by a visioning-first user
+on an empty project, before `/onboard` has rewritten `TODO.txt` — so no
+later step corrects it if it drifts. A downstream project reported the
+template as self-contradictory after reading a stale copy there.
+
+**Why not keep a corrected copy in `/product-visioning`'s report.** A
+correct duplicate still has to track `/onboard` on every future change
+to the sequence, and nothing gates that sync. The report already ends
+with "run `/onboard`", which is all a visioning user needs next.
+
+**Scope note.** Applies to command reports and the TODO text they write,
+not to user docs: `docs/user/quick-start.md` and `docs/user/lifecycle.md`
+present the full sequence on purpose, as a reader's map. Landed
+2026-09-12 in both `product-visioning.md` copies.
+
+---
+
 ## Rules-read reliability — foregrounding + skills-own-rituals, not hook enforcement
 
 **Decision.** Reliable session-start rules-read is addressed by three
