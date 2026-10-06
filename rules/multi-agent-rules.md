@@ -1,3 +1,4 @@
+<!-- This file is part of the claude-code-sdlc-template. See .claude/claude-code-sdlc-template-license.md for info. -->
 # Multi-Agent Rules
 
 This project uses the **explore-plus-plan** mode: parallel

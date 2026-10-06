@@ -1,6 +1,7 @@
 ---
 description: Author and maintain audience-facing product documentation. Stage 1 surveys the project and proposes a documentation plan for sign-off; stage 2 writes, reconciles, or revises the docs (README, quick-start, guides, reference, troubleshooting) applying a documentation-craft doctrine and the project's standing documentation guidance. Writes markdown sources plus a product-type-aware delivery recipe; the render/build is owned by /deployment-plan.
 ---
+<!-- This file is part of the claude-code-sdlc-template. See .claude/claude-code-sdlc-template-license.md for info. -->
 
 # /write-documentation
 

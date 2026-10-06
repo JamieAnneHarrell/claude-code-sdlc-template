@@ -1325,4 +1325,10 @@ copies follow in Phase 2.6):
 - The manifest stamps `documented-through` Phase 3 and the user-facing docs
   mention each item in scope item 2.
 
-**Revisions since this prompt ran:** none tracked.
+**Revisions since this prompt ran:**
+
+- LANDED 2026-10-06. Deviations:
+  - The documentation pass edited `cc-template/README.md` despite the "Do NOT
+    edit any `cc-template/` file" constraint: per Jamie, that constraint covers
+    the rules and commands; the shipping README is `/write-documentation`'s
+    planned scope.

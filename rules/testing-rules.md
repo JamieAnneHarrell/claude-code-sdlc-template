@@ -1,3 +1,4 @@
+<!-- This file is part of the claude-code-sdlc-template. See .claude/claude-code-sdlc-template-license.md for info. -->
 # Testing Rules
 
 Language-neutral test discipline. `/onboard` appends project-specific
@@ -132,12 +133,12 @@ This project has **no traditional test suite**. The deliverable
 is markdown only — no language runtime, no compilable code, no
 unit / functional / integration test categories in the usual
 sense. The categories and discipline sections above apply for any
-*future* tooling (e.g. Phase 3 regression-test automation), but
+*future* tooling (e.g. regression-test automation), but
 they're aspirational right now.
 
 What functions as testing today:
 
-1. **Re-read the six command files end-to-end after a change.**
+1. **Re-read the command files end-to-end after a change.**
    Catches: status name mismatches, file ownership overlap,
    broken prereq references, drift in the design-review or
    test-plan filename / placeholder conventions.
@@ -160,7 +161,7 @@ What functions as testing today:
    full and deferred paths) → `/wind-down`. Inspect outputs
    against each command file's spec.
 
-When Phase 3 regression-test automation ships, the live test
+If regression-test automation ships, the live test
 remains the highest-confidence check; the scripted check is a
 faster pre-flight that catches invariant-breaking changes (status
 comment renames, ONBOARD-FILL marker drift, zero-pad-width
@@ -182,10 +183,10 @@ those are *the* integration tests for this project.
 ### Expected test counts
 
 Not applicable. The relevant counts are:
-- **Six command files** at both root `.claude/commands/` and
-  `cc-template/.claude/commands/` (12 total).
+- **The same command files** at root `.claude/commands/` and
+  `cc-template/.claude/commands/` (byte-identical after a refresh).
 - **Three status comments** in `cc-template/CLAUDE.md`.
 - **Two ONBOARD-FILL marker pairs** across the rules files.
 
-Phase 3's regression-test automation may pin these as
+Regression-test automation, if it ships, may pin these as
 machine-checked invariants.

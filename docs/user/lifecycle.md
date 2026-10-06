@@ -32,7 +32,7 @@ for each kind of decision, and a command that owns each transition, so good
 software practice is the path of least resistance rather than an act of
 discipline you have to remember.
 
-## Two kinds of work
+## Configuration vs the recurring lifecycle
 
 **Configuration runs once.** [`/onboard`](commands/onboard.md),
 [`/bootstrap`](commands/bootstrap.md), and
@@ -73,15 +73,98 @@ flowchart LR
 5. When every phase is done, the loop returns to `/product-visioning` for the next
    movement.
 
-Not all work is a movement. **Bug fixes, cleanup, and release work are tactical**
-— they need no PRD. When a movement lands, `/wind-down` offers tactical work as a
-menu rather than forcing a new movement.
+## Three kinds of work
+
+Not all work is a movement. Every piece of work fits one of three lanes, and the
+lane decides how much ceremony it gets.
+
+| Lane | What it is | How it runs |
+|---|---|---|
+| **Movement** | A new strategic direction — the product goal changes. | `/product-visioning` → PRD → `/onboard` → `/design-review` |
+| **In-movement enhancement** | A change too big to do inline, but within the current product goal. | Plan → `/design-review` ratifies it and decomposes it into steps → build → `/wind-down` |
+| **Tactical** | A bug fix, cleanup, or release work. | Just do it. No PRD. |
+
+The **in-movement enhancement** is the lane people most often miss. Mid-movement,
+you discover something worth building that the plan didn't foresee — a new
+capability, a reworked command, a hardening batch. It doesn't change what the
+product is for, so it is not a new movement and needs no PRD. But it is too big
+or too risky to slip into the current step. Write a short plan, run
+`/design-review` over it, and let the review decompose it into new steps with
+their own prompts. Then build those steps like any other.
+
+When a movement lands, [`/wind-down`](commands/wind-down.md) offers tactical work
+— a release, opportunistic fixes, a backlog-cleanup `/design-review` — as a menu
+alongside the next movement, rather than forcing a new movement.
+
+## Movements, phases, and steps
+
+The plan uses three nested units:
+
+- A **movement** is the whole project plan for one PRD, as above.
+- A **phase** is a logically grouped set of tasks that achieves one goal. It may
+  take one prompt or ten.
+- A **step** is one of those prompts. Step 5.1 is the first step of Phase 5;
+  Step 5.2 is the second. Each step has one prompt in `CLAUDE_CODE_PROMPTS.md`,
+  and a step is generally one Claude Code session — steps are session-sized
+  chunks of a phase.
+
+## Changing the plan: plan revision
+
+Plans change mid-movement. A discovery in one step often means a later step
+should be rewritten, split, or reordered. When the product goal hasn't changed,
+that is a **plan revision**, and it follows four rules:
+
+1. A step that has run is never changed. Follow-up work becomes a new step.
+2. A step that has not run can be rewritten or removed.
+3. Numbers never change once assigned. A step added at the end takes the next
+   number; a step inserted between two others takes a letter — Step 5.2a goes
+   between 5.2 and 5.3. Phases work the same way.
+4. Claude proposes the revision, you approve it, Claude edits the plan and the
+   prompts, and `/wind-down` records why.
+
+Rule 3 keeps every existing reference to a step correct: nothing after an insert
+is renumbered.
+
+Two limits mark where plan revision stops:
+
+- **The product goal changed** — that is not a plan revision. Go back to
+  [`/product-visioning`](commands/product-visioning.md).
+- **The change is risky** — give it a [`/design-review`](commands/design-review.md)
+  first.
+
+## Where project files live
+
+Every project file follows one of three lifecycle patterns. The pattern tells you
+whether a file survives a new movement.
+
+| Pattern | Files | What happens on a new movement |
+|---|---|---|
+| **Durable-global** — current truth, reconciled in place | `docs/design-decisions.md`, `docs/open-questions.md`, `docs/documentation-guidance.md` | Nothing. They are kept current and never archived. |
+| **Movement-scoped** — the working plan for one movement | `docs/PROJECT_PLAN.md`, `docs/CLAUDE_CODE_PROMPTS.md` | `/onboard` archives them to `docs/project-plans/` and writes fresh ones. |
+| **Numbered artifacts** — an append-only record | PRDs, design-review checkpoints, exit-test plans, documentation plans | Nothing is deleted. The newest governs; earlier ones are marked `SUPERSEDED` or `LANDED`. |
+
+Durable-global files hold what must outlive every movement — a standing decision,
+an open question, a documentation directive — so nobody has to copy it forward
+into each new plan. When one of their entries stops being true, it is rewritten
+or moved (an abandoned approach moves to `open-questions.md` § Abandoned
+Approaches), never left behind with a "superseded" note.
 
 ## The repeating moves
 
+**Every session starts by reading the rules.** `CLAUDE.md` directs each session
+to read four rules files end-to-end before it responds:
+`coding-session-rules.md`, `design-philosophy-rules.md`, `environment-rules.md`,
+and `project-rules.md`. The other two — `testing-rules.md` and
+`multi-agent-rules.md` — are read in full before the work that needs them. The
+template ships a Claude Code output style (selected in `.claude/settings.json`)
+that tells Claude to act on `CLAUDE.md` before acting on your first message, so
+the read happens instead of being skipped.
+
 **Every session ends with [`/wind-down`](commands/wind-down.md).** It rewrites
 `TODO.txt` to the next pick-up, updates the tracking docs, and hands you the
-commit. This is what carries context across the gap between sessions.
+commit. This is what carries context across the gap between sessions. It is also
+the one place a commit handoff comes from: when another command reaches a commit
+point, it invokes `/wind-down` rather than writing its own git commands.
 
 **Every phase exit that needs it runs [`/exit-test-plan`](commands/exit-test-plan.md).**
 You walk the plan by hand (the template never runs your tests for you); the

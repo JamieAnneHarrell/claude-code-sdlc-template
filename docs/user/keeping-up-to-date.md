@@ -29,12 +29,28 @@ is left exactly as it was. There is no flag to skip this review.
 
 ## What it touches, and what it never touches
 
+| File | What refresh does |
+|---|---|
+| `.claude/commands/*.md` | Replaces them with the upstream versions. |
+| `.claude/claude-code-sdlc-template-license.md` | Replaces it with the upstream version. This is the template's MIT license file. |
+| `.claude/output-styles/claude-code-sdlc-template.md` | Replaces it with the upstream version. This is the output style that makes each session act on `CLAUDE.md` first. |
+| `.claude/settings.json` | Creates it if absent. If present, sets only the `outputStyle` key; every other key is yours. |
+| `docs/design-decisions.md`, `docs/open-questions.md`, `docs/documentation-guidance.md` | Adds the empty starter skeleton only if the file is absent. Never overwrites one you have. |
+| `rules/*.md`, `CLAUDE.md` | Block-merges the template-owned blocks (see the next section), plus two small in-place edits listed below. |
+
 Your customizations are safe by design:
 
 - Content inside `<!-- ONBOARD-FILL: ... -->` blocks — your project-specific
   scope, environment, and tooling — is never touched.
-- Content **outside** the `<!-- CC-TEMPLATE-BLOCK: ... -->` markers is yours
-  forever; refresh ignores it.
+- Content **outside** the `<!-- CC-TEMPLATE-BLOCK: ... -->` markers is yours,
+  with two exceptions that refresh keeps in step with upstream:
+  - The **session-start directive** — the blockquote near the top of `CLAUDE.md`
+    that begins "Before you respond to the first user message of any session" —
+    is updated to upstream's wording.
+  - The **provenance comment** — `<!-- This file is part of the
+    claude-code-sdlc-template. … -->` — is added as line 1 of any rules file or
+    `CLAUDE.md` that lacks it. It points at the license file and is how the MIT
+    attribution travels with the template's files.
 
 ## The marker-state model
 
@@ -60,13 +76,22 @@ A project onboarded before this marker system existed gets a one-time migration 
 its first refresh — refresh inserts the markers for you, aligning to upstream, and
 asks about any section that has diverged.
 
+## When refresh asks you to run it again
+
+Sometimes a refresh stops after installing the commands and asks you to
+re-invoke it. That happens when upstream's refresh logic is newer than your
+installed copy: an older copy must not merge files whose conventions it doesn't
+know. Refresh installs the new commands — including its own newer self — and
+stops. Run `/refresh-from-repository` again and the new logic does the merge.
+
 ## The two flags
 
 - `/refresh-from-repository --refresh-skills-only` — update only the slash
   commands and merge nothing. Useful for inspecting new refresh logic before
   letting it touch your rules.
 - `/refresh-from-repository --no-claudemd` — refresh the commands and rules but
-  leave `CLAUDE.md` alone. For a heavily-customized `CLAUDE.md`.
+  leave `CLAUDE.md` alone, including the two in-place edits. For a
+  heavily-customized `CLAUDE.md`.
 
 ## Pinning to a specific version (vendored lock-in)
 

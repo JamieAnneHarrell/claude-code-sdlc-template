@@ -30,8 +30,12 @@ rationale and the rejected alternatives are in
 Universal content — the ten rules, the design philosophy, the command files — is
 kept **identical** between the root and `cc-template/`. That duplication is
 deliberate (the root project consumes its own template) and it creates drift risk.
-The discipline that manages it: **edit in `cc-template/` first, then copy the
-change up to the root** if it's a command or rules file this project itself uses.
+The discipline that manages it: **edit in `cc-template/` first, then propagate to
+the root by running `/refresh-from-repository` at the root.** With a
+`cc-template/` subdirectory present, refresh runs in source mode and treats it as
+the upstream. Never hand-copy a command or hand-edit a root rules file or root
+`CLAUDE.md` template block — the next refresh would then report a false
+divergence. The refresh *is* the propagation, and every run dogfoods it.
 
 ## The two marker systems
 
@@ -59,13 +63,49 @@ silent regressions. The root [`CLAUDE.md`](../../CLAUDE.md) carries the
 command, and when you change an invariant, audit every command and file the chain
 names.
 
+## License provenance on shipped files
+
+Every shipped markdown file in `cc-template/` carries one HTML comment pointing at
+the license file:
+
+```
+<!-- This file is part of the claude-code-sdlc-template. See .claude/claude-code-sdlc-template-license.md for info. -->
+```
+
+It goes on line 1 — except in a command file, where it goes on the line after the
+YAML frontmatter's closing `---`. Above the frontmatter, the frontmatter stops
+parsing and the command loses its description. A new shipped markdown file needs
+the comment too. The license file itself
+(`cc-template/.claude/claude-code-sdlc-template-license.md`) carries the MIT text,
+the distribution URL, and the list of covered files; keep that list current when
+you add a command or rules file.
+
+## When to bump the refresh logic version
+
+`/refresh-from-repository` carries a **Refresh logic version** stamp. An older
+installed copy that sees a higher upstream stamp installs the new commands and
+asks for a re-invoke instead of merging. Bump the stamp when a change would make
+an older copy mishandle the newer upstream: the marker strings or state encoding
+change, the reconciliation algorithm changes, or **the set of files refresh
+delivers changes**. Cosmetic prose edits don't bump it.
+
+## Where a new file belongs
+
+A new project file follows one of three lifecycle patterns — durable-global,
+movement-scoped, or a numbered artifact — and the pattern decides whether it is
+archived on a new movement. Pick one before adding the file. The adopter-facing
+summary is in [The SDLC lifecycle](../user/lifecycle.md#where-project-files-live);
+the structural list is in [`ARCHITECTURE.md`](../ARCHITECTURE.md) § File-lifecycle
+patterns, and the rationale is in `docs/design-decisions.md`.
+
 ## How to change the template safely
 
 1. Make the edit in `cc-template/` first.
 2. Audit the invariant chain in `CLAUDE.md` for anything your change touches —
    status comments, placeholder strings, filename pad widths, marker encodings.
-3. Copy the change up to the root if it's a command or rules file the source
-   itself uses.
+3. Propagate to the root with a source-mode `/refresh-from-repository` run. A
+   logic-version bump makes the first run install the commands and ask for a
+   re-invoke; a final run should report nothing to do.
 4. **Dogfood it.** Run the changed command on this project's own docs before it
    ships. The source repository runs its own commands, so a real exercise is
    always available.

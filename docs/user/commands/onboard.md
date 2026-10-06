@@ -49,6 +49,16 @@ documentation plan exists, it leaves a `TODO.txt` reminder that user docs are no
 stale for the new movement — run [`/write-documentation`](write-documentation.md)
 once the movement's user-facing work ships.
 
+**Prompt quality.** Every feature prompt it writes into `CLAUDE_CODE_PROMPTS.md`
+(design-review prompts are exempt) meets four requirements: exit criteria are
+self-contained and testable; scope items state the contract, citing requirement
+numbers only as cross-references; the read-first list names specific files and
+sections, not whole docs; and each constraint names the trap it prevents.
+
+Both paths end by invoking [`/wind-down`](wind-down.md), which owns the commit
+handoff. If you chose a fresh `git init` during setup, it tells you to run
+`git init` first.
+
 ## Reads
 
 `CLAUDE.md` (for `ONBOARD-STATUS`), every file in `docs/design/` except its

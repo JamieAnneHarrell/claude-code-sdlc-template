@@ -369,6 +369,19 @@ so `/design-review`'s Abandoned-Approaches / whole-file read doesn't re-surface
 them as live options. (The internal-manifest question was closed as "do nothing"
 at checkpoint 007 N3; a holding area would be one more purpose-named folder.)
 
+#### Commands' "Required reading before Step 0" lines predate the four-file session start
+
+*Context.* Each shipped command opens with a "Required reading before Step 0"
+line naming two or three rules files; since checkpoint 007 R6 the `CLAUDE.md`
+directive names four. Harmless — the directive already loads all four at session
+start — so the lines are redundant rather than wrong. Surfaced 2026-10-05.
+
+*Proposed approach.* Tidy opportunistically when a later pass touches the
+commands: drop the line, or reduce it to the command-specific emphasis (e.g.
+"Rule 7 is load-bearing here") without re-listing files.
+
+*Open sub-questions.* None.
+
 ---
 
 ### Abandoned Approaches

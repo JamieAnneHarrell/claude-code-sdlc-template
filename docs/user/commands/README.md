@@ -20,7 +20,7 @@ the [Quick-start](../quick-start.md).
 | [`/exit-test-plan`](exit-test-plan.md) | At a phase exit that needs a manual walkthrough | `docs/test-plans/phase-NNN-exit.md` |
 | [`/write-documentation`](write-documentation.md) | When the audience-facing docs need writing or refreshing | A documentation plan plus the doc sources |
 | [`/wind-down`](wind-down.md) | At the end of every session | A rewritten `TODO.txt` and a commit handoff |
-| [`/refresh-from-repository`](refresh-from-repository.md) | When you want later template improvements | Updated commands and block-merged rules |
+| [`/refresh-from-repository`](refresh-from-repository.md) | When you want later template improvements | Updated commands, `.claude/` template files, and block-merged rules |
 
 ## Two groups
 

@@ -1,6 +1,7 @@
 ---
 description: Run an interactive product-visioning session to produce the next PRD (first or n-th) — settle what to build next and why, draw out the product's personality, and write a stand-alone DRAFT PRD. /onboard then decomposes it into the planning docs.
 ---
+<!-- This file is part of the claude-code-sdlc-template. See .claude/claude-code-sdlc-template-license.md for info. -->
 
 # /product-visioning
 

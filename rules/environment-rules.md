@@ -1,3 +1,4 @@
+<!-- This file is part of the claude-code-sdlc-template. See .claude/claude-code-sdlc-template-license.md for info. -->
 # Environment Rules
 
 Cross-platform conventions, shell handling, and where Claude puts
@@ -215,8 +216,7 @@ username, stop and surface the policy.
 ### Tooling beyond language
 - **Git** — maintainers / contributors only. Any modern version.
 - **Claude Code** — everyone. Any distribution (IDE extension,
-  desktop app, CLI, web). No version pin; **Opus 4.7** (as of
-  2026-05-24) or the most recent high-performance Claude model
+  desktop app, CLI, web). No version pin; the latest Opus model
   recommended for maintainers.
 
 <!-- /ONBOARD-FILL -->

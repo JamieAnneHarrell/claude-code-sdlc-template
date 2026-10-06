@@ -1,6 +1,7 @@
 ---
 description: Pull the latest commands and block-merge the latest rules + CLAUDE.md from the cc-template upstream into a downstream project, without re-onboarding. Reviews the download before applying. Source-mode syncs a local cc-template/ subdir to root.
 ---
+<!-- This file is part of the claude-code-sdlc-template. See .claude/claude-code-sdlc-template-license.md for info. -->
 
 # /refresh-from-repository
 
@@ -31,8 +32,8 @@ Two relationships use the same code path:
   trusted the heavyweight security review is replaced by a plain
   change summary.
 
-<!-- Refresh logic version: 3 -->
-**Refresh logic version: 3**
+<!-- Refresh logic version: 4 -->
+**Refresh logic version: 4**
 
 > The integer above is the drift stamp (read by Step 3). Bump it only
 > when a change would make an *older* locally-installed copy of this
@@ -41,8 +42,8 @@ Two relationships use the same code path:
 > (`template-owned` / `forked` / `removed`) or its `state=` encoding
 > changes, the reconciliation algorithm (Step 5) changes behavior, or
 > the set of files refresh delivers changes (e.g. the template-shipped
-> doc-skeleton class added in version 3). Cosmetic prose edits do
-> **not** bump it.
+> doc-skeleton class added in version 3; the `.claude/` template files
+> added in version 4). Cosmetic prose edits do **not** bump it.
 
 **Required reading before Step 0:** read
 `rules/coding-session-rules.md` and `rules/design-philosophy-rules.md`
@@ -54,7 +55,7 @@ commit through `/wind-down`.
 
 ## What gets refreshed, and what never does
 
-Refresh manages three kinds of file:
+Refresh manages four kinds of file:
 
 1. **Slash commands** (`.claude/commands/*.md`) — wholesale-replaced
    from upstream every run. Commands carry no markers; they are not
@@ -71,6 +72,17 @@ Refresh manages three kinds of file:
    content into. Delivered **only when absent** downstream and **never
    overwritten** (Step 4b). They carry no markers; their presence *is*
    the memory that they were delivered.
+4. **`.claude/` template files** — the license file
+   `.claude/claude-code-sdlc-template-license.md` and the output style
+   `.claude/output-styles/claude-code-sdlc-template.md` are
+   template-owned and overwritten from upstream every run.
+   `.claude/settings.json` is created from upstream when absent; when
+   present, only its `outputStyle` key is added or updated in place
+   (Step 4).
+
+Rules files and `CLAUDE.md` also take two targeted edits to unmarked
+template text: the session-start directive and the provenance comment
+(Step 5c).
 
 There is **no state file**. The template files are their own memory:
 each block records its own state in its marker (below). Refresh never
@@ -83,9 +95,9 @@ Two consumer-owned primitives are **never** merged or overwritten:
   project-specific content.
 - **Free regions** — any text outside both marker kinds. In
   `CLAUDE.md` the free regions are the banner, status comments,
-  `## Project-specific context`, and `## Load-bearing invariants`
+  `## Project-specific context`, and `## Load-bearing invariants`;
   only `## Reading order at session start` and `## Collaboration
-  rules` are template-owned.
+  rules` are template-owned, plus the two Step 5c targeted edits.
 
 Refresh identifies the template-owned region of each file by the
 **block ids present in the upstream copy**, never by "everything
@@ -230,9 +242,13 @@ require an explicit affirmative).
 2. **Change summary.** Report what *would* change if the consumer
    proceeds: which `.claude/commands/*.md` differ from the live copies,
    which `CC-TEMPLATE-BLOCK` ids in the rules / `CLAUDE.md` would
-   be added, updated, or surfaced for a decision in Step 5, and which
+   be added, updated, or surfaced for a decision in Step 5, which
    template-shipped doc skeletons are absent downstream and would be
-   delivered (Step 4b). This is a read-only preview; it applies nothing.
+   delivered (Step 4b), whether the license file or output style differ
+   from the live copies, whether `.claude/settings.json` would be
+   created or have its `outputStyle` key set (Step 4), and which Step 5c
+   targeted edits would apply (directive text; provenance comment). This
+   is a read-only preview; it applies nothing.
 3. **Surface findings and ask for an explicit go/no-go.** Lead with any
    security findings. If anything looks malicious, say so plainly and
    recommend declining. On **no**: delete the staging area, touch
@@ -279,11 +295,24 @@ downstream lacks. (In source mode this is a root↔dist copy; in public
 mode it is a copy out of the staging clone.) If `--refresh-skills-only`,
 stop here and report.
 
+Then sync the `.claude/` template files from upstream:
+
+- `.claude/claude-code-sdlc-template-license.md` and
+  `.claude/output-styles/claude-code-sdlc-template.md` — copy every run,
+  overwriting the downstream copy. Both are template-owned.
+- `.claude/settings.json` — downstream absent → create it from
+  upstream. Present → add or update only the `outputStyle` key, in
+  place, to upstream's value; every other key is the consumer's and is
+  left untouched.
+
 Commands carry no markers and are not reconciled block-by-block — they
-are replaced wholesale, having passed the Step 2 review. This is the
-**only** place refresh *replaces* whole files; Step 4b *adds* absent
-doc skeletons but never replaces a present one, and rules and
-`CLAUDE.md` are never copied or force-overwritten wholesale (Step 5).
+are replaced wholesale, having passed the Step 2 review. Step 4 is the
+**only** place refresh *replaces* whole files (the commands, the
+license file, the output style); Step 4b *adds* absent doc skeletons
+but never replaces a present one, and rules and `CLAUDE.md` are never
+copied or force-overwritten wholesale (Step 5). The `.claude/` template
+files are skipped under `--refresh-skills-only` and the Step 3 restage
+(both are commands-only).
 
 ---
 
@@ -404,6 +433,21 @@ understanding — the command does **not** delegate it to a
 string-matching heuristic. Scope it to the file being merged; do not
 scan sideways into other files.
 
+### Step 5c — Targeted edits to unmarked template text
+
+Two pieces of template text sit outside any block. Edit each in place;
+add no markers.
+
+- **Session-start directive.** The blockquote near the top of
+  `CLAUDE.md` that opens with **Before you respond to the first user
+  message of any session:** is replaced with upstream's blockquote, in
+  place. If downstream has none, leave it absent and note it in the
+  report. Skipped under `--no-claudemd`.
+- **Provenance comment.** Any rules file or `CLAUDE.md` (unless
+  `--no-claudemd`) whose line 1 is not upstream's provenance comment
+  (`<!-- This file is part of the claude-code-sdlc-template. … -->`)
+  gets it inserted as line 1.
+
 ---
 
 ## Step 6 — Pre-marker migration (one-time)
@@ -445,10 +489,13 @@ result.
 ## Step 7 — Report
 
 1. **Report** to Jamie: commands replaced; doc skeletons delivered;
-   blocks in sync / updated / hand-merged / newly forked / added /
-   tombstoned; existing `forked` and `removed` blocks respected; any
-   unknown local blocks; whether `CLAUDE.md` was included; and, for
-   public mode, the outcome of the Step 2 security review.
+   license file and output style updated; `.claude/settings.json`
+   created or its `outputStyle` key set; blocks in sync / updated /
+   hand-merged / newly forked / added / tombstoned; existing `forked`
+   and `removed` blocks respected; any unknown local blocks; the Step 5c
+   targeted edits made (directive updated; files given the provenance
+   comment); whether `CLAUDE.md` was included; and, for public mode, the
+   outcome of the Step 2 security review.
 2. **Clean up.** In public mode, delete the staging clone.
 3. **Do not commit.** Leave the working tree for Jamie to review and
    route the commit through `/wind-down` (rule 7). If this refresh was
@@ -490,8 +537,8 @@ nothing else to write.
 
 ## What this command does NOT do
 
-- Does not run `git commit`, `git push`, or `git tag` (rule 7).
-  Routes the commit through `/wind-down`.
+- Does not commit, push, or tag (rule 7). Routes the commit through
+  `/wind-down`.
 - Does not run tests (rule 8).
 - Does not write to the live tree before the Step 2 review — the fetch
   is quarantined and a declined review leaves nothing changed.
@@ -500,12 +547,17 @@ nothing else to write.
   only persisted reconciliation memory.
 - Does not edit `ONBOARD-FILL` regions or any free region — including
   the `CLAUDE.md` banner, status comments, `## Project-specific
-  context`, and `## Load-bearing invariants`. Only template-owned
-  blocks merge; `--no-claudemd` skips `CLAUDE.md` entirely.
+  context`, and `## Load-bearing invariants` — beyond the two Step 5c
+  targeted edits (directive text; provenance comment). Only
+  template-owned blocks merge; `--no-claudemd` skips `CLAUDE.md`
+  entirely.
+- Does not touch any `.claude/settings.json` key other than
+  `outputStyle`.
 - Does not copy or force-overwrite rules files or `CLAUDE.md` wholesale
   — they are mutated in place, block by block. The only whole-file
-  *replacement* is Step 4's commands; Step 4b *adds* absent doc
-  skeletons but never overwrites a present one. A forced clobber
+  *replacements* are Step 4's commands, license file and output style;
+  Step 4b *adds* absent doc skeletons but never overwrites a present
+  one. A forced clobber
   (`Copy-Item -Force` / `cp -f`) of these personalized files is off
   limits per `rules/environment-rules.md` ("Jamie runs all destructive
   commands").

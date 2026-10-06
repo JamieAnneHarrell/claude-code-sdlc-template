@@ -5,7 +5,7 @@ created: 2026-06-25
 status: ACTIVE
 documented-through:
   movement: initial
-  phase: "2.10"
+  phase: "3"
 ---
 
 # Documentation Plan 001 — claude-code-sdlc-template
@@ -57,8 +57,8 @@ route into it:
   contributor doc. (Mark the maintainer-guide block `adjust` to add a
   `CONTRIBUTING.md` if that changes.)
 
-**Currency.** First documentation pass, reconciled through phase `2.10` after the
-audience-folder migration; movement `initial` (the project predates
+**Currency.** First documentation pass, reconciled through phase `3` (the
+checkpoint 007 batch); movement `initial` (the project predates
 `/product-visioning`, so there are no PRDs and no `PRODUCT_VISION.md`).
 
 ## How to mark up this plan
@@ -342,7 +342,7 @@ OPEN or RESOLVED.*
 
 | Type | Item | State | Detail |
 |------|------|-------|--------|
-| Stale | Root `README.md` "Developer setup" pins "Opus 4.7 (current latest as of 2026-05-24)" | OPEN | Rule-10 stale-version claim. That section is owned by `/bootstrap`; `/write-documentation` does not edit it. Re-run `/bootstrap` or correct the pin. |
+| Stale | Root `README.md` "Developer setup" pinned "Opus 4.8 (current latest as of 2026-07-27)"; `rules/environment-rules.md` ONBOARD-FILL environment block pinned "Opus 4.7 (as of 2026-05-24)" | RESOLVED | Rule-10 stale-version claims that disagreed. Both now read "the latest Opus model" — no pin to go stale (tactical fix, 2026-10-06). |
 
 No unfilled visuals — every authored doc is text-only. No conformance gaps — the
 per-command reference was built from the real command files and agrees with them.
@@ -356,3 +356,4 @@ per-command reference was built from the real command files and agrees with them
 | Original | 2026-06-25 | initial / 2.6 | 16 sources under `docs/published/` (index, quick-start, lifecycle, keeping-up-to-date, troubleshooting, maintaining-the-template, `commands/` index + 9 per-command docs); root `README.md` (added Documentation routing); `cc-template/README.md` (self-contained, `ds-*` fix) | First pass. Command reference split into per-command docs per JAH adjust. Shipping README kept self-contained — relative links into source-only `docs/published/` would break on seed; delivery routing recorded for `/deployment-plan`. |
 | Reconcile 1 | 2026-06-26 | initial / 2.10 | Migrated the 16 sources from `docs/published/` to audience folders (`docs/user/`, `docs/user/commands/`, `docs/maintainer/`) and moved the manifest to `docs/documentation-plans/`; re-stamped all paths + currency. Refreshed the four reshaped command docs (`write-documentation`, `deployment-plan`, `wind-down`, `onboard`) to current behavior; fixed root `README.md` routing links. | Phase 2.10 reconcile after the Phase 2.8 skill reshape + Phase 2.9 root propagation: audience-folder filing, three Stage-2 modes (incl. revise), and `docs/documentation-guidance.md` ownership. Same movement — no new sign-off. |
 | Revise 1 | 2026-06-27 | initial / 2.10 | `docs/user/quick-start.md` (before-you-begin + steps 3–4), `cc-template/README.md` (How to use, steps 2–4 reordered), root `README.md` (intro + Seeding section), `docs/user/commands/onboard.md` (When to run), `docs/user/commands/product-visioning.md` (When to run) | Promote `/product-visioning` as the primary way to start a new project; demote drop-a-design-doc to an equal-but-secondary supported path. Folded "open in Claude Code" into the intake step (a slash command can't precede opening). Stamp unchanged — content, not currency. Out of scope, surfaced not edited: `cc-template/CLAUDE.md` config banner, seeded `TODO.txt` checklist, `/onboard` refusal copy. |
+| Reconcile 2 | 2026-10-06 | initial / 3 | `docs/user/lifecycle.md` (three kinds of work incl. the in-movement enhancement lane; Movement → Phase → Step; plan revision; file-lifecycle patterns; four-file session start + output style; commit routing), `quick-start.md` (four-file read; Windows deny-Bash tip), `keeping-up-to-date.md` (`.claude/` template files, doc skeletons, targeted edits, re-invoke), `troubleshooting.md` (re-invoke refusal; plan-revision drift), `commands/` README + `bootstrap`, `deployment-plan`, `onboard`, `design-review`, `wind-down`, `refresh-from-repository`; `docs/maintainer/maintaining-the-template.md` (propagation by source-mode refresh; provenance comment; logic-version bump; new-file lifecycle); root `README.md` (tree, propagation, license); `cc-template/README.md` (tree, reading order, lanes, refresh, license) | Phase 3 reconcile after the checkpoint 007 batch, including N2's two write-ups. Fixed pre-existing drift: refresh's doc-skeleton delivery was undocumented; "copy the change up" contradicted refresh-as-propagation; root tree listed a nonexistent `PRODUCT_VISION.md`; stale "Keeping a project up to date" link labels. |

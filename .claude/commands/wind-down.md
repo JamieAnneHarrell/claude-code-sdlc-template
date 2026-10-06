@@ -1,6 +1,7 @@
 ---
 description: Run the session wind-down ritual — rewrite TODO.txt, update tracking docs, and surface the commit handoff. /wind-down owns the commit-handoff ritual.
 ---
+<!-- This file is part of the claude-code-sdlc-template. See .claude/claude-code-sdlc-template-license.md for info. -->
 
 # /wind-down
 
@@ -22,7 +23,7 @@ When another skill invokes `/wind-down` at an artifact boundary
 (e.g. `/design-review` or `/exit-test-plan` at a landing),
 `/wind-down` owns the commit handoff and the doc-coherence sweep for
 any docs the calling skill doesn't own — run the full ritual below,
-scoped to what the session actually changed.
+with the sweep covering the whole repo.
 
 ---
 
@@ -179,6 +180,8 @@ next:
 - **Opportunistic / maintenance** — cleanup, bug fixes, small add-ons
   not in the plan. Tactical, not a movement: a `fix/` branch or a small
   appended phase, no PRD.
+- **Backlog cleanup** — run a `/design-review` over
+  `docs/open-questions.md` to cluster, prune, and sequence the backlog.
 - **Next movement** — run `/product-visioning` to plan the next
   strategic chunk.
 
@@ -195,8 +198,10 @@ is the per-edit review surface and pre-pasting duplicates it.
 ## Step 3: Update tracking docs (only those that apply)
 
 Wind-down keeps the rest of the repo's docs coherent — but not every
-doc changes every session. Surface only the ones with real diffs to
-apply. For each: state the intent in one short sentence, then edit
+doc changes every session. The sweep covers the whole repo, not only
+what this session touched: fix mechanical drift and small
+not-by-design errors inline, and surface judgment calls to Jamie.
+Surface only the docs with real diffs to apply. For each: state the intent in one short sentence, then edit
 directly via the Edit tool — don't paste the full proposed text in
 chat (the edit-approval mode is the per-edit review surface, and
 pre-pasting duplicates it). Multi-doc structural changes warrant a
@@ -231,6 +236,10 @@ brief plan first.
   shape — don't reproduce the format from memory.
 - Only record decisions future-Claude would benefit from knowing;
   trivial implementation choices don't belong here.
+- **No tombstones.** A decision fully abandoned moves to
+  `open-questions.md` § Abandoned Approaches; one partially superseded
+  is rewritten in place to its surviving content. Never leave a
+  "Superseded by" note.
 
 ### `docs/open-questions.md`
 - Move unresolved questions from this session *into* this file.

@@ -1,3 +1,4 @@
+<!-- This file is part of the claude-code-sdlc-template. See .claude/claude-code-sdlc-template-license.md for info. -->
 # Project-Specific Rules
 
 Project-specific scope, dependency allowlist, and defaults live here.
@@ -78,6 +79,37 @@ skill.
   findings and sign-offs are never hand-written outside it.
 - **`/exit-test-plan` owns phase-exit test plans** — the plan and
   its dispositions live in the skill's artifacts.
+<!-- /CC-TEMPLATE-BLOCK -->
+
+<!-- CC-TEMPLATE-BLOCK: work-lanes-and-plan-vocabulary -->
+### Kinds of work and plan vocabulary
+
+- **Movement:** `/product-visioning` → PRD → `/onboard` → `/design-review`.
+- **In-movement enhancement:** plan → `/design-review` ratifies and
+  decomposes it into steps → build → `/wind-down`. Too big to inline,
+  not a new movement.
+- **Tactical:** bug fix, cleanup, release. No PRD.
+
+**Movement → Phase → Step.** A movement is as above. A phase is a
+logically grouped set of tasks achieving a goal; it may take one prompt
+or ten. Each of those prompts is a step of the phase — Step 5.1 is the
+first step of Phase 5, Step 5.2 the second. Each step has one prompt,
+and generally each prompt is one Claude Code session, so steps are
+session-sized chunks of work for a phase.
+
+**Plan revision** is a small change to the plan's steps or phases, made
+in the session, when the goal has not changed:
+
+1. A step that has run is never changed; follow-up work becomes a new step.
+2. A step that has not run can be rewritten or removed.
+3. Numbers never change once assigned: adding at the end takes the next
+   number; inserting in between takes a letter (Step 5.2a goes between
+   5.2 and 5.3). Phases work the same way.
+4. Claude proposes the revision, Jamie approves, Claude edits the plan
+   and prompts; `/wind-down` records why.
+
+If the product goal changes, it is not a plan revision: go back to
+`/product-visioning`. If the change is risky, it gets a `/design-review`.
 <!-- /CC-TEMPLATE-BLOCK -->
 
 ---

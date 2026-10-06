@@ -34,17 +34,25 @@ cp -r cc-template ~/path/to/my-project
 The renamed directory *is* your new project. There is no nested
 `cc-template/cc-template/` inside it.
 
+**Windows PowerShell users:** if your project shell is PowerShell, consider adding
+`"permissions": { "deny": ["Bash"] }` to `.claude/settings.json`. It stops
+sessions opening with Bash searches. This is a personal choice; no command sets
+it.
+
 ## 2. Read the rules before you run anything
 
 Open `rules/` and read each file. The template ships an opinionated collaboration
 agreement — ten standing rules and a design philosophy — and those rules shape
-every command you are about to run.
+every command you are about to run. Claude reads four of them —
+`coding-session-rules.md`, `design-philosophy-rules.md`, `environment-rules.md`,
+and `project-rules.md` — at the start of every session, and the other two before
+the work that needs them.
 
 Treat them as a starting agreement, not law. If a rule doesn't match how you want
 to work, edit it now, before the first command runs. You own these files; editing
 them is expected. (Later, [`/refresh-from-repository`](commands/refresh-from-repository.md)
 will respect any rule you have made your own — see
-[Keeping a project up to date](keeping-up-to-date.md).)
+[Keeping the template up to date](keeping-up-to-date.md).)
 
 ## 3. Open the project in Claude Code and create your design intake
 

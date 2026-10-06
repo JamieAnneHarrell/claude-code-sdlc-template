@@ -38,7 +38,8 @@ changes nothing and reports each failed check with its command, exit code, and a
 pointer to Prerequisites.
 
 Both stages flag any version before it lands in a file (rule 10) and offer to
-confirm the current stable or LTS release.
+confirm the current stable or LTS release. Each stage ends by invoking
+[`/wind-down`](wind-down.md), which owns the commit handoff.
 
 ## Reads
 

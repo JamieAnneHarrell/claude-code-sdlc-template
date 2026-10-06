@@ -31,14 +31,21 @@ claude-code-sdlc-template/             ← THIS REPO (source-of-truth)
 ├── docs/                             ← this project's own design docs
 │   ├── REQUIREMENTS.md
 │   ├── ARCHITECTURE.md
-│   ├── PRODUCT_VISION.md
 │   ├── PROJECT_PLAN.md
 │   ├── CLAUDE_CODE_PROMPTS.md
 │   ├── design-decisions.md
 │   ├── open-questions.md
+│   ├── documentation-guidance.md     ← standing doc directives
 │   ├── design/                       ← design intake + /design-review checkpoints + PRD-<slug>-NNN.md
-│   └── project-plans/                ← archived movement plans + prompts
-├── .claude/commands/                 ← live commands this project uses on itself
+│   ├── project-plans/                ← archived movement plans + prompts
+│   ├── documentation-plans/          ← /write-documentation manifests
+│   ├── user/                         ← adopter documentation
+│   └── maintainer/                   ← maintainer documentation
+├── .claude/                          ← this project's working copy of the template's .claude/
+│   ├── commands/                     ← live commands this project uses on itself
+│   ├── output-styles/                ← session-start output style
+│   ├── settings.json                 ← selects the output style
+│   └── claude-code-sdlc-template-license.md ← MIT license for the template files
 └── cc-template/                      ← THE DISTRIBUTABLE (what gets copied to seed new projects)
     ├── CLAUDE.md                     ← new-project session-start
     ├── README.md                     ← shipping README
@@ -46,7 +53,8 @@ claude-code-sdlc-template/             ← THIS REPO (source-of-truth)
     ├── LICENSE                       ← MIT (covers everything in this subtree)
     ├── .gitignore
     ├── rules/                        ← shipping rules with ONBOARD-FILL placeholders
-    └── .claude/                      ← all shipping commands + settings example
+    ├── docs/                         ← doc skeletons + docs/design/README.md
+    └── .claude/                      ← shipping commands, output style, settings, license file
 ```
 
 ## Seeding a new project
@@ -97,8 +105,9 @@ The convention:
 
 - **Universal content** (the 10 rules, design philosophy, command
   files, etc.) is kept identical in both locations. Edit in
-  [`cc-template/`](cc-template/) first; copy the change up to
-  root if it's a command or rules file this project itself uses.
+  [`cc-template/`](cc-template/) first, then propagate to root by
+  running `/refresh-from-repository` here — with `cc-template/`
+  present it runs in source mode. Never hand-copy it up.
 - **Source-only content** (this README, root `CLAUDE.md`, real
   REQUIREMENTS / ARCHITECTURE / PROJECT_PLAN entries,
   design-decisions entries) lives only at root and never copies
@@ -139,8 +148,7 @@ exercised here before they ship.
 **For everyone:**
 - **Claude Code** — any distribution (IDE extension, desktop app,
   CLI, or web). No version pin. Maintainers are recommended to use
-  **Opus 4.8** (current latest as of 2026-07-27) or the most recent
-  high-performance Claude model available.
+  the latest Opus model.
 
 **Maintainers / contributors** also need:
 - **Git** — to clone this repository and submit changes back.
@@ -226,6 +234,11 @@ itself).
   of cc-template content — we use cc-template on ourselves the
   same way any consumer would, so those files inherit cc-template's
   MIT terms.
+- Each template file carries a one-line provenance comment pointing
+  at [`.claude/claude-code-sdlc-template-license.md`](.claude/claude-code-sdlc-template-license.md),
+  which holds the MIT text, the distribution URL, and the list of
+  covered files. The license file travels into every seeded project,
+  so the attribution goes with the files.
 - **Everything else at repo root** — the source-only project
   docs in [`docs/`](docs/), this README, root
   [`CLAUDE.md`](CLAUDE.md), [`docs/design/`](docs/design/),

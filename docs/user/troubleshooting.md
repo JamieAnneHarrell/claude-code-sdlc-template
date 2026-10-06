@@ -62,6 +62,18 @@ missing prerequisite.
   **take upstream** to accept the new version. If you would rather a block never be
   considered, move it out of its `CC-TEMPLATE-BLOCK` markers.
 
+### "Your refresh logic was N version(s) behind upstream"
+
+- **Symptom:** [`/refresh-from-repository`](commands/refresh-from-repository.md)
+  installs the commands, then stops with "Your refresh logic was N version(s)
+  behind upstream. The latest commands are now installed — re-invoke
+  `/refresh-from-repository` to merge rules and CLAUDE.md with the updated logic."
+- **Cause:** Upstream's refresh logic is newer than your installed copy. An older
+  copy must not merge files whose conventions it doesn't know, so it installs the
+  newer commands and hands over.
+- **Fix:** Run `/refresh-from-repository` again. The newly installed logic does
+  the merge.
+
 ## Common drifts
 
 These don't announce themselves with an error. They accumulate quietly, and they
@@ -78,6 +90,18 @@ course.
 - **Correct course:** Keep footers to what changed against the prompt. The
   session narrative belongs in the commit and the wind-down recap, not the prompt
   log.
+
+### Plan edits rewrite history
+
+- **Drift:** A mid-movement change edits a prompt that has already run, or
+  renumbers the steps after an insert.
+- **Why it hurts:** A step that ran is a record of what was asked; rewriting it
+  hides what actually happened. Renumbering breaks every existing reference to a
+  step — in commits, checkpoints, and `TODO.txt`.
+- **Correct course:** Follow the plan-revision rules in
+  [The SDLC lifecycle](lifecycle.md#changing-the-plan-plan-revision): follow-up
+  work on a run step becomes a new step, and an inserted step takes a letter
+  (Step 5.2a) instead of shifting the numbers.
 
 ### `TODO.txt` becomes a log or a backlog
 

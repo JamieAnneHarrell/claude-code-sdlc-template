@@ -36,6 +36,9 @@ flips `DEPLOYMENT-PLAN-STATUS` to `COMPLETE <date>`.
 appends those questions to `docs/open-questions.md`, notes the deferral in the
 README, and flips `DEPLOYMENT-PLAN-STATUS` to `DEFERRED <date>`.
 
+Either path ends by invoking [`/wind-down`](wind-down.md), which owns the commit
+handoff.
+
 **Documentation build.** When a `docs/documentation-plans/` documentation plan
 exists, `/deployment-plan` owns building the delivered docs: it reads the plan's delivery
 recipe and release-readiness ledger, codes the render targets against this
@@ -80,4 +83,4 @@ git, or run tests.
 ## See also
 
 [`/bootstrap`](bootstrap.md) · [`/write-documentation`](write-documentation.md) ·
-[Keeping a project up to date](../keeping-up-to-date.md)
+[Keeping the template up to date](../keeping-up-to-date.md)

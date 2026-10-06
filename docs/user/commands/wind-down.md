@@ -32,19 +32,25 @@ A five-step ritual:
    strikethroughs); the first entry is the next session's pick-up. Built-in
    safety nets scan for an open design-review checkpoint, an open exit-test plan,
    or a `DRAFT` PRD and set the right first entry. When every phase is complete,
-   it surfaces a menu (release / opportunistic work / next movement) without
-   acting on it.
+   it surfaces a menu (release / opportunistic work / backlog-cleanup
+   `/design-review` / next movement) without acting on it.
 3. **Update tracking docs** — edits only docs with a real change:
    `CLAUDE_CODE_PROMPTS.md` deviation footers, `design-decisions.md`,
    `open-questions.md`, `REQUIREMENTS.md`, `ARCHITECTURE.md`, `PROJECT_PLAN.md`
-   phase status, and the `CLAUDE.md` banner. It captures new standing directives
+   phase status, and the `CLAUDE.md` banner. The coherence sweep covers the whole
+   repo, not only what the session touched: it fixes mechanical drift and small
+   not-by-design errors inline and surfaces judgment calls to you. It leaves no
+   tombstones — a decision fully abandoned moves to `open-questions.md` §
+   Abandoned Approaches, and one partially superseded is rewritten in place to
+   what survives. It captures new standing directives
    into `docs/documentation-guidance.md` and retires superseded ones
    (propose-and-confirm). For files it does not own it reports status rather than
    editing — surfacing stale docs and OPEN release-readiness items, and routing
    user-facing-doc drift to [`/write-documentation`](write-documentation.md).
 4. **Surface the commit handoff** — gives you the pre-commit sequence and a
    commit message (subject plus zero or one body sentence, body bullets citing
-   doc IDs). It does not run the commit.
+   doc IDs). It does not run the commit. This is the only commit handoff in the
+   template: every other command's commit point invokes `/wind-down`.
 5. **Final report** — what was rewritten and updated, whether a commit is
    pending, and any open questions.
 

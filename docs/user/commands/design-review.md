@@ -37,6 +37,15 @@ new checkpoint when none is open; the *addendum* branch appends an
 another round. The checkpoint's frontmatter is `AWAITING-DECISIONS` for the whole
 loop.
 
+- **Abandoned approaches are hard constraints.** It never recommends an approach
+  listed under Abandoned Approaches in `docs/open-questions.md` (rule 3).
+- **Security is covered when relevant.** When the design imports code or
+  instructions, does network I/O, handles credentials, or takes untrusted input,
+  the review covers supply-chain, injection, secrets, and exfiltration risk.
+- **Every decidable decision is pinned.** A decision is left to the coding
+  session only when it can't be known until implementation, and then with its
+  decision criteria stated.
+
 **Stage 2 — walk dispositions.** After you mark each finding, the command records
 your decisions in the Disposition log and asks whether to **land** the checkpoint
 or **open another round**. Landing applies every accumulated decision to
@@ -52,8 +61,8 @@ line, which is how the command tells marked from unmarked.
 ## Reads
 
 `REQUIREMENTS.md`, `ARCHITECTURE.md`, `PROJECT_PLAN.md`, `CLAUDE_CODE_PROMPTS.md`,
-the README, `DEPLOYMENT.md` if present, the design intake, and every prior
-checkpoint.
+the README, `DEPLOYMENT.md` if present, the design intake, `open-questions.md`,
+and every prior checkpoint.
 
 ## Writes / owns
 
@@ -79,9 +88,10 @@ checkpoint.
 ## Does not do
 
 Own a `CLAUDE.md` status comment, edit design-intake docs or rules, auto-mark
-findings, auto-land a checkpoint, run git, or run tests. Its commit handoff fires
-only at artifact boundaries (initial checkpoint, landing); mid-iteration rounds
-hand off nothing.
+findings, auto-land a checkpoint, run git, or run tests. At an artifact boundary
+(a new checkpoint, a landing) it invokes [`/wind-down`](wind-down.md), which owns
+the commit handoff. Mid-iteration rounds hand off nothing — the checkpoint is
+still in flight, so run `/wind-down` only if you are stopping for the session.
 
 ## See also
 

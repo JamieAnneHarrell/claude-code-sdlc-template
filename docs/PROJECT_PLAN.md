@@ -691,7 +691,7 @@ the dry-read confirms a consumer could use it without the internal docs.
 
 ---
 
-## Phase 3 — Checkpoint 007 backlog batch (tactical)
+## Phase 3 — Checkpoint 007 backlog batch (tactical) (COMPLETE)
 
 **Goal.** Land the work accepted at
 [checkpoint 007](design/design-review-checkpoint-007.md), the MVP close-out
@@ -781,7 +781,7 @@ three kinds of work, the vocabulary, and plan revision in one block. `CLAUDE.md`
 names four session-start rules files in both the directive and the
 `collaboration-rules` block.
 
-### Step 3.2 — Propagate to root and document
+### Step 3.2 — Propagate to root and document (COMPLETE)
 
 **Deliverables.**
 - Source-mode `/refresh-from-repository` at root: the 3 → 4 bump makes the

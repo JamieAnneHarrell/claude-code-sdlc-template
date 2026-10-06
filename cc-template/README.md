@@ -27,6 +27,12 @@ walkable checklist and session handoff — follow them in order:
    keep yours (keeping yours marks the block as yours so it's never
    asked about again). You don't have to do anything special now to
    protect an edit. See "Keeping a project up to date" below.
+   Claude reads four of these files — `coding-session-rules.md`,
+   `design-philosophy-rules.md`, `environment-rules.md`, and
+   `project-rules.md` — at the start of every session, and the other
+   two before the work that needs them. The shipped output style
+   (`.claude/output-styles/`, selected in `.claude/settings.json`)
+   makes each session act on `CLAUDE.md` before your first message.
 
 3. **Open the new directory in Claude Code and create your design
    intake.** The recommended path is to run:
@@ -93,7 +99,12 @@ into a repeating loop:
 
 A *movement* is a strategic chunk opened this way. Bug fixes, cleanup,
 and release work are tactical — no PRD needed; `/wind-down` offers them
-as a menu when a movement lands.
+as a menu when a movement lands. Between the two sits the *in-movement
+enhancement*: a change too big to do inline but within the current
+product goal — write a short plan, run `/design-review` to ratify it and
+decompose it into steps, then build. `rules/project-rules.md` defines
+all three lanes, the Movement → Phase → Step vocabulary, and how to
+revise the plan mid-movement.
 
 ## Keeping a project up to date
 
@@ -139,6 +150,22 @@ Your customizations are safe by design:
 This is all the memory refresh needs — the marker states live right in
 your rules / `CLAUDE.md` files. There is no separate machine-managed
 state file to commit or worry about.
+
+Refresh also keeps a few template files current outside the markers:
+
+- The license file and the output style under `.claude/` are replaced
+  with upstream's every run. In `.claude/settings.json` it sets only the
+  `outputStyle` key; every other setting is yours.
+- Missing doc skeletons (`docs/design-decisions.md`,
+  `docs/open-questions.md`, `docs/documentation-guidance.md`) are added;
+  ones you have are never overwritten.
+- The session-start directive at the top of `CLAUDE.md` is updated to
+  upstream's wording, and any rules file or `CLAUDE.md` missing the
+  one-line provenance comment gets it back on line 1.
+
+If upstream's refresh logic is newer than yours, refresh installs the
+new commands and asks you to run it again — the new logic does the
+merge.
 
 **Moving a rule out is the same as owning it.** If you lift a template
 rule into your own section or file, refresh treats it as removed from
@@ -202,6 +229,7 @@ cc-template/
 ├── CLAUDE.md                      ← short index, status flag
 ├── README.md                      ← this file
 ├── TODO.txt                       ← session handoff (gitignored in new projects)
+├── LICENSE                        ← the template's MIT license
 ├── .gitignore                     ← language-agnostic baseline
 ├── .claude/
 │   ├── commands/
@@ -211,8 +239,13 @@ cc-template/
 │   │   ├── design-review.md       ← /design-review slash command
 │   │   ├── exit-test-plan.md      ← /exit-test-plan slash command
 │   │   ├── product-visioning.md   ← /product-visioning slash command
+│   │   ├── write-documentation.md ← /write-documentation slash command
 │   │   ├── wind-down.md           ← /wind-down slash command
 │   │   └── refresh-from-repository.md ← /refresh-from-repository slash command
+│   ├── output-styles/
+│   │   └── claude-code-sdlc-template.md ← session-start output style
+│   ├── settings.json              ← selects the output style
+│   ├── claude-code-sdlc-template-license.md ← MIT license for the template files
 │   ├── settings.local.json.example
 │   └── settings.local.json.example.README.md
 ├── rules/                         ← collaboration rules, loaded on demand
@@ -226,7 +259,8 @@ cc-template/
     ├── design/                    ← drop your design doc(s) here
     │   └── README.md
     ├── design-decisions.md        ← starts as a header skeleton
-    └── open-questions.md          ← starts as a header skeleton
+    ├── open-questions.md          ← starts as a header skeleton
+    └── documentation-guidance.md  ← starts as a header skeleton
 ```
 
 After onboarding runs, `docs/` also contains `REQUIREMENTS.md`,
@@ -256,13 +290,23 @@ the rules files have project-specific sections appended.
 ## Reading order for a configured project
 
 1. `CLAUDE.md` (short index).
-2. `TODO.txt` (gitignored; session handoff).
-3. `docs/PROJECT_PLAN.md`.
-4. `docs/CLAUDE_CODE_PROMPTS.md` for the current phase.
-5. The `rules/` files relevant to whatever the session is doing.
+2. The four session-start rules files: `coding-session-rules.md`,
+   `design-philosophy-rules.md`, `environment-rules.md`,
+   `project-rules.md`.
+3. `TODO.txt` (gitignored; session handoff).
+4. `docs/PROJECT_PLAN.md`.
+5. `docs/CLAUDE_CODE_PROMPTS.md` for the current step.
+6. `testing-rules.md` and `multi-agent-rules.md` before the work that
+   needs them.
 
 ## License
 
 The template itself is MIT. Each project generated from the template
 gets its own LICENSE — onboarding writes one based on Jamie's choice
 (MIT default).
+
+The template's own MIT terms travel separately, in
+`.claude/claude-code-sdlc-template-license.md`: the license text, the
+distribution URL, and the list of covered command and rules files.
+Each template file carries a one-line comment pointing there. Keep the
+comment and the file — they are the attribution MIT asks you to retain.
