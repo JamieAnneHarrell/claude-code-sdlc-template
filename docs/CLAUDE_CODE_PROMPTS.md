@@ -1332,3 +1332,94 @@ copies follow in Phase 2.6):
     edit any `cc-template/` file" constraint: per Jamie, that constraint covers
     the rules and commands; the shipping README is `/write-documentation`'s
     planned scope.
+
+---
+
+## Prompt 4.1: Every command reads the documentation guidance
+
+Pre-work for Phase 4, run before the `/design-review` that decomposes the rest
+of the phase: a downstream project is on hold until its `/onboard` reads the
+terms it already defined in `docs/documentation-guidance.md`. Today `/onboard`
+names that file only as an output of Step 4, never as required reading, and
+`/write-documentation` and `/wind-down` are the only commands that read it.
+
+**Read first.**
+- [`docs/PROJECT_PLAN.md`](PROJECT_PLAN.md) Phase 4, Step 4.1.
+- [`cc-template/.claude/commands/onboard.md`](../cc-template/.claude/commands/onboard.md):
+  Step 1, "Verify a design intake exists", and Step M1, "Read the PRD and
+  current state".
+- The step that reads inputs in each of the other six commands, all under
+  `cc-template/.claude/commands/`: `product-visioning.md` Step 1, "Read context
+  and sweep open work"; `design-review.md` Step S1.1, "Read project context",
+  and Step S2.1, "Read the marked latest round"; `exit-test-plan.md` Step S1.1,
+  "Read project context", and Step S2.1, "Read the marked run log and trailing
+  notes"; `bootstrap.md` Step 1, "Read project context"; `deployment-plan.md`
+  Step 1, "Read project context"; `wind-down.md` Step 1, "Take stock of the
+  session". In `design-review.md` and `exit-test-plan.md`, Step S1.1 serves
+  both Stage 1 branches; the text under "Two stages" says so.
+- `cc-template/.claude/commands/write-documentation.md`, Stage 1 item "Read the
+  standing guidance": the reading that already exists. It needs no change and
+  its wording is the model.
+- `cc-template/.claude/commands/refresh-from-repository.md`: the note under
+  "Refresh logic version", whose conditions for a bump this step does not
+  meet; and Step 4b, "Deliver template-shipped doc skeletons", which leaves a
+  present downstream file untouched.
+
+**Scope.**
+1. **The reading text, nine times, copied as written.** In each of the seven
+   commands, add this text to the step named in Read first, after that step's
+   existing reading and before its first instruction to write, ask, or
+   summarize:
+
+   > Read `docs/documentation-guidance.md` if it exists. Every entry binds what
+   > this command writes, and the file says where the project's defined terms
+   > and retired words are kept; apply those as the file directs.
+
+   In `design-review.md` and `exit-test-plan.md`, both the Stage 1 and the
+   Stage 2 read steps get it. The text takes the shape of the step it joins, a
+   list item in a list and a paragraph otherwise; the sentences do not change.
+2. **Hand off.** Invoke `/wind-down`. After Jamie pushes, the downstream
+   project runs `/refresh-from-repository` and re-runs `/onboard`; those runs
+   are hers and outside this repository.
+
+**Constraints (what NOT to do).**
+- Do NOT edit anything outside `cc-template/.claude/commands/`, other than
+  this prompt's footer. Root follows in a later step through the refresh; a
+  hand edit at root makes that refresh report false divergence.
+- Do NOT name a section, a file other than `docs/documentation-guidance.md`,
+  or a rule for using a term inside any command. The guidance file says where
+  terms are kept, so a later move of the terms to their own file changes that
+  file alone. A section name in nine commands is nine edits later and locks
+  the shape of that move in before its review.
+- Do NOT touch `cc-template/docs/documentation-guidance.md`. The downstream
+  project keeps its own file and the refresh preserves it; a later step
+  reshapes the skeleton.
+- Do NOT edit `write-documentation.md` or `refresh-from-repository.md`. The
+  first already reads the whole file; the second writes no project document.
+  An edit there widens the diff the downstream refresh review has to read.
+- Do NOT bump the Refresh logic version. Command text does not change how an
+  older local copy handles a newer upstream; a bump forces every downstream
+  into the two run choreography for nothing.
+- Do NOT add the reading to the session start directive in `CLAUDE.md`. The
+  downstream refresh merges `CLAUDE.md` by block and a forked block misses the
+  change; commands are replaced whole.
+- Do NOT run `/write-documentation`. Later steps of this phase edit the same
+  commands again; the documentation set reconciles once, after the review
+  decomposes the phase.
+
+**Exit criteria.**
+- A search for `defined terms and retired words` under
+  `cc-template/.claude/commands/` matches exactly nine lines in exactly the
+  seven files named in Read first, two each in `design-review.md` and
+  `exit-test-plan.md`. Each matched paragraph is identical to the text in
+  scope item 1.
+- The frontmatter of every command file is unchanged, and
+  `refresh-from-repository.md` still stamps `Refresh logic version: 4` in both
+  places.
+- `git diff --no-index cc-template/.claude/commands .claude/commands` reports
+  exactly the seven files, added lines only.
+- `git status` shows changes only under `cc-template/.claude/commands/`, this
+  file, and the files `/wind-down` writes.
+
+**Revisions since this prompt ran:**
+

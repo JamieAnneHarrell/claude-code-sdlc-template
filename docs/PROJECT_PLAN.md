@@ -810,6 +810,51 @@ behavior. The output-style experiment is live for the following session.
 
 ---
 
+## Phase 4 - Conduct rules, definitions, facts, and vocabulary cleanup
+
+**Goal.** Adopt six conduct rules proved out on a downstream project; give
+every project one file where its terms and retired words are checked
+(`docs/DEFINITIONS.md`) and one where its facts are recorded (`docs/FACTS.md`);
+reshape the shipped `docs/documentation-guidance.md` to match; and bring this
+repository's own live files into line with those rules, ASCII only and plain
+vocabulary. The decisions were settled with Jamie on 2026-10-06; a
+`/design-review` decomposes the rest of the phase into steps. In-movement
+enhancement, no PRD. Prompts in
+[`docs/CLAUDE_CODE_PROMPTS.md`](CLAUDE_CODE_PROMPTS.md).
+
+Step 4.1 runs before the review: a downstream project is on hold until its
+`/onboard` reads the terms it already defined. Further steps enter this file
+when the review confirms them.
+
+### Step 4.1 - Every command reads the documentation guidance
+
+**Deliverables (all under `cc-template/.claude/commands/`).**
+- One reading paragraph, identical in every place, in the step that reads
+  inputs of each command that writes a project document: `onboard.md` (Step 1
+  and Step M1), `product-visioning.md` (Step 1), `design-review.md` (Steps
+  S1.1 and S2.1), `exit-test-plan.md` (Steps S1.1 and S2.1), `bootstrap.md`
+  (Step 1), `deployment-plan.md` (Step 1), `wind-down.md` (Step 1). The
+  paragraph: "Read `docs/documentation-guidance.md` if it exists. Every entry
+  binds what this command writes, and the file says where the project's
+  defined terms and retired words are kept; apply those as the file directs."
+  It names that file only, with no section name, no rule for using a term, and
+  no other file, so a later move of the terms to their own file changes the
+  guidance file and not the commands.
+- Unchanged: `write-documentation.md` (already reads the file),
+  `refresh-from-repository.md` (writes no project document), the shipped
+  skeleton `cc-template/docs/documentation-guidance.md`, and the Refresh logic
+  version, which stays 4.
+
+**Exit criteria.** A search for `defined terms and retired words` under
+`cc-template/.claude/commands/` matches exactly nine lines in exactly the seven
+files above, each identical to the paragraph. Command frontmatter is unchanged.
+The diff of root `.claude/commands/` against `cc-template/` shows the seven
+files, added lines only; root follows in a later step through the source mode
+refresh. After Jamie pushes, the downstream project refreshes, which leaves its
+own `docs/documentation-guidance.md` untouched, and re-runs `/onboard`.
+
+---
+
 ## Out of scope (post-MVP, deferred indefinitely)
 
 - Markdown linting / style enforcement automation.
