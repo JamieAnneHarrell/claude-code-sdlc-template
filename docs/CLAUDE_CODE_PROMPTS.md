@@ -1423,3 +1423,8 @@ names that file only as an output of Step 4, never as required reading, and
 
 **Revisions since this prompt ran:**
 
+- LANDED 2026-10-06. Deviations:
+  - The reading text landed ten times, not nine: the read steps named in Read
+    first number ten (`onboard.md` has two, Step 1 and Step M1). Each of the
+    ten matches is identical to the text in scope item 1.
+

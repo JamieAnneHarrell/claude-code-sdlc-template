@@ -826,7 +826,7 @@ Step 4.1 runs before the review: a downstream project is on hold until its
 `/onboard` reads the terms it already defined. Further steps enter this file
 when the review confirms them.
 
-### Step 4.1 - Every command reads the documentation guidance
+### Step 4.1 - Every command reads the documentation guidance (COMPLETE)
 
 **Deliverables (all under `cc-template/.claude/commands/`).**
 - One reading paragraph, identical in every place, in the step that reads

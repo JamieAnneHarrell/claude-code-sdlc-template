@@ -84,6 +84,10 @@ Load these in order:
    `/write-documentation`'s manifest. Its **delivery recipe** and
    **release-readiness ledger** drive the documentation build and the
    pre-release doc-gate (Step 5).
+8. Read `docs/documentation-guidance.md` if it exists. Every entry binds
+   what this command writes, and the file says where the project's
+   defined terms and retired words are kept; apply those as the file
+   directs.
 
 If a non-stub `docs/DEPLOYMENT.md` already exists (re-run case),
 read it too and treat the existing structure as a starting point.

@@ -86,6 +86,10 @@ Load what exists (skip absent files — a fresh project has little to read):
    Limitations punted out of a phase.
 7. Prior `docs/design/design-review-checkpoint-*.md` — Notes / deferred
    findings flagged "revisit later."
+8. Read `docs/documentation-guidance.md` if it exists. Every entry binds
+   what this command writes, and the file says where the project's
+   defined terms and retired words are kept; apply those as the file
+   directs.
 
 Build a **swept inventory**: a deduplicated list of open items, each tagged
 with its source. This is the raw material the session routes into or out of

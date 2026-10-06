@@ -73,6 +73,10 @@ List files in `docs/design/`. Ignore any `README.md` in that folder
   `PRD-<slug>-001.md` from `/product-visioning` — that *is* the first
   PRD; treat it as the design intake.
 
+Read `docs/documentation-guidance.md` if it exists. Every entry binds what
+this command writes, and the file says where the project's
+defined terms and retired words are kept; apply those as the file directs.
+
 ## Step 2: Reconnaissance
 
 Before asking Jamie anything, build a concise mental model from the
@@ -580,6 +584,10 @@ PRODUCT_VISION revisions, its decisions. Then read `docs/PRODUCT_VISION.md`,
 — opening a movement over unfinished work is unusual; confirm before
 proceeding). If the PRD still has unresolved scope (a section left as a
 placeholder), stop and point back to `/product-visioning` to finish it.
+
+Read `docs/documentation-guidance.md` if it exists. Every entry binds what
+this command writes, and the file says where the project's
+defined terms and retired words are kept; apply those as the file directs.
 
 ## Step M2: Apply PRODUCT_VISION revisions
 Apply the PRD's "Proposed PRODUCT_VISION revisions" to

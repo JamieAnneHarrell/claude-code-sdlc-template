@@ -219,6 +219,10 @@ pre-`/bootstrap` or pre-`/deployment-plan`).
    investigation. The addendum you're about to author should
    re-open those threads with concrete research/clarification, plus
    any new findings the intervening session surfaced.
+11. Read `docs/documentation-guidance.md` if it exists. Every entry binds
+   what this command writes, and the file says where the project's
+   defined terms and retired words are kept; apply those as the file
+   directs.
 
 Do not start asking questions yet.
 
@@ -717,6 +721,10 @@ Re-read the latest `design-review-checkpoint-NNN.md` end-to-end.
 Identify the **latest round** — the most recent
 `## Addendum N — YYYY-MM-DD` section if any exists, otherwise the
 original Findings section (Round 1).
+
+Read `docs/documentation-guidance.md` if it exists. Every entry binds what
+this command writes, and the file says where the project's
+defined terms and retired words are kept; apply those as the file directs.
 
 Parse each AUDIT NOTE block in the latest round. Classify each as
 one of:

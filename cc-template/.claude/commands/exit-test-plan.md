@@ -241,6 +241,10 @@ Load these in order. Skip any that don't exist.
    newest run log that have been fixed since, and every
    `[BLOCKED]` row from the newest run log (auto-re-run, see
    S1.A Step 2).
+9. Read `docs/documentation-guidance.md` if it exists. Every entry binds
+   what this command writes, and the file says where the project's
+   defined terms and retired words are kept; apply those as the file
+   directs.
 
 Do not start asking questions yet.
 
@@ -693,6 +697,10 @@ In the newest run log, in particular:
   block (for §6.N) — a single free-form surface. Observations
   come in whatever shape the tester wrote them. Don't expect
   structure. Don't reformat.
+
+Read `docs/documentation-guidance.md` if it exists. Every entry binds what
+this command writes, and the file says where the project's
+defined terms and retired words are kept; apply those as the file directs.
 
 Re-state to Jamie what you found, in three short bullets:
 

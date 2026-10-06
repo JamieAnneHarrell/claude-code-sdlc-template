@@ -114,6 +114,10 @@ Load these in order to build a stack-aware mental model:
 5. The current `rules/environment-rules.md` — specifically the
    `<!-- ONBOARD-FILL: environment -->` block, so you know exactly
    where you'll be appending
+6. Read `docs/documentation-guidance.md` if it exists. Every entry binds
+   what this command writes, and the file says where the project's
+   defined terms and retired words are kept; apply those as the file
+   directs.
 
 Do not start asking questions yet.
 

@@ -29,6 +29,10 @@ with the sweep covering the whole repo.
 
 ## Step 1: Take stock of the session
 
+Read `docs/documentation-guidance.md` if it exists. Every entry binds what
+this command writes, and the file says where the project's
+defined terms and retired words are kept; apply those as the file directs.
+
 Quickly recap:
 - What was the goal of this session?
 - What landed (code committed or staged)?
