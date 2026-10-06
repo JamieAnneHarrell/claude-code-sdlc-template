@@ -1,6 +1,7 @@
 ---
 description: Run a sign-off-ready design review checkpoint at a high-risk transition. Stage 1 produces findings; stage 2 walks dispositions and either lands the doc revisions or opens another addendum round.
 ---
+<!-- This file is part of the claude-code-sdlc-template. See .claude/claude-code-sdlc-template-license.md for info. -->
 
 # /design-review
 
@@ -209,7 +210,9 @@ pre-`/bootstrap` or pre-`/deployment-plan`).
    shape what's still open; do not re-litigate findings already
    marked Accepted or Defer Approved unless something has changed
    since.
-9. **If the addendum branch is firing**: read the current
+9. `docs/open-questions.md` — the backlog. Its Abandoned Approaches
+   are hard constraints (rule 3): never recommend one again.
+10. **If the addendum branch is firing**: read the current
    checkpoint file end-to-end. The Disposition log tells you which
    findings are already finalized; the latest Addendum (or Round 1
    if none yet) tells you which markings asked for further
@@ -265,6 +268,9 @@ Cover when relevant:
   exit criteria still match what was intended, and whether
   Phase N+1's prompt body is still consistent with the architecture
   as it stands now.
+- **Security.** When the design imports code or instructions, does
+  network I/O, handles credentials, or takes untrusted input, cover
+  supply-chain, injection, secrets, and exfiltration risk.
 
 For the addendum branch, the question dialog is focused: which
 prior-round AUDIT NOTE asks for further investigation, what the
@@ -333,6 +339,9 @@ that.
 - **Phrase Recommendations as "do X" not "consider X."** A
   finding's Recommendation is the exact change Stage 2 will apply
   if Jamie accepts. Wishy-washy wording forces Stage 2 to guess.
+- **Pin every decision decidable at review time.** A decision
+  reaches the coding session only when it is unknowable until
+  implementation, and then with its decision criteria stated.
 
 For the addendum branch specifically:
 
@@ -534,35 +543,12 @@ follow-up:
 Carryover entries stay below in priority order. Do not invent
 carryovers; preserve whatever was already there.
 
-## Step S1.8: Surface git commands (rule 7) — initial branch only
+## Step S1.8: Wind down (rule 7) — initial branch only
 
-**Re-read rule 7's "Commit handoff format" section in
-`rules/coding-session-rules.md` end-to-end before drafting the
-message.** The brevity bar needs to be active in working memory
-before you write a single word.
-
-Stage only the new files:
-
-```
-git status
-```
-
-```
-git add docs/design/design-review-checkpoint-NNN.md docs/design/REVIEWS.md
-```
-
-```
-git status
-```
-
-```
-git commit -m "Design review checkpoint NNN — awaiting decisions
-
-Trigger: <one-line>.
-Findings: <B count> blockers, <R count> recommendations, <N count> notes."
-```
-
-Do not stage `TODO.txt` (it's gitignored). Do not run any commands.
+Invoke `/wind-down`, which owns the commit handoff. The new
+checkpoint file and `docs/design/REVIEWS.md` are the files to
+commit. Step S1.7 already set `TODO.txt`'s first entry;
+`/wind-down`'s safety net confirms it.
 
 The Stage 1 addendum branch does NOT surface a commit handoff —
 addendum authoring is mid-iteration of an existing artifact.
@@ -712,7 +698,9 @@ handoff.
    End with: "Addendum N written into
    `docs/design/design-review-checkpoint-NNN.md`. Mark up its
    findings (one decision per AUDIT NOTE block), then re-run
-   `/design-review` to walk Addendum N's dispositions."
+   `/design-review` to walk Addendum N's dispositions. The checkpoint
+   is still in flight; `/wind-down` only if you are stopping for the
+   session."
 
 ---
 
@@ -1068,7 +1056,9 @@ End with one of:
 - **Addendum round opened**: "Latest-round dispositions recorded;
   doc stays `AWAITING-DECISIONS` for the next round. Do the
   research/clarification work next session; re-run
-  `/design-review` when ready to author Addendum N+1."
+  `/design-review` when ready to author Addendum N+1. The checkpoint
+  is still in flight; `/wind-down` only if you are stopping for the
+  session."
 
 ---
 

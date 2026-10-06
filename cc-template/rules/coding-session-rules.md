@@ -1,3 +1,4 @@
+<!-- This file is part of the claude-code-sdlc-template. See .claude/claude-code-sdlc-template-license.md for info. -->
 # Coding Session Rules — the 10 standing rules
 
 Jamie's standing rules for every coding session, every project. They

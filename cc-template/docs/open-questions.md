@@ -1,3 +1,4 @@
+<!-- This file is part of the claude-code-sdlc-template. See .claude/claude-code-sdlc-template-license.md for info. -->
 # Open Questions and Engineering Notes
 
 Working surface for unresolved questions, deferred decisions,

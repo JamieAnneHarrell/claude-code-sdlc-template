@@ -1,3 +1,4 @@
+<!-- This file is part of the claude-code-sdlc-template. See .claude/claude-code-sdlc-template-license.md for info. -->
 # `.claude/settings.local.json` — usage notes
 
 Copy `settings.local.json.example` to `settings.local.json` and adjust

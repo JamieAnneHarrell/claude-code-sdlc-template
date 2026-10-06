@@ -1,3 +1,4 @@
+<!-- This file is part of the claude-code-sdlc-template. See .claude/claude-code-sdlc-template-license.md for info. -->
 # Environment Rules
 
 Cross-platform conventions, shell handling, and where Claude puts

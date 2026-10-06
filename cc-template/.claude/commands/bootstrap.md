@@ -1,6 +1,7 @@
 ---
 description: Plan the developer environment for an onboarded project — shell, stack bootstrap, tooling, dev secrets — and produce a working README Developer setup section.
 ---
+<!-- This file is part of the claude-code-sdlc-template. See .claude/claude-code-sdlc-template-license.md for info. -->
 
 # /bootstrap
 
@@ -31,9 +32,7 @@ relative to it.
 **Required reading before Step 0:** read
 `rules/coding-session-rules.md`, `rules/design-philosophy-rules.md`,
 and `rules/environment-rules.md` in full. The first two are the
-universal rules; the commit-handoff format Step 7 depends on lives
-in `/wind-down`'s Step 4 (rule 7 routes commit handoffs through
-`/wind-down`). The third is what this command appends into — you
+universal rules. The third is what this command appends into — you
 need to know the existing structure to add to it cleanly.
 
 ---
@@ -341,34 +340,9 @@ Keep the reading order, collaboration rules, and references
 unchanged. Stage 2 removes both the gate and the warning banner
 once status flips to `COMPLETE`.
 
-## Step 7: Surface git commands (rule 7)
+## Step 7: Wind down (rule 7)
 
-Do not run any git commands. Surface a copy/paste-ready block per
-the commit-handoff format in `/wind-down`'s Step 4.
-
-```
-git status
-```
-
-Show what to stage:
-
-```
-git add CLAUDE.md README.md rules/environment-rules.md
-```
-
-```
-git status
-```
-
-Then a single-block commit:
-
-```
-git commit -m "Bootstrap dev environment for <project name>
-
-Developer setup written to README.md; environment-rules.md filled.
-- Shell: <shell choice>
-- Stack: <one-line summary>"
-```
+Invoke `/wind-down`, which owns the commit handoff.
 
 ## Step 8: Final report
 
@@ -438,26 +412,7 @@ stdout/stderr for each.
    - Remove the session-start "Bootstrap not yet validated" gate
      added in stage 1.
 
-2. Surface git commands per rule 7. Stage 2 only modifies
-   `CLAUDE.md`:
-
-   ```
-   git status
-   ```
-
-   ```
-   git add CLAUDE.md
-   ```
-
-   ```
-   git status
-   ```
-
-   ```
-   git commit -m "Validate bootstrap for <project name>
-
-   All required tools verified on PATH; BOOTSTRAP-STATUS → COMPLETE."
-   ```
+2. Invoke `/wind-down` (rule 7), which owns the commit handoff.
 
 3. Final report: a one-line confirmation per verified tool with
    its detected version, plus a reminder that `/deployment-plan`

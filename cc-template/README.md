@@ -1,3 +1,4 @@
+<!-- This file is part of the claude-code-sdlc-template. See .claude/claude-code-sdlc-template-license.md for info. -->
 # cc-template
 
 Template seed for new software projects built with Claude Code. Provides a
@@ -62,6 +63,11 @@ walkable checklist and session handoff — follow them in order:
 7. **Run Phase 0** by pasting Prompt 0 from
    `docs/CLAUDE_CODE_PROMPTS.md`. This sets up the language tooling,
    CI workflow, and project skeleton.
+
+**Windows PowerShell users:** if the project shell is PowerShell, consider
+adding `"permissions": { "deny": ["Bash"] }` to `.claude/settings.json`. It
+stops sessions opening with Bash searches. This is a personal choice; no
+command sets it.
 
 ## After setup: the recurring lifecycle
 

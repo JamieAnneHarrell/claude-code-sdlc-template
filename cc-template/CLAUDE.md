@@ -1,9 +1,11 @@
+<!-- This file is part of the claude-code-sdlc-template. See .claude/claude-code-sdlc-template-license.md for info. -->
 # CLAUDE.md
 
 > **Before you respond to the first user message of any session:** read
-> `rules/coding-session-rules.md` and `rules/design-philosophy-rules.md`
-> end-to-end — they are not loaded into context by default. Confirm you
-> have read and understood them before proceeding.
+> `rules/coding-session-rules.md`, `rules/design-philosophy-rules.md`,
+> `rules/environment-rules.md` and `rules/project-rules.md` end-to-end.
+> They are not loaded into context by default. Confirm you have read and
+> understood them before proceeding.
 
 <!-- ONBOARD-STATUS: UNCONFIGURED -->
 <!-- BOOTSTRAP-STATUS: UNCONFIGURED -->
@@ -66,20 +68,22 @@ work.
 <!-- CC-TEMPLATE-BLOCK: collaboration-rules -->
 ## Collaboration rules
 
-The two universal rule files are named in the directive at the top of
-this file; read them end-to-end before responding.
+The four session-start rule files are named in the directive at the top
+of this file; read them end-to-end before responding.
 
-- `rules/coding-session-rules.md` — the 10 standing rules.
-- `rules/design-philosophy-rules.md` — design judgment framework.
+- `rules/coding-session-rules.md` - the 10 standing rules.
+- `rules/design-philosophy-rules.md` - design judgment framework.
+- `rules/environment-rules.md` - cross-platform conventions, shell
+  handling, scratch files.
+- `rules/project-rules.md` - project scope discipline and the project
+  conduct rules.
 
-**Read these when relevant to the current task:**
+**Read these in full before the work that needs them, every time:**
 
-- `rules/project-rules.md` — project scope discipline.
-- `rules/testing-rules.md` — test discipline.
-- `rules/environment-rules.md` — cross-platform conventions.
-- `rules/multi-agent-rules.md` — subagent use.
+- `rules/testing-rules.md` - before writing or running any test.
+- `rules/multi-agent-rules.md` - before spawning or briefing any agent.
 
-If Jamie says "rule 4" or "this is a rule 1 issue" mid-session, that's a
-drift signal pointing at `rules/coding-session-rules.md`. Acknowledge,
+If Jamie says "rule 4" or "this is a rule 1 issue" mid-session, that is
+a drift signal pointing at `rules/coding-session-rules.md`. Acknowledge,
 correct course, move on.
 <!-- /CC-TEMPLATE-BLOCK -->

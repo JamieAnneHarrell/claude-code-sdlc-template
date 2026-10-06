@@ -1,6 +1,7 @@
 ---
 description: Plan dev/test/prod topology, deploy mechanism, and CD strategy for an onboarded and bootstrapped project — produce docs/DEPLOYMENT.md and update README.
 ---
+<!-- This file is part of the claude-code-sdlc-template. See .claude/claude-code-sdlc-template-license.md for info. -->
 
 # /deployment-plan
 
@@ -38,9 +39,7 @@ relative to it.
 **Required reading before Step 0:** read
 `rules/coding-session-rules.md`, `rules/design-philosophy-rules.md`,
 and `rules/environment-rules.md` in full. The first two are the
-universal rules; the commit-handoff format lives in `/wind-down`'s
-Step 4 (rule 7 routes commit handoffs through `/wind-down`). The
-third is what `/bootstrap` populated with shell, venv, and tooling
+universal rules. The third is what `/bootstrap` populated with shell, venv, and tooling
 decisions — your deployment plan must be consistent with those.
 
 ---
@@ -304,33 +303,9 @@ Rewrite `CLAUDE.md`:
 Keep the reading order, collaboration rules, and references
 unchanged.
 
-## Step 7: Surface git commands (rule 7)
+## Step 7: Wind down (rule 7)
 
-Do not run any git commands.
-
-```
-git status
-```
-
-Show what to stage:
-
-```
-git add CLAUDE.md README.md docs/DEPLOYMENT.md docs/open-questions.md
-```
-
-```
-git status
-```
-
-Then a single-block commit. Pick the message based on completion vs
-deferral:
-
-```
-git commit -m "Deployment plan for <project name>
-
-Topology: <topology choice or 'deferred'>
-- <one-line summary of mechanism or deferred status>"
-```
+Invoke `/wind-down`, which owns the commit handoff.
 
 ## Step 8: Final report
 

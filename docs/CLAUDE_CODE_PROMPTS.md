@@ -1255,7 +1255,19 @@ copies follow in Phase 2.6):
   the `collaboration-rules` block.
 - `git status` shows changes under `cc-template/` only.
 
-**Revisions since this prompt ran:** none tracked.
+**Revisions since this prompt ran:**
+
+- LANDED 2026-10-06. Deviations:
+  - Output style copied verbatim from Jamie's downstream project
+    (`ds-gyro-doctor-private/.claude/output-styles/`); it was not in this repo.
+  - `onboard.md` Step 6 keeps one sentence telling Jamie to run `git init` first
+    on a fresh-init project; without it `/wind-down` has no repo to commit to.
+  - Refresh "does NOT do" reworded to "Does not commit, push, or tag" so the
+    `git commit` exit-criterion search matches only `wind-down.md`.
+  - The new block runs about 25 lines, not 15: the R8 rules are kept verbatim.
+  - The constraint "Do NOT touch `docs/open-questions.md`" was read as the root
+    backlog; the `cc-template/docs/open-questions.md` skeleton got the
+    provenance comment per scope item 1.
 
 ---
 

@@ -1,3 +1,4 @@
+<!-- This file is part of the claude-code-sdlc-template. See .claude/claude-code-sdlc-template-license.md for info. -->
 # Design intake
 
 Drop your design doc(s) into this folder before running `/onboard`.

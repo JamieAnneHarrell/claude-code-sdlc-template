@@ -1,6 +1,7 @@
 ---
 description: Decompose the next PRD into the project's planning docs. The first PRD configures a new project (from a dropped design doc or /product-visioning) and routes to /design-review then /bootstrap; a later movement's PRD updates the vision, archives the prior plan, opens the new movement, and routes straight to /design-review.
 ---
+<!-- This file is part of the claude-code-sdlc-template. See .claude/claude-code-sdlc-template-license.md for info. -->
 
 # /onboard
 
@@ -26,10 +27,7 @@ relative to it.
 
 **Required reading before Step 0:** read `rules/coding-session-rules.md`
 and `rules/design-philosophy-rules.md` in full. These are the universal
-rules that govern this session. The final step surfaces a commit
-handoff, whose format is owned by `/wind-down`'s Step 4 (rule 7 routes
-commit handoffs through `/wind-down`). Skipping these leads to drift
-(e.g. surfacing a bash heredoc commit block in a PowerShell session).
+rules that govern this session.
 
 ---
 
@@ -360,8 +358,13 @@ reading-order pointers — go after the deviation block.)
   above, the footer is for plan deviations only — not a recap of what
   landed.
 
-Pattern reference: this template's own
-`docs/CLAUDE_CODE_PROMPTS.md` is the canonical shape.
+Feature prompts (design-review prompts are exempt) also meet four
+requirements:
+- Exit criteria are self-contained and testable — never a bare "per
+  PROJECT_PLAN Phase N".
+- Scope items state the contract; FR numbers are cross-references only.
+- Read-first names specific anchors (file and section), not whole docs.
+- Constraints name the trap each one prevents.
 
 **Design-review prompts.** Every design-review phase in
 PROJECT_PLAN.md gets a matching numbered prompt entry in
@@ -533,39 +536,11 @@ Rewrite `CLAUDE.md`:
 Keep the reading order, collaboration rules, and references
 unchanged.
 
-## Step 6: Surface git commands (rule 7)
+## Step 6: Wind down (rule 7)
 
-Do not run any git commands. Surface a copy/paste-ready block per
-the commit-handoff format in `/wind-down`'s Step 4:
-
-```
-git init
-```
-
-Show what to stage (note: `rules/environment-rules.md` is not yet
-modified — `/bootstrap` will append to it later):
-
-```
-git add CLAUDE.md README.md LICENSE .gitignore TODO.txt rules/ docs/ .claude/
-```
-
-```
-git status
-```
-
-Then a single-block commit:
-
-```
-git commit -m "Initial commit from cc-template
-
-Onboarded for <project name>. See docs/PROJECT_PLAN.md for phase queue.
-- Multi-agent mode: <mode>
-- Language: <language>"
-```
-
-If GitHub remote was specified, surface the `git remote add origin` and
-`git push -u origin main` commands separately. **Do not push** unless
-Jamie explicitly asks in this same session.
+Invoke `/wind-down`, which owns the commit handoff. If Jamie chose a
+fresh git init in Step 3, tell her to run `git init` first. **Do not
+push** unless Jamie explicitly asks in this same session.
 
 ## Step 7: Final report
 

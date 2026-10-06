@@ -1,3 +1,4 @@
+<!-- This file is part of the claude-code-sdlc-template. See .claude/claude-code-sdlc-template-license.md for info. -->
 # Documentation Guidance
 
 Standing, project-level directives for how *this project's* documentation

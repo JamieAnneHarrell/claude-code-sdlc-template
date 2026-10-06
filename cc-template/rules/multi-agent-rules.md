@@ -1,3 +1,4 @@
+<!-- This file is part of the claude-code-sdlc-template. See .claude/claude-code-sdlc-template-license.md for info. -->
 # Multi-Agent Rules
 
 > *This file is a placeholder. `/onboard` rewrites it with the

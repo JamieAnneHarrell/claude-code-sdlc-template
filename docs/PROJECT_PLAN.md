@@ -705,7 +705,7 @@ This phase is the first written in the settled vocabulary (checkpoint 007 R5):
 a phase groups steps; a step is one prompt's worth of work, generally one
 Claude Code session; steps are numbered `Step N.M`.
 
-### Step 3.1 — Build (`cc-template/` only)
+### Step 3.1 — Build (`cc-template/` only) (COMPLETE)
 
 **Deliverables (all under `cc-template/`).**
 - **License provenance (R1).** New `.claude/claude-code-sdlc-template-license.md`

@@ -1,6 +1,7 @@
 ---
 description: Author and close out a manual phase-exit test plan. Stage 1 writes the plan from the phase's exit criteria; stage 2 walks the run log and trailing notes and lands dispositions across the project's docs.
 ---
+<!-- This file is part of the claude-code-sdlc-template. See .claude/claude-code-sdlc-template-license.md for info. -->
 
 # /exit-test-plan
 
