@@ -1243,7 +1243,10 @@ deliberate exception.
 2026-06-24 while dogfooding `/refresh-from-repository` (whose `Copy-Item`
 of the LF dist into the CRLF root surfaced the patchwork). If raw
 root↔`cc-template/` comparisons get noisy again, the remedy is a
-re-checkout to uniform CRLF, not adding `.gitattributes`.
+re-checkout to uniform CRLF, not adding `.gitattributes`. The earlier story
+proposing `.gitattributes` plus EOL detection inside
+`/refresh-from-repository` was dropped as moot at checkpoint 007 (R7b): the
+command never carried EOL detection, and this decision declined the file.
 
 ---
 
@@ -1426,3 +1429,128 @@ refresh's Step 7 report) tipped a write-target into proactive delivery.
 deletes reappears empty on the next refresh (an empty skeleton loses nothing).
 Refresh stays transport, not an author — the ownership model is unchanged
 (`/onboard` creates/seeds, `/wind-down` captures, `/write-documentation` reads).
+
+---
+
+## Movement → Phase → Step vocabulary, and "plan revision" for in-session plan changes
+
+**Decision.** A *movement* is the whole project plan (the `movement:`
+counter). A *phase* is a logically grouped set of tasks achieving a goal; it
+may take one prompt or ten. Each prompt is a *step* of its phase — Step 5.1 is
+the first step of Phase 5 — and a step is generally one Claude Code session,
+so steps are session-sized. Small in-session changes to the plan are a **plan
+revision** under four rules: a step that has run is never changed (follow-up
+work is a new step); a step that has not run can be rewritten or removed;
+numbers never change once assigned — append with the next number, insert
+between two entries with a letter (Step 5.2a), phases the same; Claude proposes,
+Jamie approves, Claude edits the plan and prompts, `/wind-down` records why.
+Two limits: a product-goal change is not a plan revision (it goes back to
+`/product-visioning`), and a risky change gets a `/design-review`. The three
+kinds of work — movement, in-movement enhancement, tactical — are defined once,
+beside this, in shipped `rules/project-rules.md`.
+
+**Why.** "Phase", "step" and "prompt" were used interchangeably, and nothing
+said where a prompt fits. Mid-movement discoveries routinely re-sequence a plan
+without changing the product; with no convention, the choices were an inline
+edit that risked rewriting an already-run prompt, or a full `/design-review`
+for a low-risk reorder. Letter inserts keep every existing reference to a step
+correct — nothing after the insert is renumbered.
+
+**Why not a `/reflow` command.** The four rules are prose a session can
+follow; a new command must earn its place on a live project and this one has
+not yet. Named "plan revision" because "re-flow" overstated what it is.
+
+**Why not renumber the existing plan.** The existing "Phase 2.x" labels are
+really Steps 2.x of Phase 2 with correct numbers; a rename-only sweep is
+deferred until it hurts. New entries use `Step N.M`.
+
+**Scope note.** Decided at checkpoint 007 (R5, R8), 2026-10-05. The definition
+lands in `rules/project-rules.md` at Step 3.1; ARCHITECTURE carries the
+source-side statement.
+
+---
+
+## Every command that reaches a commit point invokes `/wind-down`
+
+**Decision.** No shipped command carries an inline `git add` / `git commit`
+block. `/design-review` Stage 1 initial, `/bootstrap` (both stopping points),
+`/deployment-plan` and `/onboard` end a commit-worthy boundary by invoking
+`/wind-down`, full ritual. There is no lightweight wind-down mode and no
+sanctioned inline exception for configuration commands.
+
+**Why.** Rules 7 and 9 already say it; the inline blocks were the stale
+surface. Downstream evidence settled the policy question: after `/bootstrap`
+completed with only an inline handoff, `TODO.txt` went stale and no coherence
+sweep ran — a configuration landing is in practice a session boundary, so the
+full ritual is what was missing, not what would be excessive.
+
+**Why not a lightweight "config-commit" mode.** It would save the parts of
+`/wind-down` that the downstream case showed were needed, and it adds a mode to
+maintain.
+
+**Scope note.** Decided at checkpoint 007 (N6, N7), 2026-10-05; the edits land
+at Step 3.1. Mid-iteration paths (addendum rounds, open-another-round) still
+surface no handoff; `/wind-down` stages their pending changes at session close.
+
+---
+
+## License provenance: a plain comment per shipped file, pointing at a bundled license file
+
+**Decision.** Every shipped markdown file carries a one-line HTML comment at
+its top (below the YAML frontmatter in command files): "This file is part of
+the claude-code-sdlc-template. See .claude/claude-code-sdlc-template-license.md
+for info." That file holds the full MIT text, the distribution URL, the
+statement that the copyright applies to the original files as provided in the
+distribution, and the list of covered files. `/refresh-from-repository`
+delivers the license file into `.claude/` every run and adds the comment to any
+rules file or `CLAUDE.md` that lacks it (refresh logic version 4).
+
+**Why.** `/onboard` rewrites the shipped README and consumers replace
+`LICENSE`, so a seeded project could retain no record of the MIT grant — out of
+compliance with the notice-retention condition. A per-file pointer survives
+that; the bundled file keeps the notice itself in the copy, since a URL alone
+can die.
+
+**Why not SPDX headers.** The identifier is a tag most consumers would have to
+look up; a plain sentence does the same job.
+
+**Why not `docs/`.** `.claude/` sits with the files the license covers, cannot
+be mistaken for the project's own license or docs, and is overwritten on every
+refresh so it stays current; the `docs/` skeleton class is add-when-absent and
+never updates.
+
+**Scope note.** Decided at checkpoint 007 (R1), 2026-10-05. How the user docs
+reach adopters stays with `/deployment-plan`. The comment is unmarked text;
+refresh adds it by targeted edit, not by a new `CC-TEMPLATE-BLOCK`.
+
+---
+
+## Session start: four rules files, and a shipped output style; `CLAUDE.md` otherwise stays as is
+
+**Decision.** The session-start directive and the `collaboration-rules` block
+in `CLAUDE.md` name four rules files to read end-to-end —
+`coding-session-rules.md`, `design-philosophy-rules.md`,
+`environment-rules.md`, `project-rules.md`; `testing-rules.md` and
+`multi-agent-rules.md` are read in full before the work that needs them. The
+template ships an output style, `claude-code-sdlc-template`, that has the
+session act on `CLAUDE.md` before acting on the first message, selected by a
+shipped `.claude/settings.json`. `CLAUDE.md` is otherwise reasonable as is: no
+further thinning, no status callout, no quick-orientation section, no marker
+guardrail, no session-start skill.
+
+**Why.** Downstream sessions were opening with Bash searches and skipping
+`CLAUDE.md` directives; the output style is what fixed it (the operator also
+denied Bash at the same time, so the deny's own effect is unproven — it is a
+README suggestion for PowerShell users, not something a command sets). Project
+scope and environment rules proved load-bearing enough to belong in every
+session's first read. `TODO.txt` already carries in-flight status, and
+`project-rules.md` is the home for project orientation, so the add-to-CLAUDE.md
+stories were dropped.
+
+**Why not a "good morning" skill.** The existing session-start pattern works;
+the failure was directives being skipped, which the output style addresses at
+the system-prompt level.
+
+**Scope note.** Decided at checkpoint 007 (R6), 2026-10-05. Refresh updates
+the unmarked directive text in place rather than wrapping it in a block. The
+portability audit (what else here should ship) stays an open question.

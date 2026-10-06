@@ -691,6 +691,125 @@ the dry-read confirms a consumer could use it without the internal docs.
 
 ---
 
+## Phase 3 — Checkpoint 007 backlog batch (tactical)
+
+**Goal.** Land the work accepted at
+[checkpoint 007](design/design-review-checkpoint-007.md), the MVP close-out
+backlog groom: public-launch license provenance, the session-start output
+style, the `/design-review` / `/wind-down` / `/onboard` hardening edits, the
+work-lanes and plan-vocabulary doctrine, and the commit-handoff routing fix.
+Tactical lane — no PRD. Two session-sized steps; prompts in
+[`docs/CLAUDE_CODE_PROMPTS.md`](CLAUDE_CODE_PROMPTS.md).
+
+This phase is the first written in the settled vocabulary (checkpoint 007 R5):
+a phase groups steps; a step is one prompt's worth of work, generally one
+Claude Code session; steps are numbered `Step N.M`.
+
+### Step 3.1 — Build (`cc-template/` only)
+
+**Deliverables (all under `cc-template/`).**
+- **License provenance (R1).** New `.claude/claude-code-sdlc-template-license.md`
+  carrying the full MIT text, the distribution URL
+  (`https://github.com/JamieAnneHarrell/claude-code-sdlc-template`), a statement
+  that the copyright applies to the original files as provided in the
+  distribution, and the list of covered files (the command and rules files). A
+  plain HTML comment on every shipped markdown file — the 9 command files, the
+  6 rules files, `CLAUDE.md`, `README.md`, the 4 doc skeletons, the
+  settings-example README — reading along the lines of "This file is part of
+  the claude-code-sdlc-template. See .claude/claude-code-sdlc-template-license.md
+  for info." Placement: the top of the file (command files: below the YAML
+  frontmatter). No SPDX.
+- **Session-start output style (R6).** New
+  `.claude/output-styles/claude-code-sdlc-template.md` (Jamie's file as
+  provided) and `.claude/settings.json` selecting it (`"outputStyle":
+  "claude-code-sdlc-template"`). `README.md` gains a short suggestion for
+  Windows PowerShell users to deny Bash in their settings; no skill sets it.
+- **Refresh delivers the `.claude/` template files (R1, R6).**
+  `/refresh-from-repository` Step 4 also copies the license file and the output
+  style every run (overwrite); `settings.json` is created when absent, and when
+  present only the `outputStyle` key is merged in place. Two targeted edits
+  to unmarked template text, no new blocks: update the session-start
+  directive at the top of `CLAUDE.md` to upstream's wording, and add the
+  provenance comment at the top of any rules file or `CLAUDE.md` that lacks
+  it. Refresh logic version 3 → 4.
+- **Four-file session-start read (R6).** `CLAUDE.md` top-of-file directive and
+  `collaboration-rules` block name four rules files
+  (`coding-session-rules.md`, `design-philosophy-rules.md`,
+  `environment-rules.md`, `project-rules.md`), using Jamie's block text. The
+  directive stays unmarked; refresh updates its text in place.
+- **Work lanes + plan vocabulary (R5, R8).** One new `CC-TEMPLATE-BLOCK` in
+  `rules/project-rules.md`: the three kinds of work (movement / in-movement
+  enhancement / tactical); the Movement → Phase → Step definition in Jamie's
+  words (a phase is a logically grouped set of tasks achieving a goal, one
+  prompt or ten; each prompt is a step — Step 5.1 is the first step of Phase 5;
+  a step is generally one Claude Code session); and the **plan revision**
+  convention — (1) a step that has run is never changed, follow-up work is a new
+  step; (2) a step that has not run can be rewritten or removed; (3) numbers
+  never change once assigned — add at the end with the next number, insert in
+  between with a letter (Step 5.2a between 5.2 and 5.3), phases the same;
+  (4) Claude proposes, Jamie approves, Claude edits the plan and prompts,
+  `/wind-down` records why. Limits: a product-goal change is not a plan
+  revision (→ `/product-visioning`); a risky change gets a `/design-review`.
+- **`/design-review` hardening (R2, N6).** In `design-review.md`, each one to
+  three lines: S1.1 reads `docs/open-questions.md` with Abandoned Approaches as
+  hard constraints; a security bullet in S1.3 (imported code / instructions,
+  network, credentials, untrusted input); a pin-every-pinnable composition rule
+  in S1.4; a "mid-round `/wind-down` is optional" line in the mid-iteration
+  reports; S1.8's inline git block deleted in favor of invoking `/wind-down`.
+- **`/wind-down` hardening (R2, R4).** In `wind-down.md`: the no-tombstone rule
+  (fully abandoned → Abandoned Approaches; partially superseded → rewrite in
+  place) in Step 3; a backlog-cleanup `/design-review` line in the
+  movement-complete menu; two sentences making the coherence sweep repo-wide —
+  mechanical drift and small not-by-design errors fixed inline, judgment calls
+  surfaced.
+- **`/onboard` prescriptive prompts (R3).** Four requirement lines in the
+  "Per-prompt structure" for feature prompts only — self-contained testable exit
+  criteria; scope items that state the contract; read-first naming specific
+  anchors; constraints naming the trap — replacing the "this template's own
+  `docs/CLAUDE_CODE_PROMPTS.md` is the canonical shape" pointer.
+- **Commit-handoff routing (N7).** Inline git blocks deleted from
+  `bootstrap.md` (Step 7 and Stage 2 S3), `deployment-plan.md` and
+  `onboard.md`; each boundary ends by invoking `/wind-down`.
+
+**Exit criteria.** Every file above exists or is edited under `cc-template/`
+only; root is untouched. Every shipped markdown file carries the provenance
+comment and the license file carries the MIT text + URL + scope statement.
+`refresh-from-repository.md` names the three new deliverables and the two
+targeted edits, and stamps version 4. No shipped command other than
+`wind-down.md` contains a `git commit` block. `project-rules.md` defines the
+three kinds of work, the vocabulary, and plan revision in one block. `CLAUDE.md`
+names four session-start rules files in both the directive and the
+`collaboration-rules` block.
+
+### Step 3.2 — Propagate to root and document
+
+**Deliverables.**
+- Source-mode `/refresh-from-repository` at root: the 3 → 4 bump makes the
+  first run restage commands-only (re-invoke); the second delivers the license
+  file, output style and `settings.json`, replaces the commands, and merges the
+  blocks — takes upstream on `collaboration-rules`, adds
+  `work-lanes-and-plan-vocabulary` to `project-rules.md` — and makes the two
+  targeted edits: the `CLAUDE.md` directive text updated to four files, the
+  provenance comment added at the top of `CLAUDE.md` and each rules file; a
+  third run verifies quiet. Root is edited only by the refresh run, never by
+  hand.
+- `/write-documentation` pass (reconcile / revise) covering the four-file
+  session start, the output style + settings and the Windows deny-Bash
+  suggestion, the three kinds of work and the Movement/Phase/Step vocabulary,
+  plan revision, the license comment and file, the commit-handoff routing, and
+  the two write-ups from N2 (the in-movement lane; the file-lifecycle patterns).
+
+**Exit criteria.** Root `.claude/commands/` byte-identical to `cc-template/`;
+`.claude/claude-code-sdlc-template-license.md`,
+`.claude/output-styles/claude-code-sdlc-template.md` and `.claude/settings.json`
+present at root; root `CLAUDE.md` and all six root rules files carry the
+provenance comment; the root directive names four rules files exactly once;
+the third refresh is quiet. The documentation manifest is
+re-stamped current through Phase 3 and the user-facing docs describe the new
+behavior. The output-style experiment is live for the following session.
+
+---
+
 ## Out of scope (post-MVP, deferred indefinitely)
 
 - Markdown linting / style enforcement automation.

@@ -311,10 +311,19 @@ creates; `/wind-down` captures):
   it to detect a fully-landed movement (every non-roadmap phase
   `(COMPLETE)`, ignoring `(roadmap)` / `(SUPERSEDED …)`). Don't rename
   the token without auditing `/wind-down` and `/design-review`.
-- **Phase vs. step terminology:** a *phase* is a top-level integer (Phase 1,
-  Phase 2, Phase 3); a *step* is a dot-numbered entry within a phase (2.7, 2.8).
-  The plan currently labels dot-numbered entries "Phase 2.x"; "Phase 2.x" and
-  "Step 2.x" are used interchangeably for now (checkpoint 006 R4).
+- **Movement → Phase → Step (checkpoint 007 R5, R8):** a *movement* is the
+  whole project plan (the `movement:` counter). A *phase* is a logically grouped
+  set of tasks achieving a goal; it may take one prompt or ten. Each prompt is a
+  *step* of the phase — Step 5.1 is the first step of Phase 5, Step 5.2 the
+  second; a step has exactly one prompt and is generally one Claude Code
+  session. Numbers never change once assigned: a new step or phase appended at
+  the end takes the next number; one inserted in between takes a letter (Step
+  5.2a between 5.2 and 5.3). A step that has run is never changed; follow-up
+  work is a new step. Small in-session changes to the plan under these rules
+  are a *plan revision*; a product-goal change is not (→ `/product-visioning`),
+  and a risky change gets a `/design-review`. Entries written before Phase 3 are
+  labelled "Phase 2.x" for what are Steps 2.x of Phase 2; they keep that label
+  until a future vocabulary sweep (rename only, numbers kept).
 
 ## Runtime / data flow
 
@@ -353,7 +362,14 @@ then reconciles `rules/*.md` + `CLAUDE.md` against the downstream's
 current state using the CC-TEMPLATE-BLOCK marker-state model above
 (two-way compare + ask-once; the executing session merges,
 preserving `ONBOARD-FILL` regions), and delivers any template-shipped
-doc skeleton (`cc-template/docs/*.md`) the downstream lacks. When a downstream's loaded
+doc skeleton (`cc-template/docs/*.md`) the downstream lacks. From refresh
+logic version 4 (checkpoint 007 R1, R6) it also delivers the template's
+`.claude/` files: the license file and the session-start output style are
+copied every run, and `.claude/settings.json` is created when absent or
+has only its `outputStyle` key merged when present, plus two targeted
+edits to unmarked template text (the `CLAUDE.md` session-start
+directive; the provenance comment at the top of rules files and
+`CLAUDE.md`). When a downstream's loaded
 refresh logic is behind upstream, it self-modifies: pulls the
 commands skills-only first, then asks the consumer to re-invoke so
 the new logic runs the merge. Built in Phase 2.1; the Option A

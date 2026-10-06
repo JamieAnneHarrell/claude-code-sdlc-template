@@ -115,7 +115,16 @@ mechanism — now an abandoned approach). It also **delivers
 template-shipped doc skeletons** (`cc-template/docs/*.md`) the
 downstream lacks — add-when-absent, never overwritten (the
 `documentation-guidance.md` class was added at refresh logic
-version 3). Template-managed regions
+version 3). From logic version 4 (checkpoint 007 R1, R6) it also
+delivers the template's `.claude/` files: the license file
+(`.claude/claude-code-sdlc-template-license.md`) and the session-start
+output style are copied every run, and `.claude/settings.json` is
+created when absent or has only its `outputStyle` key merged in place
+when present. Version 4 also makes two targeted edits to unmarked
+template text — the session-start directive at the top of `CLAUDE.md`
+is updated to upstream's wording, and the provenance comment is added
+at the top of any rules file or `CLAUDE.md` that lacks it; no new
+markers are introduced for either. Template-managed regions
 are wrapped in `CC-TEMPLATE-BLOCK` markers that carry per-block
 state: `template-owned` (normal, tracks upstream), `forked`
 (consumer-owned, set by asking once), and `removed` (a tombstone
@@ -238,6 +247,17 @@ that behavior lands — never before. New movements arise only at a finished
 movement's end via `/product-visioning` → PRD → `/onboard`. The store never
 writes `PRODUCT_VISION.md`.
 
+**FR-19: The template ships a session-start output style.** The distributable
+carries `.claude/output-styles/claude-code-sdlc-template.md` — an output style
+that has the session act on `CLAUDE.md` (read its directives and the files they
+name, confirm what they ask) before acting on the first user message — and
+`.claude/settings.json` selecting it (`"outputStyle":
+"claude-code-sdlc-template"`). Both reach existing downstreams through
+`/refresh-from-repository` (FR-13). Denying the `Bash` tool for PowerShell
+projects is a README suggestion only; no command writes it. Landed at
+[checkpoint 007](design/design-review-checkpoint-007.md) R6 from downstream
+use, where sessions had been skipping `CLAUDE.md` directives at open.
+
 ## Non-functional requirements
 
 **NFR-1: Cross-platform.** Windows 11 is primary; Linux and macOS
@@ -315,7 +335,13 @@ non-fork projects. Source-only docs at repo root (REQUIREMENTS,
 ARCHITECTURE, PROJECT_PLAN, CLAUDE_CODE_PROMPTS, design intake,
 design-decisions, open-questions, this README, root CLAUDE.md)
 ship under CC BY-NC-ND 4.0 — those project-management docs are
-not meant to be redistributed.
+not meant to be redistributed. Because `/onboard` rewrites the shipped
+README and consumers replace `LICENSE`, every shipped markdown file
+carries a plain HTML provenance comment pointing at
+`.claude/claude-code-sdlc-template-license.md`, which holds the full MIT
+text, the distribution URL, and the statement that the copyright
+applies to the original files as provided in the distribution
+(checkpoint 007 R1).
 
 **NFR-8: File ownership doesn't overlap.** Each command's "What this
 command does NOT do" section lists what the others own. `/onboard` owns
